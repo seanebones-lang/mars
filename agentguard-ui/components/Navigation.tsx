@@ -1,7 +1,28 @@
 'use client';
 
-import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton, Tooltip } from '@mui/material';
-import { Visibility, Dashboard, Assessment, Science, LightMode, DarkMode } from '@mui/icons-material';
+import React from 'react';
+import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton, Tooltip, Menu, MenuItem, ListItemIcon, ListItemText } from '@mui/material';
+import { 
+  VisibilityOutlined, 
+  DashboardOutlined, 
+  AssessmentOutlined, 
+  ScienceOutlined, 
+  LightModeOutlined, 
+  DarkModeOutlined, 
+  CloudUploadOutlined, 
+  AnalyticsOutlined, 
+  WebhookOutlined, 
+  RocketLaunchOutlined, 
+  ExpandMoreOutlined, 
+  CodeOutlined, 
+  SettingsOutlined,
+  MonitorHeartOutlined,
+  TuneOutlined,
+  SecurityOutlined,
+  SpeedOutlined,
+  BugReportOutlined,
+  PlayArrowOutlined
+} from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTheme } from '@mui/material/styles';
@@ -14,14 +35,64 @@ interface NavigationProps {
 export default function Navigation({ darkMode = false, onToggleDarkMode }: NavigationProps) {
   const pathname = usePathname();
   const theme = useTheme();
+  const [monitoringAnchor, setMonitoringAnchor] = React.useState<null | HTMLElement>(null);
+  const [integrationsAnchor, setIntegrationsAnchor] = React.useState<null | HTMLElement>(null);
+  const [testingAnchor, setTestingAnchor] = React.useState<null | HTMLElement>(null);
 
-  const navItems = [
-    { label: 'Dashboard', href: '/', icon: <Dashboard /> },
-    { label: 'Live Monitor', href: '/monitor', icon: <Assessment /> },
-    { label: 'Quick Test', href: '/freeform', icon: <Science /> },
-    { label: 'Demo', href: '/demo', icon: <Science /> },
-    { label: 'Metrics', href: '/metrics', icon: <Assessment /> },
+  // Core navigation - just Dashboard
+  const coreNavItems = [
+    { label: 'Dashboard', href: '/', icon: <DashboardOutlined /> },
   ];
+
+  // Monitoring & Analytics dropdown
+  const monitoringItems = [
+    { label: 'Live Monitor', href: '/monitor', icon: <MonitorHeartOutlined />, description: 'Real-time agent monitoring' },
+    { label: 'Analytics', href: '/analytics', icon: <AnalyticsOutlined />, description: 'Performance insights & trends' },
+    { label: 'Performance', href: '/performance', icon: <SpeedOutlined />, description: 'System health & metrics' },
+    { label: 'Custom Rules', href: '/custom-rules', icon: <TuneOutlined />, description: 'Industry-specific detection' },
+  ];
+
+  // Deploy & Integrations dropdown
+  const integrationItems = [
+    { label: 'Webhooks', href: '/webhooks', icon: <WebhookOutlined />, description: 'Slack, Teams, Email alerts' },
+    { label: 'Python SDK', href: '/sdk', icon: <CodeOutlined />, description: 'Enterprise integration library' },
+    { label: 'Batch Processing', href: '/batch', icon: <CloudUploadOutlined />, description: 'Bulk analysis & exports' },
+    { label: 'API Docs', href: '/docs', icon: <SettingsOutlined />, description: 'REST API documentation' },
+  ];
+
+  // Testing & Demo dropdown
+  const testingItems = [
+    { label: 'Quick Test', href: '/freeform', icon: <ScienceOutlined />, description: 'Test agent outputs instantly' },
+    { label: 'Demo Mode', href: '/demo', icon: <PlayArrowOutlined />, description: 'Interactive demonstration' },
+    { label: 'Debug Tools', href: '/debug', icon: <BugReportOutlined />, description: 'Advanced debugging features' },
+  ];
+
+  // Dropdown handlers
+  const handleMonitoringClick = (event: React.MouseEvent<HTMLElement>) => {
+    setMonitoringAnchor(event.currentTarget);
+  };
+  const handleMonitoringClose = () => {
+    setMonitoringAnchor(null);
+  };
+
+  const handleIntegrationsClick = (event: React.MouseEvent<HTMLElement>) => {
+    setIntegrationsAnchor(event.currentTarget);
+  };
+  const handleIntegrationsClose = () => {
+    setIntegrationsAnchor(null);
+  };
+
+  const handleTestingClick = (event: React.MouseEvent<HTMLElement>) => {
+    setTestingAnchor(event.currentTarget);
+  };
+  const handleTestingClose = () => {
+    setTestingAnchor(null);
+  };
+
+  // Active state checks
+  const isMonitoringActive = monitoringItems.some(item => pathname === item.href);
+  const isIntegrationsActive = integrationItems.some(item => pathname === item.href);
+  const isTestingActive = testingItems.some(item => pathname === item.href);
 
   return (
     <AppBar position="static" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
@@ -40,7 +111,7 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
               boxShadow: '0 3px 10px rgba(25, 118, 210, 0.3)',
             }}
           >
-            <Visibility sx={{ color: 'white', fontSize: '20px' }} />
+            <VisibilityOutlined sx={{ color: 'white', fontSize: '20px' }} />
           </Box>
           <Box sx={{ flexGrow: 1 }}>
             <Typography
@@ -64,7 +135,8 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
           </Box>
 
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
-            {navItems.map((item) => (
+            {/* Core Navigation Items */}
+            {coreNavItems.map((item) => (
               <Button
                 key={item.href}
                 component={Link}
@@ -81,6 +153,186 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
                 {item.label}
               </Button>
             ))}
+
+            {/* Monitoring Dropdown */}
+            <Button
+              onClick={handleMonitoringClick}
+              endIcon={<ExpandMoreOutlined />}
+              startIcon={<MonitorHeartOutlined />}
+              color="inherit"
+              sx={{
+                fontWeight: isMonitoringActive ? 600 : 400,
+                borderBottom: isMonitoringActive ? 2 : 0,
+                borderRadius: 0,
+                borderColor: 'primary.main',
+              }}
+            >
+              Monitor
+            </Button>
+
+            {/* Testing Dropdown */}
+            <Button
+              onClick={handleTestingClick}
+              endIcon={<ExpandMoreOutlined />}
+              startIcon={<ScienceOutlined />}
+              color="inherit"
+              sx={{
+                fontWeight: isTestingActive ? 600 : 400,
+                borderBottom: isTestingActive ? 2 : 0,
+                borderRadius: 0,
+                borderColor: 'primary.main',
+              }}
+            >
+              Test
+            </Button>
+
+            {/* Deploy Dropdown */}
+            <Button
+              onClick={handleIntegrationsClick}
+              endIcon={<ExpandMoreOutlined />}
+              startIcon={<RocketLaunchOutlined />}
+              color="inherit"
+              sx={{
+                fontWeight: isIntegrationsActive ? 600 : 400,
+                borderBottom: isIntegrationsActive ? 2 : 0,
+                borderRadius: 0,
+                borderColor: 'primary.main',
+              }}
+            >
+              Deploy
+            </Button>
+
+            {/* Monitoring Menu */}
+            <Menu
+              anchorEl={monitoringAnchor}
+              open={Boolean(monitoringAnchor)}
+              onClose={handleMonitoringClose}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  minWidth: 280,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }
+              }}
+            >
+              {monitoringItems.map((item) => (
+                <MenuItem
+                  key={item.href}
+                  component={Link}
+                  href={item.href}
+                  onClick={handleMonitoringClose}
+                  sx={{
+                    py: 1.5,
+                    backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    secondary={item.description}
+                    primaryTypographyProps={{
+                      fontWeight: pathname === item.href ? 600 : 400,
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: '0.75rem',
+                      color: 'text.secondary',
+                    }}
+                  />
+                </MenuItem>
+              ))}
+            </Menu>
+
+            {/* Testing Menu */}
+            <Menu
+              anchorEl={testingAnchor}
+              open={Boolean(testingAnchor)}
+              onClose={handleTestingClose}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  minWidth: 280,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }
+              }}
+            >
+              {testingItems.map((item) => (
+                <MenuItem
+                  key={item.href}
+                  component={Link}
+                  href={item.href}
+                  onClick={handleTestingClose}
+                  sx={{
+                    py: 1.5,
+                    backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    secondary={item.description}
+                    primaryTypographyProps={{
+                      fontWeight: pathname === item.href ? 600 : 400,
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: '0.75rem',
+                      color: 'text.secondary',
+                    }}
+                  />
+                </MenuItem>
+              ))}
+            </Menu>
+            
+            {/* Deploy Menu */}
+            <Menu
+              anchorEl={integrationsAnchor}
+              open={Boolean(integrationsAnchor)}
+              onClose={handleIntegrationsClose}
+              PaperProps={{
+                sx: {
+                  mt: 1,
+                  minWidth: 280,
+                  boxShadow: '0 8px 32px rgba(0,0,0,0.12)',
+                  border: '1px solid',
+                  borderColor: 'divider',
+                }
+              }}
+            >
+              {integrationItems.map((item) => (
+                <MenuItem
+                  key={item.href}
+                  component={Link}
+                  href={item.href}
+                  onClick={handleIntegrationsClose}
+                  sx={{
+                    py: 1.5,
+                    backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
+                  }}
+                >
+                  <ListItemIcon sx={{ minWidth: 40 }}>
+                    {item.icon}
+                  </ListItemIcon>
+                  <ListItemText
+                    primary={item.label}
+                    secondary={item.description}
+                    primaryTypographyProps={{
+                      fontWeight: pathname === item.href ? 600 : 400,
+                    }}
+                    secondaryTypographyProps={{
+                      fontSize: '0.75rem',
+                      color: 'text.secondary',
+                    }}
+                  />
+                </MenuItem>
+              ))}
+            </Menu>
             
             {/* Dark Mode Toggle */}
             <Tooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
@@ -89,7 +341,7 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
                 color="inherit"
                 sx={{ ml: 1 }}
               >
-                {darkMode ? <LightMode /> : <DarkMode />}
+                {darkMode ? <LightModeOutlined /> : <DarkModeOutlined />}
               </IconButton>
             </Tooltip>
           </Box>

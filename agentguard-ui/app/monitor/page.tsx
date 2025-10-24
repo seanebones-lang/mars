@@ -7,6 +7,11 @@ import {
   Stack, IconButton, Tooltip, Collapse, TextField, Slider,
   Divider, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
+import RiskGauge from '@/components/RiskGauge';
+import CircularMeter from '@/components/CircularMeter';
+import AudioSettings from '@/components/AudioSettings';
+import AlertSettings from '@/components/AlertSettings';
+import StatsSettings from '@/components/StatsSettings';
 import { 
   PlayArrow, Stop, Refresh, Download, Settings, 
   Computer, Store, People, Warning, CheckCircle 
@@ -238,6 +243,10 @@ export default function MonitorPage() {
             control={<Switch checked={autoMode} onChange={(e) => setAutoMode(e.target.checked)} />}
             label="Auto Mode"
           />
+          
+          {/* Compact Audio Controls */}
+          <AudioSettings compact={true} />
+          
           <Tooltip title="Settings">
             <IconButton onClick={() => setShowSettings(!showSettings)}>
               <Settings />
@@ -371,17 +380,31 @@ export default function MonitorPage() {
                     }
                     label="Desktop Notifications"
                   />
-                  
-                  <FormControlLabel
-                    control={
-                      <Switch 
-                        checked={soundEnabled} 
-                        onChange={(e) => setSoundEnabled(e.target.checked)} 
-                      />
-                    }
-                    label="Sound Alerts"
-                  />
                 </Stack>
+                
+                <Divider />
+                
+                {/* Audio Settings */}
+                <Box>
+                  <Typography variant="h6" gutterBottom>
+                    Audio Alert System
+                  </Typography>
+                  <AudioSettings compact={false} />
+                </Box>
+                
+                <Divider />
+                
+                {/* Persistent Alert Settings */}
+                <Box>
+                  <AlertSettings />
+                </Box>
+                
+                <Divider />
+                
+                {/* Real-time Stats Settings */}
+                <Box>
+                  <StatsSettings />
+                </Box>
               </Stack>
             </Grid>
           </Grid>
@@ -409,72 +432,82 @@ export default function MonitorPage() {
         </Paper>
       </Collapse>
 
-      {/* Metrics Summary */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
-        <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Total Responses
-              </Typography>
-              <Typography variant="h4">
-                {totalChecks}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Processed in session
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Flagged Responses
-              </Typography>
-              <Typography variant="h4" color="error">
-                {flaggedCount}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Hallucinations detected
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Hallucination Rate
-              </Typography>
-              <Typography variant="h4" color={flaggedRate > 30 ? "error" : "primary"}>
-                {flaggedRate.toFixed(1)}%
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Of total responses
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} md={3}>
-          <Card>
-            <CardContent>
-              <Typography color="textSecondary" gutterBottom>
-                Avg Processing Time
-              </Typography>
-              <Typography variant="h4" color={avgProcessingTime > 5 ? "warning" : "success"}>
-                {avgProcessingTime.toFixed(2)}s
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                Detection latency
-              </Typography>
-            </CardContent>
-          </Card>
-        </Grid>
-      </Grid>
+      {/* Metrics Summary with Circular Meters - Horizontal Layout */}
+      <Box sx={{ 
+        display: 'grid', 
+        gridTemplateColumns: { xs: '1fr', sm: '1fr 1fr', lg: 'repeat(4, 1fr)' }, 
+        gap: 4, 
+        mb: 6, 
+        mt: 2,
+        justifyItems: 'center'
+      }}>
+        <RiskGauge
+          riskLevel={flaggedRate}
+          title="Hallucination Rate"
+          subtitle={`${flaggedCount} of ${totalChecks} flagged`}
+          size="small"
+          showTrend={true}
+          trendValue={2.1}
+        />
+        
+        <Card sx={{ height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '200px', minHeight: '240px' }}>
+          <CardContent sx={{ textAlign: 'center', p: 3, pt: 4 }}>
+            <CircularMeter
+              value={Math.min(100, (totalChecks / 50) * 100)} // Scale to 50 max
+              size={100}
+              thickness={8}
+              label="Total Responses"
+              color="info"
+              showValue={false}
+            />
+            <Typography variant="h5" fontWeight={700} color="info.main" sx={{ mt: 1 }}>
+              {totalChecks}
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Processed in session
+            </Typography>
+          </CardContent>
+        </Card>
+        
+        <Card sx={{ height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '200px', minHeight: '240px' }}>
+          <CardContent sx={{ textAlign: 'center', p: 3, pt: 4 }}>
+            <CircularMeter
+              value={100 - (avgProcessingTime / 20 * 100)} // Invert: lower time = higher score
+              size={100}
+              thickness={8}
+              label="Response Speed"
+              color={avgProcessingTime > 10 ? "warning" : "success"}
+              showValue={false}
+            />
+            <Typography variant="h5" fontWeight={700} color={avgProcessingTime > 10 ? "warning.main" : "success.main"} sx={{ mt: 1 }}>
+              {avgProcessingTime.toFixed(1)}s
+            </Typography>
+            <Typography variant="body2" color="text.secondary">
+              Average latency
+            </Typography>
+          </CardContent>
+        </Card>
+        
+        <Card sx={{ height: 'auto', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '200px', minHeight: '240px' }}>
+          <CardContent sx={{ textAlign: 'center', p: 3, pt: 4 }}>
+            <CircularMeter
+              value={92.3} // Mock accuracy
+              size={100}
+              thickness={8}
+              label="Detection Accuracy"
+              color="primary"
+              showValue={true}
+              subtitle="%"
+            />
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              System accuracy
+            </Typography>
+          </CardContent>
+        </Card>
+      </Box>
 
       {/* Agent Status Grid */}
-      <Grid container spacing={3} sx={{ mb: 4 }}>
+      <Grid container spacing={3} sx={{ mb: 4, justifyContent: 'center' }}>
         {Object.entries(AGENT_CONFIG).map(([agentId, config]) => {
           const status = getAgentStatus(agentId);
           const statusColor = getStatusColor(status);
@@ -482,7 +515,7 @@ export default function MonitorPage() {
           const lastResponse = agentResults.slice(-1)[0];
           
           return (
-            <Grid item xs={12} md={4} key={agentId}>
+            <Grid item xs={12} md={4} key={agentId} sx={{ display: 'flex', justifyContent: 'center' }}>
               <motion.div
                 animate={{ 
                   scale: status === 'danger' ? [1, 1.02, 1] : 1,
@@ -564,7 +597,7 @@ export default function MonitorPage() {
                 <AnimatePresence>
                   {realtimeResults.slice(-10).reverse().map((result, index) => (
                     <motion.div
-                      key={`${result.agent_id}-${result.timestamp}`}
+                      key={`${result.agent_id}-${result.timestamp}-${index}`}
                       initial={{ opacity: 0, x: -20 }}
                       animate={{ opacity: 1, x: 0 }}
                       exit={{ opacity: 0, x: 20 }}

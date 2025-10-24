@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { WatcherThemeProvider, useThemeMode } from '@/contexts/ThemeContext';
 import Navigation from '@/components/Navigation';
+import PersistentAlerts from '@/components/PersistentAlerts';
+import RealtimeStatsOverlay from '@/components/RealtimeStatsOverlay';
 import { Toaster } from 'react-hot-toast';
 import { Box, Typography, Link } from '@mui/material';
 import { LinkedIn } from '@mui/icons-material';
@@ -19,6 +21,12 @@ function AppContent({ children }: { children: React.ReactNode }) {
       <main>
         {children}
       </main>
+      
+      {/* Global Persistent Alerts */}
+      <PersistentAlerts position="top-right" maxWidth={420} />
+      
+      {/* Real-time Stats Overlay */}
+      <RealtimeStatsOverlay position="top-left" maxWidth={350} />
       
       {/* Footer with contact info */}
       <Box

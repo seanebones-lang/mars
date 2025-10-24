@@ -1,0 +1,2 @@
+# This would be a low-priority alert sound file
+# For now, we'll create a placeholder and use Web Audio API to generate tones

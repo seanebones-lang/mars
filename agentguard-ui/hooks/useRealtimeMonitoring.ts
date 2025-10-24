@@ -6,6 +6,9 @@
 import { useEffect, useState, useCallback, useRef } from 'react';
 import { useStore } from '@/lib/store';
 import toast from 'react-hot-toast';
+import { audioAlerts } from '@/lib/audioAlerts';
+import { persistentAlerts } from '@/lib/persistentAlerts';
+import { realtimeStats } from '@/lib/realtimeStats';
 
 export interface RealtimeData {
   type: string;
@@ -79,15 +82,11 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
     }
   }, []);
 
-  const playAlertSound = useCallback(() => {
+  const playAlertSound = useCallback(async (agentId: string, riskScore: number, segments: string[] = []) => {
     try {
-      const audio = new Audio('/alert-sound.mp3');
-      audio.volume = 0.3; // Moderate volume
-      audio.play().catch(() => {
-        // Ignore audio play failures (user interaction required, etc.)
-      });
+      await audioAlerts.playHallucinationAlert(agentId, riskScore, segments);
     } catch (error) {
-      // Ignore audio errors
+      console.error('Failed to play audio alert:', error);
     }
   }, []);
 
@@ -99,6 +98,15 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         case 'detection_result':
           setLastMessage(data);
           addRealtimeResult(data);
+          
+          // Track stats
+          realtimeStats.addResponse({
+            agentId: data.agent_id,
+            riskScore: data.hallucination_risk,
+            latency: data.processing_time_ms,
+            flagged: data.flagged,
+            timestamp: new Date(data.timestamp)
+          });
           
           // Show alerts for flagged responses
           if (data.flagged) {
@@ -115,8 +123,18 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
               }
             );
             
-            playAlertSound();
+            playAlertSound(data.agent_id, data.hallucination_risk, data.flagged_segments);
             showNotification(data);
+            
+            // Create persistent alert for high-risk detections
+            if (data.hallucination_risk >= 0.5) {
+              persistentAlerts.createHallucinationAlert(
+                data.agent_id,
+                data.hallucination_risk,
+                data.flagged_segments,
+                data.mitigation
+              );
+            }
           } else {
             // Show success toast for clean responses (less prominent)
             toast.success(
@@ -135,11 +153,13 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
           
         case 'monitoring_started':
           toast.success('🟢 Live monitoring started', { duration: 3000 });
+          audioAlerts.playSystemAlert('monitoring_started');
           setError(null);
           break;
           
         case 'monitoring_stopped':
           toast('🔴 Live monitoring stopped', { duration: 3000 });
+          audioAlerts.playSystemAlert('monitoring_stopped');
           if (data.stats) {
             setConnectionStats(data.stats);
           }
@@ -147,6 +167,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
           
         case 'connection_established':
           console.log('WebSocket connection established');
+          audioAlerts.playSystemAlert('connection_restored');
           setError(null);
           setReconnectAttempts(0);
           break;
@@ -164,6 +185,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         case 'processing_error':
           console.error('Processing error:', data.error);
           toast.error(`Processing error for ${data.agent_id}: ${data.error}`);
+          realtimeStats.recordError();
           break;
           
         default:
@@ -287,6 +309,18 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         setConnectionState('disconnected');
         setSocket(null);
         
+        // Play connection lost alert if it wasn't a manual disconnect
+        if (event.code !== 1000) {
+          audioAlerts.playSystemAlert('connection_lost');
+          persistentAlerts.createAlert({
+            title: '🔴 Connection Lost',
+            message: 'WebSocket connection to monitoring service has been lost',
+            severity: 'high',
+            category: 'connection',
+            metadata: { code: event.code, reason: event.reason }
+          });
+        }
+        
         // Only attempt reconnect if it wasn't a manual disconnect
         if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
           setReconnectAttempts(prev => prev + 1);
@@ -302,6 +336,14 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         console.error('WebSocket error:', error);
         setConnectionState('error');
         setError('WebSocket connection error');
+        audioAlerts.playSystemAlert('connection_lost');
+        persistentAlerts.createAlert({
+          title: '❌ Connection Error',
+          message: 'Failed to establish WebSocket connection to monitoring service',
+          severity: 'critical',
+          category: 'connection',
+          metadata: { error: error.toString() }
+        });
         
         // Attempt reconnect on error
         if (reconnectAttempts < maxReconnectAttempts) {

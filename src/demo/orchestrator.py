@@ -23,6 +23,7 @@ class AgentResponse:
     timestamp: str
     confidence: float = 0.8
     response_time_ms: int = 1500
+    unique_id: str = ""
 
 
 class AgentSimulator:
@@ -46,6 +47,9 @@ class AgentSimulator:
         self.response_count += 1
         self.last_response_time = datetime.utcnow()
         
+        # Create unique ID for this response
+        unique_id = f"{self.agent_id}-{self.response_count}-{int(self.last_response_time.timestamp() * 1000000)}"
+        
         return AgentResponse(
             agent_id=self.agent_id,
             query=scenario["query"],
@@ -53,7 +57,8 @@ class AgentSimulator:
             expected_hallucination=scenario["hallucinated"],
             timestamp=self.last_response_time.isoformat(),
             confidence=scenario.get("confidence", 0.8),
-            response_time_ms=response_time
+            response_time_ms=response_time,
+            unique_id=unique_id
         )
 
 

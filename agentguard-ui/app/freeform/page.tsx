@@ -2,6 +2,7 @@
 
 import { Container, Box, Typography } from '@mui/material';
 import FreeformTest from '@/components/FreeformTest';
+import RAGTestForm from '@/components/RAGTestForm';
 
 export default function FreeformPage() {
   return (
@@ -15,7 +16,14 @@ export default function FreeformPage() {
         </Typography>
       </Box>
 
-      <FreeformTest />
+      <RAGTestForm />
+      
+      <Box sx={{ mt: 4 }}>
+        <Typography variant="h6" gutterBottom>
+          🔄 Legacy Test (Without RAG)
+        </Typography>
+        <FreeformTest />
+      </Box>
     </Container>
   );
 }

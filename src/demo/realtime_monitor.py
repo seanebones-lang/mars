@@ -14,6 +14,7 @@ from .orchestrator import DemoOrchestrator, AgentResponse
 from ..judges.ensemble_judge import EnsembleJudge
 from ..models.schemas import AgentTestRequest, HallucinationReport
 from ..api.websocket import get_connection_manager
+from ..services.webhook_service import get_webhook_service, WebhookAlert
 
 logger = logging.getLogger(__name__)
 
@@ -28,8 +29,10 @@ class RealtimeMonitor:
         self.orchestrator = DemoOrchestrator()
         self.judge = EnsembleJudge(claude_api_key)
         self.connection_manager = get_connection_manager()
+        self.webhook_service = get_webhook_service()
         self.is_monitoring = False
         self.monitoring_task: Optional[asyncio.Task] = None
+        self.processed_responses: set = set()  # Track processed response IDs
         self.stats = {
             "total_responses": 0,
             "flagged_responses": 0,
@@ -91,6 +94,9 @@ class RealtimeMonitor:
                 pass
             self.monitoring_task = None
         
+        # Clear processed responses for fresh start
+        self.processed_responses.clear()
+        
         logger.info("Stopped real-time monitoring")
         
         # Broadcast monitoring stopped
@@ -125,6 +131,21 @@ class RealtimeMonitor:
     
     async def _process_agent_response(self, agent_response: AgentResponse) -> None:
         """Process a single agent response through the detection pipeline."""
+        # Check for duplicates
+        response_id = agent_response.unique_id or f"{agent_response.agent_id}-{agent_response.timestamp}"
+        if response_id in self.processed_responses:
+            logger.warning(f"Skipping duplicate response: {response_id}")
+            return
+        
+        self.processed_responses.add(response_id)
+        
+        # Clean up old processed IDs (keep only last 1000)
+        if len(self.processed_responses) > 1000:
+            # Remove oldest 200 entries
+            old_ids = list(self.processed_responses)[:200]
+            for old_id in old_ids:
+                self.processed_responses.discard(old_id)
+        
         start_time = datetime.utcnow()
         
         try:
@@ -174,6 +195,10 @@ class RealtimeMonitor:
                 "expected_hallucination": agent_response.expected_hallucination,
                 "detection_accuracy": (detection_result.hallucination_risk > 0.5) == agent_response.expected_hallucination
             }
+            
+            # Send webhook alerts for high-risk detections
+            if detection_result.hallucination_risk > 0.5:
+                await self._send_webhook_alert(agent_response, detection_result, processing_time)
             
             # Log to MLflow
             await self._log_to_mlflow(agent_response, detection_result, processing_time)
@@ -231,6 +256,58 @@ class RealtimeMonitor:
         except Exception as e:
             logger.error(f"Error generating mitigation: {e}")
             return "Please review this response for accuracy."
+    
+    async def _send_webhook_alert(self, 
+                                agent_response: AgentResponse, 
+                                detection_result: HallucinationReport,
+                                processing_time: float) -> None:
+        """Send webhook alert for high-risk hallucination detection."""
+        try:
+            # Determine severity based on risk level
+            if detection_result.hallucination_risk >= 0.9:
+                severity = "critical"
+            elif detection_result.hallucination_risk >= 0.7:
+                severity = "high"
+            else:
+                severity = "medium"
+            
+            # Create webhook alert
+            alert = WebhookAlert(
+                alert_id=f"hal-{agent_response.unique_id}",
+                alert_type="hallucination",
+                severity=severity,
+                title=f"Hallucination Detected: {agent_response.agent_id}",
+                message=f"Agent '{agent_response.agent_id}' produced a response with {detection_result.hallucination_risk:.1%} hallucination risk. Response: '{agent_response.output[:100]}{'...' if len(agent_response.output) > 100 else ''}'",
+                agent_id=agent_response.agent_id,
+                agent_name=agent_response.agent_id.replace('_', ' ').title(),
+                hallucination_risk=detection_result.hallucination_risk,
+                confidence=1 - detection_result.uncertainty,
+                timestamp=agent_response.timestamp,
+                details={
+                    "query": agent_response.query,
+                    "full_output": agent_response.output,
+                    "claude_explanation": detection_result.details.get("claude_explanation", ""),
+                    "flagged_segments": detection_result.details.get("hallucinated_segments", []),
+                    "processing_time_ms": processing_time * 1000,
+                    "expected_hallucination": agent_response.expected_hallucination,
+                    "detection_accuracy": (detection_result.hallucination_risk > 0.5) == agent_response.expected_hallucination
+                },
+                requires_acknowledgment=severity in ["high", "critical"]
+            )
+            
+            # Send alert via webhook service
+            async with self.webhook_service:
+                results = await self.webhook_service.send_alert(alert)
+                
+                # Log webhook results
+                successful_webhooks = [k for k, v in results.items() if v]
+                if successful_webhooks:
+                    logger.info(f"Webhook alerts sent successfully: {successful_webhooks}")
+                else:
+                    logger.warning("No webhook alerts were sent successfully")
+                    
+        except Exception as e:
+            logger.error(f"Error sending webhook alert: {e}")
     
     async def _log_to_mlflow(self, 
                            agent_response: AgentResponse, 
