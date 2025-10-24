@@ -39,7 +39,6 @@ import dynamic from 'next/dynamic';
 const loadLeaflet = async () => {
   if (typeof window !== 'undefined') {
     const L = await import('leaflet');
-    await import('leaflet/dist/leaflet.css');
     // @ts-ignore
     await import('leaflet.heat');
     
@@ -107,7 +106,7 @@ const getStatusIcon = (status: string) => {
   }
 };
 
-const createCustomIcon = (status: string, alertCount: number) => {
+const createCustomIcon = (status: string, alertCount: number, L: any) => {
   const color = getStatusColor(status);
   const hasAlerts = alertCount > 0;
   
@@ -264,7 +263,7 @@ function InteractiveWorldMapComponent({ workstations, onWorkstationSelect }: Int
       
       // Add hover effects
       const buttons = div.querySelectorAll('button');
-      buttons.forEach(button => {
+      buttons.forEach((button: HTMLButtonElement) => {
         button.addEventListener('mouseenter', () => {
           button.style.background = isDark ? '#616161' : '#f0f0f0';
           button.style.transform = 'scale(1.05)';
@@ -303,7 +302,7 @@ function InteractiveWorldMapComponent({ workstations, onWorkstationSelect }: Int
     workstations.forEach(workstation => {
       const marker = L.marker(
         [workstation.coordinates.lat, workstation.coordinates.lng],
-        { icon: createCustomIcon(workstation.status, workstation.alertCount) }
+        { icon: createCustomIcon(workstation.status, workstation.alertCount, L) }
       );
 
       // Create popup content

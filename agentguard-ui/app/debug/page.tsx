@@ -597,13 +597,10 @@ export default function DebugPage() {
               <TableBody>
                 <AnimatePresence>
                   {filteredSessions.slice(0, 10).map((session) => (
-                    <motion.tr
+                    <TableRow
                       key={session.id}
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      component={TableRow}
                       hover
+                      sx={{ cursor: 'pointer' }}
                     >
                       <TableCell>
                         <Typography variant="body2" fontFamily="monospace">
@@ -669,7 +666,7 @@ export default function DebugPage() {
                           </Tooltip>
                         </Box>
                       </TableCell>
-                    </motion.tr>
+                    </TableRow>
                   ))}
                 </AnimatePresence>
               </TableBody>

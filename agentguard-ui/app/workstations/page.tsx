@@ -989,14 +989,6 @@ export default function WorkstationsPage() {
         </DialogActions>
       </Dialog>
 
-      {/* Floating Action Button */}
-      <Fab
-        color="primary"
-        sx={{ position: 'fixed', bottom: 24, right: 24 }}
-        onClick={() => {/* Add workstation */}}
-      >
-        <ComputerOutlined />
-      </Fab>
     </Container>
   );
 }

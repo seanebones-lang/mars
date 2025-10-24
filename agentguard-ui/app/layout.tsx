@@ -6,6 +6,7 @@ import { WatcherThemeProvider, useThemeMode } from '@/contexts/ThemeContext';
 import Navigation from '@/components/Navigation';
 import PersistentAlerts from '@/components/PersistentAlerts';
 import RealtimeStatsOverlay from '@/components/RealtimeStatsOverlay';
+import AIAssistantWidget from '@/components/AIAssistantWidget';
 import { Toaster } from 'react-hot-toast';
 import { Box, Typography, Link } from '@mui/material';
 import { LinkedIn } from '@mui/icons-material';
@@ -27,6 +28,9 @@ function AppContent({ children }: { children: React.ReactNode }) {
       
       {/* Real-time Stats Overlay */}
       <RealtimeStatsOverlay position="top-left" maxWidth={350} />
+      
+      {/* AI Assistant Widget - Available on every page */}
+      <AIAssistantWidget position="bottom-right" />
       
       {/* Footer with contact info */}
       <Box

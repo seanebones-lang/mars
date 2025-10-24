@@ -806,12 +806,12 @@ response = requests.post(
                                 <Typography variant="h6" gutterBottom>Request Body</Typography>
                                 <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
                                   <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
-                                    {JSON.stringify(endpoint.requestBody.example, null, 2)}
+                                    {JSON.stringify(endpoint.requestBody?.example, null, 2)}
                                   </Typography>
                                   <Box display="flex" justifyContent="flex-end" mt={1}>
                                     <IconButton 
                                       size="small" 
-                                      onClick={() => copyToClipboard(JSON.stringify(endpoint.requestBody.example, null, 2))}
+                                      onClick={() => copyToClipboard(JSON.stringify(endpoint.requestBody?.example, null, 2))}
                                     >
                                       <ContentCopyOutlined />
                                     </IconButton>
