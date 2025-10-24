@@ -1,0 +1,143 @@
+# Render.com Deployment Configuration for Watcher AI Backend
+# This file configures the FastAPI backend deployment on Render
+
+services:
+  # Main API Service
+  - type: web
+    name: watcher-api
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m uvicorn src.api.main_realtime:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    
+    # Environment Variables
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: DEBUG
+        value: false
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CORS_ORIGINS
+        value: "https://watcher.mothership-ai.com,https://watcher-ai.vercel.app"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: watcher-postgres
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: watcher-redis
+          property: connectionString
+      - key: CLAUDE_API_KEY
+        sync: false  # Set manually in Render dashboard
+      - key: JWT_SECRET_KEY
+        generateValue: true
+      - key: ENCRYPTION_KEY
+        generateValue: true
+      - key: WEBHOOK_SECRET
+        generateValue: true
+    
+    # Auto-deploy settings
+    autoDeploy: true
+    branch: main
+    
+    # Health check configuration
+    healthCheck:
+      path: /health
+      initialDelaySeconds: 30
+      periodSeconds: 10
+      timeoutSeconds: 5
+      failureThreshold: 3
+    
+    # Resource limits
+    disk:
+      name: watcher-api-disk
+      size: 1GB
+      mountPath: /data
+    
+    # Scaling configuration
+    scaling:
+      minInstances: 1
+      maxInstances: 3
+      targetCPUPercent: 70
+      targetMemoryPercent: 80
+
+  # Redis Cache Service
+  - type: redis
+    name: watcher-redis
+    region: oregon
+    plan: starter
+    ipAllowList: []  # Allow all IPs (will be restricted by authentication)
+
+# Database Configuration
+databases:
+  - name: watcher-postgres
+    region: oregon
+    plan: starter
+    databaseName: watcher_ai
+    user: watcher_admin
+    
+    # Database initialization
+    initScript: |
+      -- Create extensions
+      CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
+      CREATE EXTENSION IF NOT EXISTS "pg_trgm";
+      CREATE EXTENSION IF NOT EXISTS "btree_gin";
+      
+      -- Create initial admin user (will be handled by application)
+      -- Application will handle all table creation and migrations
+
+# Static Site (for API documentation)
+  - type: static
+    name: watcher-docs
+    buildCommand: |
+      pip install -r requirements.txt
+      python -c "
+      from src.api.main_realtime import app
+      import json
+      with open('openapi.json', 'w') as f:
+          json.dump(app.openapi(), f, indent=2)
+      "
+      mkdir -p public
+      echo '<!DOCTYPE html>
+      <html>
+      <head>
+          <title>Watcher AI API Documentation</title>
+          <link rel="stylesheet" type="text/css" href="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui.css" />
+      </head>
+      <body>
+          <div id="swagger-ui"></div>
+          <script src="https://unpkg.com/swagger-ui-dist@3.25.0/swagger-ui-bundle.js"></script>
+          <script>
+              SwaggerUIBundle({
+                  url: "./openapi.json",
+                  dom_id: "#swagger-ui",
+                  presets: [SwaggerUIBundle.presets.apis, SwaggerUIBundle.presets.standalone]
+              });
+          </script>
+      </body>
+      </html>' > public/index.html
+      cp openapi.json public/
+    staticPublishPath: ./public
+    
+# Environment Groups (for shared configuration)
+envVarGroups:
+  - name: watcher-common
+    envVars:
+      - key: APP_NAME
+        value: "Watcher AI"
+      - key: APP_VERSION
+        value: "1.0.0"
+      - key: COMPANY_NAME
+        value: "Mothership AI"
+      - key: SUPPORT_EMAIL
+        value: "support@mothership-ai.com"
+      - key: MAX_UPLOAD_SIZE
+        value: "100MB"
+      - key: RATE_LIMIT_PER_MINUTE
+        value: "1000"
+      - key: SESSION_TIMEOUT_HOURS
+        value: "24"
