@@ -1,3 +1,5 @@
+'use client';
+
 import { Container, Typography, Button, Box } from '@mui/material';
 import Link from 'next/link';
 
@@ -11,9 +13,11 @@ export default function NotFound() {
         Page Not Found
       </Typography>
       <Box sx={{ mt: 4 }}>
-        <Button variant="contained" component={Link} href="/">
-          Return to Dashboard
-        </Button>
+        <Link href="/" passHref>
+          <Button variant="contained">
+            Return to Dashboard
+          </Button>
+        </Link>
       </Box>
     </Container>
   );

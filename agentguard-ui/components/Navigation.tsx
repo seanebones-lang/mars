@@ -144,21 +144,20 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
           <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {/* Core Navigation Items */}
             {coreNavItems.map((item) => (
-              <Button
-                key={item.href}
-                component={Link}
-                href={item.href}
-                startIcon={item.icon}
-                color="inherit"
-                sx={{
-                  fontWeight: pathname === item.href ? 600 : 400,
-                  borderBottom: pathname === item.href ? 2 : 0,
-                  borderRadius: 0,
-                  borderColor: 'primary.main',
-                }}
-              >
-                {item.label}
-              </Button>
+              <Link key={item.href} href={item.href} passHref style={{ textDecoration: 'none' }}>
+                <Button
+                  startIcon={item.icon}
+                  color="inherit"
+                  sx={{
+                    fontWeight: pathname === item.href ? 600 : 400,
+                    borderBottom: pathname === item.href ? 2 : 0,
+                    borderRadius: 0,
+                    borderColor: 'primary.main',
+                  }}
+                >
+                  {item.label}
+                </Button>
+              </Link>
             ))}
 
             {/* Monitoring Dropdown */}
@@ -225,31 +224,30 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
               }}
             >
               {monitoringItems.map((item) => (
-                <MenuItem
-                  key={item.href}
-                  component={Link}
-                  href={item.href}
-                  onClick={handleMonitoringClose}
-                  sx={{
-                    py: 1.5,
-                    backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
-                    secondary={item.description}
-                    primaryTypographyProps={{
-                      fontWeight: pathname === item.href ? 600 : 400,
+                <Link key={item.href} href={item.href} passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <MenuItem
+                    onClick={handleMonitoringClose}
+                    sx={{
+                      py: 1.5,
+                      backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
                     }}
-                    secondaryTypographyProps={{
-                      fontSize: '0.75rem',
-                      color: 'text.secondary',
-                    }}
-                  />
-                </MenuItem>
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      secondary={item.description}
+                      primaryTypographyProps={{
+                        fontWeight: pathname === item.href ? 600 : 400,
+                      }}
+                      secondaryTypographyProps={{
+                        fontSize: '0.75rem',
+                        color: 'text.secondary',
+                      }}
+                    />
+                  </MenuItem>
+                </Link>
               ))}
             </Menu>
 
@@ -269,31 +267,30 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
               }}
             >
               {testingItems.map((item) => (
-                <MenuItem
-                  key={item.href}
-                  component={Link}
-                  href={item.href}
-                  onClick={handleTestingClose}
-                  sx={{
-                    py: 1.5,
-                    backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
-                    secondary={item.description}
-                    primaryTypographyProps={{
-                      fontWeight: pathname === item.href ? 600 : 400,
+                <Link key={item.href} href={item.href} passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <MenuItem
+                    onClick={handleTestingClose}
+                    sx={{
+                      py: 1.5,
+                      backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
                     }}
-                    secondaryTypographyProps={{
-                      fontSize: '0.75rem',
-                      color: 'text.secondary',
-                    }}
-                  />
-                </MenuItem>
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      secondary={item.description}
+                      primaryTypographyProps={{
+                        fontWeight: pathname === item.href ? 600 : 400,
+                      }}
+                      secondaryTypographyProps={{
+                        fontSize: '0.75rem',
+                        color: 'text.secondary',
+                      }}
+                    />
+                  </MenuItem>
+                </Link>
               ))}
             </Menu>
             
@@ -313,31 +310,30 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
               }}
             >
               {integrationItems.map((item) => (
-                <MenuItem
-                  key={item.href}
-                  component={Link}
-                  href={item.href}
-                  onClick={handleIntegrationsClose}
-                  sx={{
-                    py: 1.5,
-                    backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
-                  }}
-                >
-                  <ListItemIcon sx={{ minWidth: 40 }}>
-                    {item.icon}
-                  </ListItemIcon>
-                  <ListItemText
-                    primary={item.label}
-                    secondary={item.description}
-                    primaryTypographyProps={{
-                      fontWeight: pathname === item.href ? 600 : 400,
+                <Link key={item.href} href={item.href} passHref style={{ textDecoration: 'none', color: 'inherit' }}>
+                  <MenuItem
+                    onClick={handleIntegrationsClose}
+                    sx={{
+                      py: 1.5,
+                      backgroundColor: pathname === item.href ? 'action.selected' : 'transparent',
                     }}
-                    secondaryTypographyProps={{
-                      fontSize: '0.75rem',
-                      color: 'text.secondary',
-                    }}
-                  />
-                </MenuItem>
+                  >
+                    <ListItemIcon sx={{ minWidth: 40 }}>
+                      {item.icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      primary={item.label}
+                      secondary={item.description}
+                      primaryTypographyProps={{
+                        fontWeight: pathname === item.href ? 600 : 400,
+                      }}
+                      secondaryTypographyProps={{
+                        fontSize: '0.75rem',
+                        color: 'text.secondary',
+                      }}
+                    />
+                  </MenuItem>
+                </Link>
               ))}
             </Menu>
             
