@@ -137,5 +137,138 @@ Please provide:
       contextualAnalysis: claudeResponse
     };
   },
+
+  // Get Claude-powered workstation insights
+  getWorkstationInsights: async (workstation: any): Promise<{
+    systemHealth: string;
+    securityAssessment: string;
+    performanceRecommendations: string[];
+    anomalyDetection: string;
+    maintenanceSchedule: string[];
+    riskFactors: string[];
+    optimizationTips: string[];
+    complianceStatus: string;
+  }> => {
+    const workstationPrompt = `Analyze this enterprise workstation and provide intelligent insights, recommendations, and assessments.
+
+Workstation Details:
+- Name: ${workstation.name}
+- OS: ${workstation.os} ${workstation.platformVersion}
+- CPU Usage: ${workstation.cpuUsage}%
+- Memory: ${workstation.memoryUsage}% (${workstation.memoryTotalGb}GB total)
+- Disk: ${workstation.diskUsage}% (${workstation.diskTotalGb}GB total)
+- Status: ${workstation.status}
+- Agent Status: ${workstation.agentStatus}
+- Security Score: ${workstation.securityScore}/100
+- Vulnerabilities: ${workstation.vulnerabilities?.length || 0} found
+- Open Ports: ${workstation.openPorts?.join(', ') || 'None'}
+- Last Seen: ${workstation.lastSeen}
+- Uptime: ${workstation.uptime}
+
+Please provide:
+1. Overall system health assessment
+2. Security risk evaluation and recommendations
+3. Performance optimization suggestions
+4. Anomaly detection insights
+5. Maintenance schedule recommendations
+6. Risk factors to monitor
+7. Optimization tips for better performance
+8. Compliance status assessment
+
+Be specific, actionable, and enterprise-focused.`;
+
+    const response = await axios.post(`${API_URL}/chat`, { message: workstationPrompt });
+    const claudeResponse = response.data.response;
+    
+    return {
+      systemHealth: claudeResponse,
+      securityAssessment: `Security Score: ${workstation.securityScore}/100. ${workstation.vulnerabilities?.length || 0} vulnerabilities detected.`,
+      performanceRecommendations: [
+        "Monitor CPU usage patterns during peak hours",
+        "Consider memory upgrade if usage consistently >80%",
+        "Schedule disk cleanup for optimal performance",
+        "Review running processes for optimization opportunities"
+      ],
+      anomalyDetection: claudeResponse,
+      maintenanceSchedule: [
+        "Weekly security scan",
+        "Monthly performance review",
+        "Quarterly hardware assessment",
+        "Annual compliance audit"
+      ],
+      riskFactors: [
+        workstation.cpuUsage > 80 ? "High CPU usage" : null,
+        workstation.memoryUsage > 85 ? "High memory usage" : null,
+        workstation.diskUsage > 90 ? "Low disk space" : null,
+        workstation.securityScore < 70 ? "Low security score" : null,
+        workstation.vulnerabilities?.length > 0 ? `${workstation.vulnerabilities.length} vulnerabilities` : null
+      ].filter((item): item is string => Boolean(item)),
+      optimizationTips: [
+        "Enable automatic updates for security patches",
+        "Implement resource monitoring alerts",
+        "Regular cleanup of temporary files",
+        "Optimize startup programs"
+      ],
+      complianceStatus: workstation.securityScore > 80 ? "Compliant" : "Needs attention"
+    };
+  },
+
+  // Get Claude-powered fleet analysis
+  getFleetInsights: async (workstations: any[]): Promise<{
+    fleetOverview: string;
+    criticalIssues: string[];
+    recommendations: string[];
+    trends: string;
+    riskAssessment: string;
+  }> => {
+    const fleetStats = {
+      total: workstations.length,
+      online: workstations.filter(w => w.status === 'online').length,
+      avgCpu: workstations.reduce((sum, w) => sum + w.cpuUsage, 0) / workstations.length,
+      avgMemory: workstations.reduce((sum, w) => sum + w.memoryUsage, 0) / workstations.length,
+      avgSecurity: workstations.reduce((sum, w) => sum + w.securityScore, 0) / workstations.length,
+      vulnerabilities: workstations.reduce((sum, w) => sum + (w.vulnerabilities?.length || 0), 0)
+    };
+
+    const fleetPrompt = `Analyze this enterprise workstation fleet and provide strategic insights.
+
+Fleet Statistics:
+- Total Workstations: ${fleetStats.total}
+- Online: ${fleetStats.online} (${((fleetStats.online/fleetStats.total)*100).toFixed(1)}%)
+- Average CPU Usage: ${fleetStats.avgCpu.toFixed(1)}%
+- Average Memory Usage: ${fleetStats.avgMemory.toFixed(1)}%
+- Average Security Score: ${fleetStats.avgSecurity.toFixed(1)}/100
+- Total Vulnerabilities: ${fleetStats.vulnerabilities}
+
+Provide enterprise-level analysis including:
+1. Fleet health overview
+2. Critical issues requiring immediate attention
+3. Strategic recommendations for IT management
+4. Performance and security trends
+5. Overall risk assessment
+
+Focus on actionable insights for enterprise IT decision-making.`;
+
+    const response = await axios.post(`${API_URL}/chat`, { message: fleetPrompt });
+    const claudeResponse = response.data.response;
+    
+    return {
+      fleetOverview: claudeResponse,
+      criticalIssues: [
+        fleetStats.avgSecurity < 70 ? "Fleet security score below acceptable threshold" : null,
+        fleetStats.vulnerabilities > fleetStats.total * 2 ? "High vulnerability count across fleet" : null,
+        (fleetStats.online/fleetStats.total) < 0.95 ? "Workstation availability below 95%" : null,
+        fleetStats.avgCpu > 80 ? "Fleet CPU usage critically high" : null
+      ].filter((item): item is string => Boolean(item)),
+      recommendations: [
+        "Implement centralized patch management",
+        "Deploy automated monitoring alerts",
+        "Schedule regular security assessments",
+        "Optimize resource allocation across fleet"
+      ],
+      trends: claudeResponse,
+      riskAssessment: fleetStats.avgSecurity > 80 ? "Low Risk" : fleetStats.avgSecurity > 60 ? "Medium Risk" : "High Risk"
+    };
+  },
 };
 

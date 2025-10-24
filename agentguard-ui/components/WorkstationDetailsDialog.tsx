@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -38,6 +38,7 @@ import {
   Stack,
   Tab,
   Tabs,
+  CircularProgress,
 } from '@mui/material';
 import {
   ComputerOutlined,
@@ -71,9 +72,14 @@ import {
   CloudOutlined,
   TimelineOutlined,
   AssessmentOutlined,
-  NotificationsOutlined
+  NotificationsOutlined,
+  AutoAwesome,
+  Psychology,
+  Lightbulb,
+  TrendingUp,
 } from '@mui/icons-material';
 import { useTheme } from '@mui/material/styles';
+import { agentGuardApi } from '@/lib/api';
 
 interface Workstation {
   id: string;
@@ -212,8 +218,38 @@ export default function WorkstationDetailsDialog({
 }: WorkstationDetailsDialogProps) {
   const theme = useTheme();
   const [tabValue, setTabValue] = useState(0);
+  const [claudeInsights, setClaudeInsights] = useState<any>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
 
   if (!workstation) return null;
+
+  // Get Claude insights when dialog opens
+  useEffect(() => {
+    if (open && workstation && !claudeInsights) {
+      getClaudeInsights();
+    }
+  }, [open, workstation]);
+
+  const getClaudeInsights = async () => {
+    if (!workstation) return;
+    
+    setInsightsLoading(true);
+    try {
+      const insights = await agentGuardApi.getWorkstationInsights(workstation);
+      setClaudeInsights(insights);
+      setShowInsights(true);
+    } catch (err) {
+      console.error('Failed to get Claude insights:', err);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
+
+  const handleRefreshInsights = async () => {
+    setClaudeInsights(null);
+    await getClaudeInsights();
+  };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
     setTabValue(newValue);
@@ -281,6 +317,15 @@ export default function WorkstationDetailsDialog({
             <Tab label="Software" icon={<CodeOutlined />} />
             <Tab label="Performance" icon={<TimelineOutlined />} />
             <Tab label="Management" icon={<SettingsOutlined />} />
+            <Tab 
+              label="Claude Insights" 
+              icon={<AutoAwesome />} 
+              sx={{ 
+                '& .MuiTab-wrapper': { 
+                  color: theme.palette.primary.main 
+                } 
+              }} 
+            />
           </Tabs>
         </Box>
 
@@ -1025,6 +1070,203 @@ export default function WorkstationDetailsDialog({
                 </Grid>
               )}
             </Grid>
+          </TabPanel>
+
+          {/* Claude Insights Tab */}
+          <TabPanel value={tabValue} index={7}>
+            <Box sx={{ py: 2 }}>
+              <Box display="flex" alignItems="center" justifyContent="space-between" mb={3}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <AutoAwesome color="primary" />
+                  <Typography variant="h6">
+                    Claude Intelligence Analysis
+                  </Typography>
+                  <Chip label="AI Powered" color="primary" size="small" />
+                </Box>
+                <Tooltip title="Refresh Insights">
+                  <IconButton onClick={handleRefreshInsights} disabled={insightsLoading}>
+                    <RefreshOutlined />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+
+              {insightsLoading && (
+                <Box sx={{ mb: 3, textAlign: 'center' }}>
+                  <CircularProgress />
+                  <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                    Claude is analyzing workstation data for intelligent insights...
+                  </Typography>
+                </Box>
+              )}
+
+              {claudeInsights && (
+                <Grid container spacing={3}>
+                  {/* System Health Assessment */}
+                  <Grid size={12}>
+                    <Card>
+                      <CardHeader 
+                        title="System Health Assessment" 
+                        avatar={<Psychology color="primary" />}
+                      />
+                      <CardContent>
+                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                          {claudeInsights.systemHealth}
+                        </Typography>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Risk Factors */}
+                  {claudeInsights.riskFactors && claudeInsights.riskFactors.length > 0 && (
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Card>
+                        <CardHeader 
+                          title="Risk Factors" 
+                          avatar={<WarningOutlined color="warning" />}
+                        />
+                        <CardContent>
+                          <List dense>
+                            {claudeInsights.riskFactors.map((risk: string, index: number) => (
+                              <ListItem key={index}>
+                                <ListItemIcon>
+                                  <WarningOutlined color="warning" fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText primary={risk} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  )}
+
+                  {/* Performance Recommendations */}
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card>
+                      <CardHeader 
+                        title="Performance Recommendations" 
+                        avatar={<TrendingUp color="success" />}
+                      />
+                      <CardContent>
+                        <List dense>
+                          {claudeInsights.performanceRecommendations.map((rec: string, index: number) => (
+                            <ListItem key={index}>
+                              <ListItemIcon>
+                                <Lightbulb color="primary" fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText primary={rec} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Security Assessment */}
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card>
+                      <CardHeader 
+                        title="Security Assessment" 
+                        avatar={<ShieldOutlined color="info" />}
+                      />
+                      <CardContent>
+                        <Typography variant="body2" gutterBottom>
+                          {claudeInsights.securityAssessment}
+                        </Typography>
+                        <Box sx={{ mt: 2 }}>
+                          <Chip 
+                            label={claudeInsights.complianceStatus} 
+                            color={claudeInsights.complianceStatus === 'Compliant' ? 'success' : 'warning'}
+                            size="small"
+                          />
+                        </Box>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Optimization Tips */}
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <Card>
+                      <CardHeader 
+                        title="Optimization Tips" 
+                        avatar={<AutoAwesome color="secondary" />}
+                      />
+                      <CardContent>
+                        <List dense>
+                          {claudeInsights.optimizationTips.map((tip: string, index: number) => (
+                            <ListItem key={index}>
+                              <ListItemIcon>
+                                <CheckCircleOutlined color="success" fontSize="small" />
+                              </ListItemIcon>
+                              <ListItemText primary={tip} />
+                            </ListItem>
+                          ))}
+                        </List>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Maintenance Schedule */}
+                  <Grid size={12}>
+                    <Card>
+                      <CardHeader 
+                        title="Recommended Maintenance Schedule" 
+                        avatar={<UpdateOutlined color="info" />}
+                      />
+                      <CardContent>
+                        <Grid container spacing={2}>
+                          {claudeInsights.maintenanceSchedule.map((task: string, index: number) => (
+                            <Grid size={{ xs: 12, sm: 6, md: 3 }} key={index}>
+                              <Alert severity="info" variant="outlined">
+                                <Typography variant="body2">{task}</Typography>
+                              </Alert>
+                            </Grid>
+                          ))}
+                        </Grid>
+                      </CardContent>
+                    </Card>
+                  </Grid>
+
+                  {/* Anomaly Detection */}
+                  <Grid size={12}>
+                    <Accordion>
+                      <AccordionSummary expandIcon={<ExpandMoreOutlined />}>
+                        <Box display="flex" alignItems="center" gap={2}>
+                          <BugReportOutlined color="primary" />
+                          <Typography variant="subtitle1" fontWeight={600}>
+                            Anomaly Detection Analysis
+                          </Typography>
+                        </Box>
+                      </AccordionSummary>
+                      <AccordionDetails>
+                        <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                          {claudeInsights.anomalyDetection}
+                        </Typography>
+                      </AccordionDetails>
+                    </Accordion>
+                  </Grid>
+                </Grid>
+              )}
+
+              {!claudeInsights && !insightsLoading && (
+                <Box textAlign="center" py={6}>
+                  <AutoAwesome sx={{ fontSize: 48, color: 'text.secondary', mb: 2 }} />
+                  <Typography variant="h6" color="text.secondary" gutterBottom>
+                    Claude Intelligence Insights
+                  </Typography>
+                  <Typography variant="body2" color="text.secondary" paragraph>
+                    Get AI-powered analysis and recommendations for this workstation
+                  </Typography>
+                  <Button 
+                    variant="contained" 
+                    startIcon={<Psychology />}
+                    onClick={getClaudeInsights}
+                  >
+                    Generate Insights
+                  </Button>
+                </Box>
+              )}
+            </Box>
           </TabPanel>
         </Box>
       </DialogContent>

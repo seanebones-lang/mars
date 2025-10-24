@@ -69,10 +69,12 @@ import {
   TrendingUpOutlined,
   NotificationsOutlined,
   GroupOutlined,
-  BusinessOutlined
+  BusinessOutlined,
+  AutoAwesome
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
+import { agentGuardApi } from '@/lib/api';
 import InteractiveWorldMap from '@/components/InteractiveWorldMap';
 import WorkstationDetailsDialog from '@/components/WorkstationDetailsDialog';
 import WorkstationDiscoveryDialog from '@/components/WorkstationDiscoveryDialog';
@@ -551,6 +553,9 @@ export default function WorkstationsPage() {
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
   const [discoveryDialogOpen, setDiscoveryDialogOpen] = useState(false);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
+  const [fleetInsights, setFleetInsights] = useState<any>(null);
+  const [fleetInsightsLoading, setFleetInsightsLoading] = useState(false);
+  const [showFleetInsights, setShowFleetInsights] = useState(false);
 
   // Load mock data
   useEffect(() => {
@@ -636,6 +641,25 @@ export default function WorkstationsPage() {
 
   const handleRefresh = () => {
     setWorkstations(generateMockWorkstations(150));
+  };
+
+  // Fleet Insights Functions
+  const getFleetInsights = async () => {
+    setFleetInsightsLoading(true);
+    try {
+      const insights = await agentGuardApi.getFleetInsights(workstations);
+      setFleetInsights(insights);
+      setShowFleetInsights(true);
+    } catch (err) {
+      console.error('Failed to get fleet insights:', err);
+    } finally {
+      setFleetInsightsLoading(false);
+    }
+  };
+
+  const handleRefreshFleetInsights = async () => {
+    setFleetInsights(null);
+    await getFleetInsights();
   };
 
   // Workstation Management Functions
@@ -741,6 +765,23 @@ export default function WorkstationsPage() {
             onClick={handleRefresh}
           >
             Refresh
+          </Button>
+          
+          <Button
+            variant="outlined"
+            startIcon={<AutoAwesome />}
+            onClick={getFleetInsights}
+            disabled={fleetInsightsLoading}
+            sx={{ 
+              borderColor: 'primary.main',
+              color: 'primary.main',
+              '&:hover': {
+                borderColor: 'primary.dark',
+                backgroundColor: 'primary.light'
+              }
+            }}
+          >
+            {fleetInsightsLoading ? 'Analyzing...' : 'Claude Insights'}
           </Button>
           
           <Button
