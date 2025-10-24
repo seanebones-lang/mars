@@ -207,28 +207,9 @@ export default function AIAssistantWidget({ position = 'bottom-right' }: AIAssis
     setIsLoading(true);
 
     try {
-      // Create a comprehensive prompt for Claude that includes system knowledge
-      const prompt = `${SYSTEM_KNOWLEDGE}
-
-User Question: "${messageContent}"
-
-Please provide a helpful, detailed response as the Watcher AI Assistant. Include:
-1. Direct answer to their question
-2. Step-by-step guidance if applicable
-3. Relevant feature suggestions
-4. Next steps they should take
-
-Adapt your tone to their technical level and be encouraging. If they're asking about a specific feature, provide navigation instructions and explain the benefits.`;
-
-      // Use the existing API to get Claude's response
-      const response = await agentGuardApi.testAgent({
-        agent_output: prompt,
-        ground_truth: "Provide helpful, accurate guidance about the Watcher AI platform based on the system knowledge provided. Be conversational, helpful, and provide specific actionable steps.",
-        conversation_history: []
-      });
-
-      // Extract the explanation as the assistant's response
-      const assistantContent = response.details?.claude_explanation || "I'm here to help! Could you please rephrase your question?";
+      // Create a direct response based on system knowledge without using the hallucination detection API
+      // This prevents the assistant from fact-checking itself!
+      const assistantContent = generateDirectResponse(messageContent);
       
       // Generate contextual suggestions based on the user's question
       const suggestions = generateSuggestions(messageContent);
@@ -261,6 +242,212 @@ Adapt your tone to their technical level and be encouraging. If they're asking a
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const generateDirectResponse = (userMessage: string): string => {
+    const message = userMessage.toLowerCase();
+    
+    // Quick Test / Hallucination Detection
+    if (message.includes('test') || message.includes('check') || message.includes('hallucination')) {
+      return `Great question! Here's how to test for hallucinations:
+
+**Quick Test (Easiest):**
+1. Go to the "Quick Test" page (/freeform)
+2. Paste your AI agent's response in the text box
+3. Click "Analyze" - you'll get results in seconds!
+
+**For Developers:**
+1. Use our Python SDK: \`pip install watcher-ai\`
+2. Get your API key from Settings → API Keys
+3. Test programmatically with our REST API
+
+**What you'll get:**
+• Confidence score (0-100%)
+• Specific reasoning about potential issues
+• Categories of problems detected
+• Recommendations for improvement
+
+Would you like me to walk you through any of these options?`;
+    }
+    
+    // Live Monitoring
+    if (message.includes('monitor') || message.includes('live') || message.includes('real-time')) {
+      return `Perfect! Live monitoring is one of our most powerful features:
+
+**Live Monitor Dashboard (/monitor):**
+1. Shows real-time detection from multiple AI agents
+2. WebSocket streaming with <100ms latency
+3. Visual and audio alerts for high-risk responses
+4. Draggable stats overlay for system metrics
+
+**Workstation Monitoring (/workstations):**
+1. Monitor 150+ workstations across your enterprise
+2. Interactive world map showing global deployment
+3. Real-time CPU, memory, and agent status
+4. Heatmap visualization for performance metrics
+
+**Getting Started:**
+1. Visit /monitor to see the live dashboard
+2. Check /workstations for enterprise monitoring
+3. Configure alerts in the settings panel
+
+The connection status should show green when everything's working!`;
+    }
+    
+    // API/SDK Integration
+    if (message.includes('api') || message.includes('sdk') || message.includes('integrate')) {
+      return `Excellent! Here's your integration roadmap:
+
+**Python SDK (Recommended):**
+\`\`\`python
+pip install watcher-ai
+from watcher_ai import WatcherClient
+
+client = WatcherClient(api_key="your_key")
+result = client.test_agent(
+    agent_output="Your AI response here",
+    context="Optional context"
+)
+print(f"Risk: {result.confidence}%")
+\`\`\`
+
+**REST API:**
+- Base URL: \`https://api.watcher.mothership-ai.com/v1\`
+- Authentication: X-API-Key header
+- Rate Limits: Free (10/min), Pro (100/min), Enterprise (1000/min)
+
+**Next Steps:**
+1. Get API key: Settings → API Keys → Generate New Key
+2. Check /docs for complete API reference
+3. Visit /sdk for detailed Python examples
+4. Set up /webhooks for real-time notifications
+
+Need help with a specific integration scenario?`;
+    }
+    
+    // Enterprise/Workstation Setup
+    if (message.includes('enterprise') || message.includes('workstation') || message.includes('deploy')) {
+      return `Great choice for enterprise deployment! Here's your setup guide:
+
+**Workstation Monitoring Setup:**
+1. Go to /workstations to see the dashboard
+2. Use the interactive world map to visualize your deployment
+3. Monitor CPU, memory, and agent performance in real-time
+4. Set up alerts for performance thresholds
+
+**Enterprise Features:**
+• Multi-tenant architecture with data isolation
+• Custom detection rules for your domain
+• Compliance & audit trails (SOC2, GDPR, HIPAA)
+• User authentication & role-based access control
+• Alert escalation with on-call scheduling
+
+**Deployment Options:**
+• Python SDK for individual workstations
+• REST API for system integration
+• Webhooks for Slack/Teams notifications
+• Batch processing for historical analysis
+
+**Getting Started:**
+1. Visit /workstations for the monitoring dashboard
+2. Check /webhooks to set up notifications
+3. Use /sdk for deployment scripts
+4. Configure /custom-rules for your specific needs
+
+What's your primary use case - monitoring existing agents or setting up new ones?`;
+    }
+    
+    // Troubleshooting
+    if (message.includes('error') || message.includes('problem') || message.includes('issue') || message.includes('not working')) {
+      return `I'm here to help troubleshoot! Let's diagnose the issue:
+
+**Common Issues & Solutions:**
+
+**Connection Problems:**
+• Check the connection status in /monitor (should be green)
+• Verify your API key in Settings → API Keys
+• Check rate limits in /performance
+
+**Slow Performance:**
+• Monitor system metrics in the stats overlay (top-left)
+• Check /analytics for processing trends
+• Verify network latency in /workstations
+
+**API Integration Issues:**
+• Confirm API key format: \`watcher_api_key_...\`
+• Check /docs for correct endpoint URLs
+• Verify request headers include \`X-API-Key\`
+
+**WebSocket/Real-time Issues:**
+• Refresh the /monitor page
+• Check browser console for connection errors
+• Verify firewall allows WebSocket connections
+
+**Quick Diagnostic Steps:**
+1. Try the Quick Test (/freeform) - if this works, API is fine
+2. Check /monitor connection status
+3. Visit /performance for system health
+4. Use /debug for advanced troubleshooting
+
+What specific error or behavior are you seeing?`;
+    }
+    
+    // Getting Started / Help
+    if (message.includes('help') || message.includes('start') || message.includes('begin') || message.includes('tutorial')) {
+      return `Welcome to Watcher AI! I'll get you started step-by-step:
+
+**For Complete Beginners:**
+1. **Quick Test** (/freeform): Paste any AI text → Click "Analyze" → See if it's suspicious
+2. **Dashboard** (/): Overview of your testing activity and system health
+3. **Demo Mode** (/demo): See how detection works with example scenarios
+
+**For Developers:**
+1. **API Docs** (/docs): Complete REST API reference
+2. **Python SDK** (/sdk): Install guide and code examples
+3. **Webhooks** (/webhooks): Set up Slack/Teams notifications
+
+**For Enterprise Users:**
+1. **Live Monitor** (/monitor): Real-time detection dashboard
+2. **Workstations** (/workstations): Monitor your entire deployment
+3. **Analytics** (/analytics): Performance trends and insights
+
+**Key Features:**
+• **Detection Methods**: Claude 4.5 + Statistical Models + Custom Rules
+• **Real-time Monitoring**: <100ms latency WebSocket streaming
+• **Enterprise Ready**: Multi-tenant, RBAC, compliance features
+
+**Recommended First Steps:**
+1. Try Quick Test with some AI text
+2. Explore the Live Monitor
+3. Check out the API documentation
+
+What's your main goal - testing individual responses, monitoring live systems, or enterprise deployment?`;
+    }
+    
+    // Default helpful response
+    return `I'm your Watcher AI Assistant! I can help you with:
+
+**🔍 Testing & Detection:**
+• Quick hallucination testing (/freeform)
+• Batch file processing (/batch)
+• Live monitoring dashboard (/monitor)
+
+**🔧 Integration & Development:**
+• Python SDK setup (/sdk)
+• REST API documentation (/docs)
+• Webhook configuration (/webhooks)
+
+**📊 Enterprise & Analytics:**
+• Workstation monitoring (/workstations)
+• Performance analytics (/analytics)
+• Custom detection rules
+
+**🛠️ Troubleshooting:**
+• Debug tools and system diagnostics
+• Connection and performance issues
+• API integration help
+
+What would you like to learn about? I can provide step-by-step guidance for any task, from basic testing to enterprise deployment!`;
   };
 
   const generateSuggestions = (userMessage: string): string[] => {
