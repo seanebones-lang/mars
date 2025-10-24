@@ -89,12 +89,37 @@ const generateMockWorkstations = (count: number) => {
     { name: 'Mumbai', lat: 19.0760, lng: 72.8777 }
   ];
   const departments = ['IT', 'Finance', 'HR', 'Sales', 'Marketing', 'Operations', 'R&D', 'Support'];
+  const manufacturers = ['Dell', 'HP', 'Lenovo', 'Apple', 'ASUS', 'Acer', 'Microsoft'];
+  const models = ['OptiPlex 7090', 'EliteDesk 800', 'ThinkCentre M90q', 'iMac Pro', 'VivoBook', 'Aspire', 'Surface Studio'];
+  const platforms = ['Windows 11', 'macOS Sonoma', 'Ubuntu 22.04', 'Windows 10', 'macOS Ventura', 'CentOS 8'];
+  const users = ['john.doe', 'jane.smith', 'mike.johnson', 'sarah.wilson', 'david.brown', 'lisa.davis'];
+  const discoveryMethods = ['network_scan', 'dhcp_lease', 'dns_query', 'active_directory', 'manual'];
+  const commonPorts = [22, 80, 443, 3389, 5900, 8080, 9090];
+  const commonServices = ['SSH', 'HTTP', 'HTTPS', 'RDP', 'VNC', 'HTTP-Alt', 'Prometheus'];
+  const softwareList = ['Chrome', 'Firefox', 'VS Code', 'Office 365', 'Slack', 'Zoom', 'Docker', 'Python', 'Node.js'];
+  const processList = ['chrome.exe', 'firefox.exe', 'code.exe', 'outlook.exe', 'slack.exe', 'zoom.exe', 'docker.exe'];
+  const vulnerabilities = [
+    { severity: 'low', description: 'Outdated browser version', cve: 'CVE-2024-1234' },
+    { severity: 'medium', description: 'Unpatched OS vulnerability', cve: 'CVE-2024-5678' },
+    { severity: 'high', description: 'Critical security update missing', cve: 'CVE-2024-9012' }
+  ];
   
   return Array.from({ length: count }, (_, i) => {
     const locationInfo = locationData[Math.floor(Math.random() * locationData.length)];
-    // Add some random offset to coordinates for realistic clustering
-    const latOffset = (Math.random() - 0.5) * 0.5; // ±0.25 degrees
-    const lngOffset = (Math.random() - 0.5) * 0.5; // ±0.25 degrees
+    const latOffset = (Math.random() - 0.5) * 0.5;
+    const lngOffset = (Math.random() - 0.5) * 0.5;
+    const platform = platforms[Math.floor(Math.random() * platforms.length)];
+    const manufacturer = manufacturers[Math.floor(Math.random() * manufacturers.length)];
+    const openPortsCount = Math.floor(Math.random() * 5) + 1;
+    const selectedPorts = commonPorts.slice(0, openPortsCount);
+    const services: { [port: number]: string } = {};
+    selectedPorts.forEach((port, idx) => {
+      services[port] = commonServices[idx] || 'Unknown';
+    });
+    
+    const vulnCount = Math.floor(Math.random() * 3);
+    const deviceVulns = vulnerabilities.slice(0, vulnCount);
+    const securityScore = Math.max(0, 100 - (vulnCount * 25) - Math.floor(Math.random() * 20));
     
     return {
       id: `ws_${i.toString().padStart(4, '0')}`,
@@ -109,14 +134,37 @@ const generateMockWorkstations = (count: number) => {
       diskUsage: Math.floor(Math.random() * 100),
       agentCount: Math.floor(Math.random() * 5),
       alertCount: Math.floor(Math.random() * 10),
-      platform: ['Windows', 'macOS', 'Linux'][Math.floor(Math.random() * 3)],
+      platform: platform.split(' ')[0], // Keep backward compatibility
       version: '1.0.0',
       uptime: Math.floor(Math.random() * 86400),
       networkLatency: Math.floor(Math.random() * 100),
       coordinates: {
         lat: locationInfo.lat + latOffset,
         lng: locationInfo.lng + lngOffset
-      }
+      },
+      // Additional backend fields
+      macAddress: Array.from({length: 6}, () => Math.floor(Math.random() * 256).toString(16).padStart(2, '0')).join(':'),
+      user: users[Math.floor(Math.random() * users.length)],
+      cpuCount: [4, 6, 8, 12, 16][Math.floor(Math.random() * 5)],
+      memoryTotalGb: [8, 16, 32, 64, 128][Math.floor(Math.random() * 5)],
+      diskTotalGb: [256, 512, 1024, 2048][Math.floor(Math.random() * 4)],
+      platformVersion: platform,
+      pythonVersion: ['3.9.0', '3.10.0', '3.11.0', '3.12.0'][Math.floor(Math.random() * 4)],
+      watcherClientVersion: '1.2.0',
+      manufacturer,
+      model: models[Math.floor(Math.random() * models.length)],
+      serialNumber: `SN${Math.random().toString(36).substr(2, 9).toUpperCase()}`,
+      openPorts: selectedPorts,
+      services,
+      installedSoftware: softwareList.slice(0, Math.floor(Math.random() * 6) + 3),
+      runningProcesses: processList.slice(0, Math.floor(Math.random() * 4) + 2),
+      vulnerabilities: deviceVulns,
+      securityScore,
+      agentInstalled: Math.random() > 0.3,
+      agentVersion: Math.random() > 0.5 ? '1.2.0' : '1.1.0',
+      agentStatus: ['active', 'idle', 'error'][Math.floor(Math.random() * 3)],
+      discoveryMethod: discoveryMethods[Math.floor(Math.random() * discoveryMethods.length)],
+      tags: ['production', 'monitored', 'critical'].slice(0, Math.floor(Math.random() * 3))
     };
   });
 };
@@ -142,6 +190,29 @@ interface Workstation {
     lat: number;
     lng: number;
   };
+  // Additional backend fields
+  macAddress: string;
+  user: string;
+  cpuCount: number;
+  memoryTotalGb: number;
+  diskTotalGb: number;
+  platformVersion: string;
+  pythonVersion: string;
+  watcherClientVersion: string;
+  manufacturer?: string;
+  model?: string;
+  serialNumber?: string;
+  openPorts: number[];
+  services: { [port: number]: string };
+  installedSoftware: string[];
+  runningProcesses: string[];
+  vulnerabilities: Array<{ severity: string; description: string; cve?: string }>;
+  securityScore?: number;
+  agentInstalled: boolean;
+  agentVersion?: string;
+  agentStatus?: string;
+  discoveryMethod: string;
+  tags: string[];
 }
 
 const getStatusColor = (status: string) => {
