@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { TestResult } from './store';
+import { validateAgentTestRequest, SecureAgentTestRequest, SecurityLogger } from './security';
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
 
@@ -22,14 +23,39 @@ export interface HealthResponse {
 }
 
 export const agentGuardApi = {
-  // Test an agent
+  // Test an agent with security validation
   testAgent: async (request: AgentTestRequest): Promise<TestResult> => {
-    const response = await axios.post(`${API_URL}/test-agent`, request);
-    return {
-      ...response.data,
-      id: `${Date.now()}-${Math.random()}`,
-      timestamp: new Date().toISOString(),
-    };
+    try {
+      // Validate and sanitize input
+      const secureRequest = validateAgentTestRequest(request);
+      
+      // Log security event
+      SecurityLogger.logSecurityEvent('API_REQUEST', {
+        endpoint: '/test-agent',
+        inputLength: request.agent_output?.length || 0,
+      });
+
+      const response = await axios.post(`${API_URL}/test-agent`, secureRequest, {
+        timeout: 30000, // 30 second timeout
+        headers: {
+          'Content-Type': 'application/json',
+          'X-Client-Version': '1.0.0',
+        },
+      });
+
+      return {
+        ...response.data,
+        id: `${Date.now()}-${Math.random()}`,
+        timestamp: new Date().toISOString(),
+      };
+    } catch (error: any) {
+      // Log security errors
+      SecurityLogger.logSecurityEvent('API_ERROR', {
+        endpoint: '/test-agent',
+        error: error.message,
+      });
+      throw error;
+    }
   },
   
   // Check health
