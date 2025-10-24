@@ -41,6 +41,9 @@ from ..services.custom_rules_engine import get_custom_rules_engine, CustomRule, 
 from ..services.compliance_service import get_compliance_service, AuditEvent, AuditEventType, ComplianceFramework, DataClassification
 from ..services.tenant_service import get_tenant_service, TenantConfig, TenantStatus, SubscriptionTier, BillingCycle
 from ..middleware.tenant_middleware import add_tenant_middleware, get_current_tenant, require_tenant_feature, check_tenant_quota
+from ..services.websocket_manager import get_websocket_manager, WebSocketMessage, MessageType, ConnectionType
+from ..services.alert_escalation_service import get_escalation_service, Alert, AlertSeverity, AlertStatus, EscalationRule, OnCallSchedule, EscalationLevel
+from ..services.workstation_discovery_service import get_discovery_service, NetworkRange, DiscoveryTask, DiscoveryMethod, DeviceType, OperatingSystem
 
 # Load environment variables
 load_dotenv()
@@ -1740,6 +1743,1031 @@ async def get_current_tenant_usage(
     except Exception as e:
         logger.error(f"Error getting tenant usage: {e}")
         raise HTTPException(status_code=500, detail="Failed to get usage statistics")
+
+
+# Scalable WebSocket Endpoints
+@app.websocket("/ws/dashboard")
+async def websocket_dashboard(websocket: WebSocket, token: str = None):
+    """WebSocket endpoint for dashboard connections."""
+    try:
+        # Authenticate user (simplified for demo)
+        if not token:
+            await websocket.close(code=1008, reason="Authentication required")
+            return
+        
+        # Get tenant context (simplified)
+        tenant = get_current_tenant()
+        if not tenant:
+            tenant_id = "default"
+        else:
+            tenant_id = tenant.tenant_id
+        
+        # Connect to WebSocket manager
+        ws_manager = await get_websocket_manager()
+        connection_id = await ws_manager.connect(
+            websocket=websocket,
+            connection_type=ConnectionType.DASHBOARD,
+            tenant_id=tenant_id,
+            user_id="dashboard_user",
+            metadata={"token": token}
+        )
+        
+        try:
+            # Keep connection alive and handle messages
+            while True:
+                try:
+                    data = await websocket.receive_json()
+                    
+                    # Handle different message types
+                    if data.get("type") == "heartbeat":
+                        await ws_manager.handle_heartbeat(connection_id)
+                    elif data.get("type") == "subscribe":
+                        # Handle subscription requests
+                        pass
+                    
+                except WebSocketDisconnect:
+                    break
+                except Exception as e:
+                    logger.error(f"Error handling WebSocket message: {e}")
+                    
+        finally:
+            await ws_manager.disconnect(connection_id)
+            
+    except Exception as e:
+        logger.error(f"WebSocket dashboard error: {e}")
+        try:
+            await websocket.close(code=1011, reason="Internal server error")
+        except:
+            pass
+
+
+@app.websocket("/ws/workstation")
+async def websocket_workstation(websocket: WebSocket, api_key: str = None):
+    """WebSocket endpoint for workstation connections."""
+    try:
+        # Authenticate via API key
+        if not api_key:
+            await websocket.close(code=1008, reason="API key required")
+            return
+        
+        # Validate API key and get tenant
+        tenant_service = get_tenant_service()
+        tenant = tenant_service.validate_api_key(api_key)
+        
+        if not tenant:
+            await websocket.close(code=1008, reason="Invalid API key")
+            return
+        
+        # Connect to WebSocket manager
+        ws_manager = await get_websocket_manager()
+        connection_id = await ws_manager.connect(
+            websocket=websocket,
+            connection_type=ConnectionType.WORKSTATION,
+            tenant_id=tenant.tenant_id,
+            metadata={"api_key": api_key}
+        )
+        
+        try:
+            # Handle workstation messages
+            while True:
+                try:
+                    data = await websocket.receive_json()
+                    
+                    message_type = data.get("message_type")
+                    
+                    if message_type == "heartbeat":
+                        await ws_manager.handle_heartbeat(connection_id)
+                    elif message_type == "status_update":
+                        # Handle workstation status update
+                        await _handle_workstation_status_update(data, tenant.tenant_id)
+                    elif message_type == "metrics_update":
+                        # Handle system metrics update
+                        await _handle_workstation_metrics_update(data, tenant.tenant_id)
+                    elif message_type == "detection_result":
+                        # Handle detection result from workstation
+                        await _handle_workstation_detection_result(data, tenant.tenant_id)
+                    elif message_type == "system_alert":
+                        # Handle system alert from workstation
+                        await _handle_workstation_system_alert(data, tenant.tenant_id)
+                    
+                except WebSocketDisconnect:
+                    break
+                except Exception as e:
+                    logger.error(f"Error handling workstation message: {e}")
+                    
+        finally:
+            await ws_manager.disconnect(connection_id)
+            
+    except Exception as e:
+        logger.error(f"WebSocket workstation error: {e}")
+        try:
+            await websocket.close(code=1011, reason="Internal server error")
+        except:
+            pass
+
+
+@app.websocket("/ws/agent/{agent_id}")
+async def websocket_agent(websocket: WebSocket, agent_id: str, api_key: str = None):
+    """WebSocket endpoint for individual agent connections."""
+    try:
+        # Authenticate via API key
+        if not api_key:
+            await websocket.close(code=1008, reason="API key required")
+            return
+        
+        # Validate API key and get tenant
+        tenant_service = get_tenant_service()
+        tenant = tenant_service.validate_api_key(api_key)
+        
+        if not tenant:
+            await websocket.close(code=1008, reason="Invalid API key")
+            return
+        
+        # Connect to WebSocket manager
+        ws_manager = await get_websocket_manager()
+        connection_id = await ws_manager.connect(
+            websocket=websocket,
+            connection_type=ConnectionType.AGENT,
+            tenant_id=tenant.tenant_id,
+            agent_id=agent_id,
+            metadata={"api_key": api_key, "agent_id": agent_id}
+        )
+        
+        try:
+            # Handle agent messages
+            while True:
+                try:
+                    data = await websocket.receive_json()
+                    
+                    message_type = data.get("message_type")
+                    
+                    if message_type == "heartbeat":
+                        await ws_manager.handle_heartbeat(connection_id)
+                    elif message_type == "agent_output":
+                        # Handle agent output for real-time detection
+                        await _handle_agent_output(data, agent_id, tenant.tenant_id)
+                    
+                except WebSocketDisconnect:
+                    break
+                except Exception as e:
+                    logger.error(f"Error handling agent message: {e}")
+                    
+        finally:
+            await ws_manager.disconnect(connection_id)
+            
+    except Exception as e:
+        logger.error(f"WebSocket agent error: {e}")
+        try:
+            await websocket.close(code=1011, reason="Internal server error")
+        except:
+            pass
+
+
+@app.get("/ws/stats", tags=["websockets"])
+async def get_websocket_stats(current_user = Depends(require_admin)):
+    """Get WebSocket performance statistics (Admin only)."""
+    try:
+        ws_manager = await get_websocket_manager()
+        stats = ws_manager.get_performance_stats()
+        
+        return {
+            "status": "success",
+            "data": stats,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting WebSocket stats: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get WebSocket statistics")
+
+
+@app.post("/ws/broadcast", tags=["websockets"])
+async def broadcast_message(
+    message_type: str,
+    data: Dict[str, Any],
+    target_tenant: Optional[str] = None,
+    target_type: Optional[str] = None,
+    current_user = Depends(require_admin)
+):
+    """Broadcast message to WebSocket connections (Admin only)."""
+    try:
+        ws_manager = await get_websocket_manager()
+        
+        # Create message
+        message = WebSocketMessage(
+            message_id=f"broadcast_{secrets.token_urlsafe(8)}",
+            message_type=MessageType(message_type),
+            tenant_id=target_tenant or "all",
+            source_id="admin",
+            target_id=None,
+            channel="broadcast",
+            data=data
+        )
+        
+        # Send based on target
+        if target_tenant:
+            await ws_manager.send_to_tenant(target_tenant, message)
+        elif target_type:
+            connection_type = ConnectionType(target_type)
+            await ws_manager.send_to_connection_type(connection_type, message)
+        else:
+            await ws_manager.broadcast_to_all(message)
+        
+        return {
+            "status": "success",
+            "message": "Broadcast sent successfully",
+            "message_id": message.message_id
+        }
+        
+    except Exception as e:
+        logger.error(f"Error broadcasting message: {e}")
+        raise HTTPException(status_code=500, detail="Failed to broadcast message")
+
+
+# WebSocket Message Handlers
+async def _handle_workstation_status_update(data: Dict[str, Any], tenant_id: str):
+    """Handle workstation status update."""
+    try:
+        workstation_id = data.get("workstation_id")
+        status = data.get("status")
+        
+        # Store workstation info (simplified)
+        logger.info(f"Workstation {workstation_id} status: {status}")
+        
+        # Broadcast to dashboard connections
+        ws_manager = await get_websocket_manager()
+        message = WebSocketMessage(
+            message_id=f"status_{secrets.token_urlsafe(8)}",
+            message_type=MessageType.WORKSTATION_STATUS,
+            tenant_id=tenant_id,
+            source_id=workstation_id,
+            target_id=None,
+            channel=f"tenant:{tenant_id}",
+            data=data
+        )
+        
+        await ws_manager.send_to_tenant(tenant_id, message)
+        
+    except Exception as e:
+        logger.error(f"Error handling workstation status update: {e}")
+
+
+async def _handle_workstation_metrics_update(data: Dict[str, Any], tenant_id: str):
+    """Handle workstation metrics update."""
+    try:
+        workstation_id = data.get("workstation_id")
+        metrics = data.get("metrics")
+        
+        # Store metrics (simplified)
+        logger.debug(f"Workstation {workstation_id} metrics: CPU {metrics.get('cpu_percent')}%")
+        
+        # Broadcast to dashboard connections
+        ws_manager = await get_websocket_manager()
+        message = WebSocketMessage(
+            message_id=f"metrics_{secrets.token_urlsafe(8)}",
+            message_type=MessageType.PERFORMANCE_METRIC,
+            tenant_id=tenant_id,
+            source_id=workstation_id,
+            target_id=None,
+            channel=f"tenant:{tenant_id}",
+            data=data
+        )
+        
+        await ws_manager.send_to_tenant(tenant_id, message)
+        
+    except Exception as e:
+        logger.error(f"Error handling workstation metrics update: {e}")
+
+
+async def _handle_workstation_detection_result(data: Dict[str, Any], tenant_id: str):
+    """Handle detection result from workstation."""
+    try:
+        workstation_id = data.get("workstation_id")
+        agent_id = data.get("agent_id")
+        detection_result = data.get("detection_result")
+        
+        # Store detection result (simplified)
+        logger.info(f"Detection result from {workstation_id}/{agent_id}: {detection_result}")
+        
+        # Broadcast to dashboard connections
+        ws_manager = await get_websocket_manager()
+        message = WebSocketMessage(
+            message_id=f"detection_{secrets.token_urlsafe(8)}",
+            message_type=MessageType.DETECTION_RESULT,
+            tenant_id=tenant_id,
+            source_id=f"{workstation_id}/{agent_id}",
+            target_id=None,
+            channel=f"tenant:{tenant_id}",
+            data=data
+        )
+        
+        await ws_manager.send_to_tenant(tenant_id, message)
+        
+    except Exception as e:
+        logger.error(f"Error handling workstation detection result: {e}")
+
+
+async def _handle_workstation_system_alert(data: Dict[str, Any], tenant_id: str):
+    """Handle system alert from workstation."""
+    try:
+        workstation_id = data.get("workstation_id")
+        alerts = data.get("alerts")
+        
+        # Process system alerts
+        logger.warning(f"System alerts from {workstation_id}: {alerts}")
+        
+        # Broadcast to dashboard connections
+        ws_manager = await get_websocket_manager()
+        message = WebSocketMessage(
+            message_id=f"alert_{secrets.token_urlsafe(8)}",
+            message_type=MessageType.SYSTEM_ALERT,
+            tenant_id=tenant_id,
+            source_id=workstation_id,
+            target_id=None,
+            channel=f"tenant:{tenant_id}",
+            data=data
+        )
+        
+        await ws_manager.send_to_tenant(tenant_id, message)
+        
+    except Exception as e:
+        logger.error(f"Error handling workstation system alert: {e}")
+
+
+async def _handle_agent_output(data: Dict[str, Any], agent_id: str, tenant_id: str):
+    """Handle agent output for real-time detection."""
+    try:
+        output_text = data.get("output_text")
+        
+        # Perform real-time detection (simplified)
+        # In practice, this would use the detection pipeline
+        detection_result = {
+            "hallucination_risk": 0.1,  # Placeholder
+            "confidence": 0.9,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+        # Broadcast detection result
+        ws_manager = await get_websocket_manager()
+        message = WebSocketMessage(
+            message_id=f"realtime_{secrets.token_urlsafe(8)}",
+            message_type=MessageType.DETECTION_RESULT,
+            tenant_id=tenant_id,
+            source_id=agent_id,
+            target_id=None,
+            channel=f"tenant:{tenant_id}",
+            data={
+                "agent_id": agent_id,
+                "output_text": output_text,
+                "detection_result": detection_result
+            }
+        )
+        
+        await ws_manager.send_to_tenant(tenant_id, message)
+        
+    except Exception as e:
+        logger.error(f"Error handling agent output: {e}")
+
+
+# Alert Escalation System Endpoints
+@app.post("/alerts", tags=["alerts"])
+async def create_alert(
+    source_id: str,
+    source_type: str,
+    title: str,
+    description: str,
+    severity: str,
+    tags: List[str] = [],
+    metadata: Dict[str, Any] = {},
+    current_user = Depends(require_authentication)
+):
+    """Create a new alert."""
+    try:
+        tenant = get_current_tenant()
+        if not tenant:
+            raise HTTPException(status_code=400, detail="No tenant context available")
+        
+        escalation_service = get_escalation_service()
+        
+        # Validate severity
+        try:
+            alert_severity = AlertSeverity(severity.lower())
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid alert severity")
+        
+        # Create alert
+        alert = Alert(
+            alert_id="",  # Will be generated
+            tenant_id=tenant.tenant_id,
+            source_id=source_id,
+            source_type=source_type,
+            title=title,
+            description=description,
+            severity=alert_severity,
+            tags=tags,
+            metadata=metadata
+        )
+        
+        alert_id = await escalation_service.create_alert(alert)
+        
+        return {
+            "status": "success",
+            "data": {
+                "alert_id": alert_id,
+                "message": "Alert created and escalation monitoring started"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating alert: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create alert")
+
+
+@app.post("/alerts/{alert_id}/acknowledge", tags=["alerts"])
+async def acknowledge_alert(
+    alert_id: str,
+    current_user = Depends(require_authentication)
+):
+    """Acknowledge an alert."""
+    try:
+        escalation_service = get_escalation_service()
+        
+        success = await escalation_service.acknowledge_alert(alert_id, current_user.user_id)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail="Alert not found or already acknowledged")
+        
+        return {
+            "status": "success",
+            "message": "Alert acknowledged successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error acknowledging alert: {e}")
+        raise HTTPException(status_code=500, detail="Failed to acknowledge alert")
+
+
+@app.post("/alerts/{alert_id}/resolve", tags=["alerts"])
+async def resolve_alert(
+    alert_id: str,
+    resolution_notes: Optional[str] = None,
+    current_user = Depends(require_authentication)
+):
+    """Resolve an alert."""
+    try:
+        escalation_service = get_escalation_service()
+        
+        success = await escalation_service.resolve_alert(alert_id, current_user.user_id, resolution_notes)
+        
+        if not success:
+            raise HTTPException(status_code=404, detail="Alert not found")
+        
+        return {
+            "status": "success",
+            "message": "Alert resolved successfully"
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error resolving alert: {e}")
+        raise HTTPException(status_code=500, detail="Failed to resolve alert")
+
+
+@app.get("/alerts/statistics", tags=["alerts"])
+async def get_alert_statistics(
+    days: int = Query(30, ge=1, le=365, description="Number of days for statistics"),
+    current_user = Depends(require_authentication)
+):
+    """Get alert statistics for current tenant."""
+    try:
+        tenant = get_current_tenant()
+        if not tenant:
+            raise HTTPException(status_code=400, detail="No tenant context available")
+        
+        escalation_service = get_escalation_service()
+        statistics = await escalation_service.get_alert_statistics(tenant.tenant_id, days)
+        
+        return {
+            "status": "success",
+            "data": statistics
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error getting alert statistics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get alert statistics")
+
+
+@app.post("/escalation-rules", tags=["alerts"])
+async def create_escalation_rule(
+    name: str,
+    description: str,
+    severity_levels: List[str] = [],
+    source_types: List[str] = [],
+    tags: List[str] = [],
+    departments: List[str] = [],
+    level_1_timeout: int = 5,
+    level_2_timeout: int = 15,
+    level_3_timeout: int = 30,
+    level_4_timeout: int = 60,
+    level_5_timeout: int = 120,
+    current_user = Depends(require_admin)
+):
+    """Create escalation rule (Admin only)."""
+    try:
+        tenant = get_current_tenant()
+        if not tenant:
+            raise HTTPException(status_code=400, detail="No tenant context available")
+        
+        escalation_service = get_escalation_service()
+        
+        # Validate severity levels
+        validated_severities = []
+        for severity in severity_levels:
+            try:
+                validated_severities.append(AlertSeverity(severity.lower()))
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Invalid severity level: {severity}")
+        
+        # Create escalation rule
+        rule = EscalationRule(
+            rule_id="",  # Will be generated
+            tenant_id=tenant.tenant_id,
+            name=name,
+            description=description,
+            severity_levels=validated_severities,
+            source_types=source_types,
+            tags=tags,
+            departments=departments,
+            level_1_timeout=level_1_timeout,
+            level_2_timeout=level_2_timeout,
+            level_3_timeout=level_3_timeout,
+            level_4_timeout=level_4_timeout,
+            level_5_timeout=level_5_timeout
+        )
+        
+        rule_id = await escalation_service.create_escalation_rule(rule)
+        
+        return {
+            "status": "success",
+            "data": {
+                "rule_id": rule_id,
+                "message": "Escalation rule created successfully"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating escalation rule: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create escalation rule")
+
+
+@app.post("/on-call-schedules", tags=["alerts"])
+async def create_on_call_schedule(
+    name: str,
+    description: str,
+    escalation_level: str,
+    rotation_type: str,
+    team_members: List[str],
+    current_user = Depends(require_admin)
+):
+    """Create on-call schedule (Admin only)."""
+    try:
+        tenant = get_current_tenant()
+        if not tenant:
+            raise HTTPException(status_code=400, detail="No tenant context available")
+        
+        escalation_service = get_escalation_service()
+        
+        # Validate escalation level
+        try:
+            level = EscalationLevel(escalation_level.lower())
+        except ValueError:
+            raise HTTPException(status_code=400, detail="Invalid escalation level")
+        
+        # Validate rotation type
+        if rotation_type not in ["daily", "weekly", "monthly"]:
+            raise HTTPException(status_code=400, detail="Invalid rotation type")
+        
+        # Create on-call schedule
+        schedule = OnCallSchedule(
+            schedule_id="",  # Will be generated
+            tenant_id=tenant.tenant_id,
+            name=name,
+            description=description,
+            escalation_level=level,
+            rotation_type=rotation_type,
+            team_members=team_members
+        )
+        
+        schedule_id = await escalation_service.create_on_call_schedule(schedule)
+        
+        return {
+            "status": "success",
+            "data": {
+                "schedule_id": schedule_id,
+                "message": "On-call schedule created successfully"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating on-call schedule: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create on-call schedule")
+
+
+@app.get("/escalation-levels", tags=["alerts"])
+async def get_escalation_levels(current_user = Depends(require_authentication)):
+    """Get available escalation levels."""
+    levels = [
+        {
+            "level": "level_1",
+            "name": "Level 1 - Primary On-Call",
+            "description": "First responder, typically 5-15 minutes"
+        },
+        {
+            "level": "level_2", 
+            "name": "Level 2 - Supervisor",
+            "description": "Team lead or supervisor, typically 15-30 minutes"
+        },
+        {
+            "level": "level_3",
+            "name": "Level 3 - Manager", 
+            "description": "Department manager, typically 30-60 minutes"
+        },
+        {
+            "level": "level_4",
+            "name": "Level 4 - Executive",
+            "description": "Senior management, typically 1-2 hours"
+        },
+        {
+            "level": "level_5",
+            "name": "Level 5 - Emergency",
+            "description": "Emergency contacts, 2+ hours"
+        }
+    ]
+    
+    return {
+        "status": "success",
+        "data": levels
+    }
+
+
+@app.get("/alert-severities", tags=["alerts"])
+async def get_alert_severities(current_user = Depends(require_authentication)):
+    """Get available alert severities."""
+    severities = [
+        {
+            "severity": "low",
+            "name": "Low",
+            "description": "Minor issues, can wait for business hours",
+            "color": "#4CAF50"
+        },
+        {
+            "severity": "medium",
+            "name": "Medium", 
+            "description": "Moderate impact, should be addressed soon",
+            "color": "#FF9800"
+        },
+        {
+            "severity": "high",
+            "name": "High",
+            "description": "Significant impact, requires immediate attention",
+            "color": "#F44336"
+        },
+        {
+            "severity": "critical",
+            "name": "Critical",
+            "description": "System down or major security incident",
+            "color": "#9C27B0"
+        }
+    ]
+    
+    return {
+        "status": "success", 
+        "data": severities
+    }
+
+
+# Workstation Discovery Endpoints
+@app.post("/discovery/network-ranges", tags=["discovery"])
+async def add_network_range(
+    name: str,
+    cidr: str,
+    description: str = "",
+    scan_frequency: int = 3600,
+    current_user = Depends(require_admin)
+):
+    """Add network range for discovery (Admin only)."""
+    try:
+        discovery_service = get_discovery_service()
+        
+        network_range = NetworkRange(
+            range_id="",  # Will be generated
+            name=name,
+            cidr=cidr,
+            description=description,
+            scan_frequency=scan_frequency
+        )
+        
+        range_id = await discovery_service.add_network_range(network_range)
+        
+        return {
+            "status": "success",
+            "data": {
+                "range_id": range_id,
+                "message": "Network range added successfully"
+            }
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error adding network range: {e}")
+        raise HTTPException(status_code=500, detail="Failed to add network range")
+
+
+@app.post("/discovery/tasks", tags=["discovery"])
+async def create_discovery_task(
+    name: str,
+    description: str,
+    network_ranges: List[str],
+    discovery_methods: List[str] = ["network_scan"],
+    interval_seconds: int = 3600,
+    port_scan_enabled: bool = True,
+    service_detection_enabled: bool = True,
+    os_detection_enabled: bool = True,
+    max_concurrent_scans: int = 50,
+    current_user = Depends(require_admin)
+):
+    """Create discovery task (Admin only)."""
+    try:
+        discovery_service = get_discovery_service()
+        
+        # Validate discovery methods
+        validated_methods = []
+        for method in discovery_methods:
+            try:
+                validated_methods.append(DiscoveryMethod(method.lower()))
+            except ValueError:
+                raise HTTPException(status_code=400, detail=f"Invalid discovery method: {method}")
+        
+        task = DiscoveryTask(
+            task_id="",  # Will be generated
+            name=name,
+            description=description,
+            network_ranges=network_ranges,
+            discovery_methods=validated_methods,
+            interval_seconds=interval_seconds,
+            port_scan_enabled=port_scan_enabled,
+            service_detection_enabled=service_detection_enabled,
+            os_detection_enabled=os_detection_enabled,
+            max_concurrent_scans=max_concurrent_scans
+        )
+        
+        task_id = await discovery_service.create_discovery_task(task)
+        
+        return {
+            "status": "success",
+            "data": {
+                "task_id": task_id,
+                "message": "Discovery task created successfully"
+            }
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Error creating discovery task: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create discovery task")
+
+
+@app.post("/discovery/tasks/{task_id}/run", tags=["discovery"])
+async def run_discovery_task(
+    task_id: str,
+    current_user = Depends(require_admin)
+):
+    """Run discovery task manually (Admin only)."""
+    try:
+        discovery_service = get_discovery_service()
+        results = await discovery_service.run_discovery_task(task_id)
+        
+        return {
+            "status": "success",
+            "data": results,
+            "message": "Discovery task completed successfully"
+        }
+        
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.error(f"Error running discovery task: {e}")
+        raise HTTPException(status_code=500, detail="Failed to run discovery task")
+
+
+@app.get("/discovery/devices", tags=["discovery"])
+async def get_discovered_devices(
+    limit: int = Query(100, ge=1, le=1000, description="Number of devices to return"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
+    current_user = Depends(require_authentication)
+):
+    """Get discovered devices with pagination."""
+    try:
+        discovery_service = get_discovery_service()
+        devices = await discovery_service.get_discovered_devices(limit, offset)
+        
+        return {
+            "status": "success",
+            "data": devices,
+            "count": len(devices),
+            "limit": limit,
+            "offset": offset
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting discovered devices: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get discovered devices")
+
+
+@app.get("/discovery/statistics", tags=["discovery"])
+async def get_discovery_statistics(current_user = Depends(require_authentication)):
+    """Get discovery statistics."""
+    try:
+        discovery_service = get_discovery_service()
+        statistics = await discovery_service.get_discovery_statistics()
+        
+        return {
+            "status": "success",
+            "data": statistics
+        }
+        
+    except Exception as e:
+        logger.error(f"Error getting discovery statistics: {e}")
+        raise HTTPException(status_code=500, detail="Failed to get discovery statistics")
+
+
+@app.get("/discovery/methods", tags=["discovery"])
+async def get_discovery_methods(current_user = Depends(require_authentication)):
+    """Get available discovery methods."""
+    methods = [
+        {
+            "method": "network_scan",
+            "name": "Network Scanning",
+            "description": "TCP port scanning and service detection"
+        },
+        {
+            "method": "active_directory",
+            "name": "Active Directory",
+            "description": "Query Active Directory for computer objects"
+        },
+        {
+            "method": "snmp",
+            "name": "SNMP Discovery",
+            "description": "SNMP-based device discovery and inventory"
+        },
+        {
+            "method": "dhcp_logs",
+            "name": "DHCP Log Analysis",
+            "description": "Parse DHCP server logs for device information"
+        },
+        {
+            "method": "dns_lookup",
+            "name": "DNS Enumeration",
+            "description": "DNS zone transfers and reverse lookups"
+        },
+        {
+            "method": "manual",
+            "name": "Manual Entry",
+            "description": "Manually added device information"
+        }
+    ]
+    
+    return {
+        "status": "success",
+        "data": methods
+    }
+
+
+@app.get("/discovery/device-types", tags=["discovery"])
+async def get_device_types(current_user = Depends(require_authentication)):
+    """Get available device types."""
+    types = [
+        {
+            "type": "workstation",
+            "name": "Workstation",
+            "description": "Desktop computers and workstations",
+            "icon": "computer"
+        },
+        {
+            "type": "server",
+            "name": "Server",
+            "description": "Server systems and infrastructure",
+            "icon": "server"
+        },
+        {
+            "type": "laptop",
+            "name": "Laptop",
+            "description": "Portable computers and laptops",
+            "icon": "laptop"
+        },
+        {
+            "type": "mobile",
+            "name": "Mobile Device",
+            "description": "Smartphones and tablets",
+            "icon": "phone"
+        },
+        {
+            "type": "printer",
+            "name": "Printer",
+            "description": "Network printers and multifunction devices",
+            "icon": "printer"
+        },
+        {
+            "type": "network_device",
+            "name": "Network Device",
+            "description": "Routers, switches, and network equipment",
+            "icon": "network"
+        },
+        {
+            "type": "iot_device",
+            "name": "IoT Device",
+            "description": "Internet of Things and smart devices",
+            "icon": "sensors"
+        },
+        {
+            "type": "unknown",
+            "name": "Unknown",
+            "description": "Unidentified or unclassified devices",
+            "icon": "help"
+        }
+    ]
+    
+    return {
+        "status": "success",
+        "data": types
+    }
+
+
+@app.get("/discovery/operating-systems", tags=["discovery"])
+async def get_operating_systems(current_user = Depends(require_authentication)):
+    """Get available operating systems."""
+    systems = [
+        {
+            "os": "windows",
+            "name": "Microsoft Windows",
+            "description": "Windows desktop and server operating systems",
+            "icon": "windows"
+        },
+        {
+            "os": "macos",
+            "name": "macOS",
+            "description": "Apple macOS and Mac OS X",
+            "icon": "apple"
+        },
+        {
+            "os": "linux",
+            "name": "Linux",
+            "description": "Linux distributions and variants",
+            "icon": "linux"
+        },
+        {
+            "os": "unix",
+            "name": "Unix",
+            "description": "Unix and Unix-like operating systems",
+            "icon": "terminal"
+        },
+        {
+            "os": "android",
+            "name": "Android",
+            "description": "Google Android mobile operating system",
+            "icon": "android"
+        },
+        {
+            "os": "ios",
+            "name": "iOS",
+            "description": "Apple iOS mobile operating system",
+            "icon": "apple"
+        },
+        {
+            "os": "unknown",
+            "name": "Unknown",
+            "description": "Unidentified operating system",
+            "icon": "help"
+        }
+    ]
+    
+    return {
+        "status": "success",
+        "data": systems
+    }
 
 
 # Custom Detection Rules Endpoints

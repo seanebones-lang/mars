@@ -27,7 +27,7 @@ import {
   CheckCircle,
   Speed,
   Security,
-  Integration,
+  ExtensionOutlined,
   CloudDownload,
   GitHub,
   Description
@@ -70,7 +70,7 @@ export default function SDKPage() {
   const features = [
     { icon: <Speed />, title: 'High Performance', description: 'Async operations with <100ms latency' },
     { icon: <Security />, title: 'Enterprise Security', description: 'JWT authentication & role-based access' },
-    { icon: <Integration />, title: 'Easy Integration', description: 'One-line hallucination detection' },
+    { icon: <ExtensionOutlined />, title: 'Easy ExtensionOutlined', description: 'One-line hallucination detection' },
     { icon: <CheckCircle />, title: 'Type Safety', description: 'Full TypeScript support & validation' }
   ];
 
@@ -246,7 +246,7 @@ results = client.get_batch_results(job.job_id)
 
           <TabPanel value={tabValue} index={3}>
             <Typography variant="h6" gutterBottom>
-              Custom Rules Integration
+              Custom Rules ExtensionOutlined
             </Typography>
             <Paper sx={{ p: 2, bgcolor: 'grey.50', fontFamily: 'monospace', mb: 2 }}>
               <pre>{`from watcher_ai_sdk import WatcherClient, CustomRule, RuleType, RuleCategory

@@ -204,7 +204,7 @@ export default function AnalyticsPage() {
 
         {/* Summary Cards */}
         <Grid container spacing={3} mb={4}>
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Card>
               <CardContent>
                 <Box display="flex" alignItems="center" mb={2}>
@@ -221,7 +221,7 @@ export default function AnalyticsPage() {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Card>
               <CardContent>
                 <Box display="flex" alignItems="center" mb={2}>
@@ -245,7 +245,7 @@ export default function AnalyticsPage() {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Card>
               <CardContent>
                 <Box display="flex" alignItems="center" mb={2}>
@@ -262,7 +262,7 @@ export default function AnalyticsPage() {
             </Card>
           </Grid>
 
-          <Grid item xs={12} sm={6} md={3}>
+          <Grid xs={12} sm={6} md={3}>
             <Card>
               <CardContent>
                 <Box display="flex" alignItems="center" mb={2}>
@@ -293,7 +293,7 @@ export default function AnalyticsPage() {
         {/* Tab Panels */}
         <TabPanel value={tabValue} index={0}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -331,7 +331,7 @@ export default function AnalyticsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -372,7 +372,7 @@ export default function AnalyticsPage() {
 
         <TabPanel value={tabValue} index={1}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={8}>
+            <Grid xs={12} md={8}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -395,7 +395,7 @@ export default function AnalyticsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={4}>
+            <Grid xs={12} md={4}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -446,7 +446,7 @@ export default function AnalyticsPage() {
 
         <TabPanel value={tabValue} index={2}>
           <Grid container spacing={3}>
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -475,7 +475,7 @@ export default function AnalyticsPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} md={6}>
+            <Grid xs={12} md={6}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
@@ -498,14 +498,14 @@ export default function AnalyticsPage() {
 
         <TabPanel value={tabValue} index={3}>
           <Grid container spacing={3}>
-            <Grid item xs={12}>
+            <Grid xs={12}>
               <Card>
                 <CardContent>
                   <Typography variant="h6" gutterBottom>
                     System Performance Metrics
                   </Typography>
                   <Grid container spacing={3}>
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid xs={12} sm={6} md={3}>
                       <Box textAlign="center" p={2}>
                         <CheckCircle color="success" sx={{ fontSize: 48, mb: 1 }} />
                         <Typography variant="h4" color="success">
@@ -517,7 +517,7 @@ export default function AnalyticsPage() {
                       </Box>
                     </Grid>
                     
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid xs={12} sm={6} md={3}>
                       <Box textAlign="center" p={2}>
                         <Speed color="primary" sx={{ fontSize: 48, mb: 1 }} />
                         <Typography variant="h4" color="primary">
@@ -529,7 +529,7 @@ export default function AnalyticsPage() {
                       </Box>
                     </Grid>
                     
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid xs={12} sm={6} md={3}>
                       <Box textAlign="center" p={2}>
                         <Timeline color="info" sx={{ fontSize: 48, mb: 1 }} />
                         <Typography variant="h4" color="info">
@@ -541,7 +541,7 @@ export default function AnalyticsPage() {
                       </Box>
                     </Grid>
                     
-                    <Grid item xs={12} sm={6} md={3}>
+                    <Grid xs={12} sm={6} md={3}>
                       <Box textAlign="center" p={2}>
                         <Pattern color="secondary" sx={{ fontSize: 48, mb: 1 }} />
                         <Typography variant="h4" color="secondary">

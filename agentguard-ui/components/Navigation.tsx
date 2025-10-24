@@ -21,7 +21,8 @@ import {
   SecurityOutlined,
   SpeedOutlined,
   BugReportOutlined,
-  PlayArrowOutlined
+  PlayArrowOutlined,
+  ComputerOutlined
 } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
@@ -47,6 +48,7 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
   // Monitoring & Analytics dropdown
   const monitoringItems = [
     { label: 'Live Monitor', href: '/monitor', icon: <MonitorHeartOutlined />, description: 'Real-time agent monitoring' },
+    { label: 'Workstations', href: '/workstations', icon: <ComputerOutlined />, description: 'Enterprise workstation dashboard' },
     { label: 'Analytics', href: '/analytics', icon: <AnalyticsOutlined />, description: 'Performance insights & trends' },
     { label: 'Performance', href: '/performance', icon: <SpeedOutlined />, description: 'System health & metrics' },
     { label: 'Custom Rules', href: '/custom-rules', icon: <TuneOutlined />, description: 'Industry-specific detection' },

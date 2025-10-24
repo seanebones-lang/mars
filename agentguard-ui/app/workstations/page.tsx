@@ -1,0 +1,1003 @@
+"use client";
+
+import React, { useState, useEffect, useMemo } from 'react';
+import {
+  Box,
+  Container,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  Chip,
+  TextField,
+  InputAdornment,
+  FormControl,
+  InputLabel,
+  Select,
+  MenuItem,
+  Button,
+  IconButton,
+  Tooltip,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Table,
+  TableBody,
+  TableCell,
+  TableContainer,
+  TableHead,
+  TableRow,
+  Paper,
+  LinearProgress,
+  Alert,
+  Fab,
+  Badge,
+  Switch,
+  FormControlLabel,
+  Divider,
+  Avatar,
+  ListItemText,
+  Menu,
+  ListItemIcon
+} from '@mui/material';
+import {
+  SearchOutlined,
+  FilterListOutlined,
+  RefreshOutlined,
+  SettingsOutlined,
+  ComputerOutlined,
+  WarningOutlined,
+  CheckCircleOutlined,
+  ErrorOutlined,
+  InfoOutlined,
+  LocationOnOutlined,
+  SpeedOutlined,
+  MemoryOutlined,
+  StorageOutlined,
+  NetworkCheckOutlined,
+  PlayArrowOutlined,
+  StopOutlined,
+  RestartAltOutlined,
+  DeleteOutlined,
+  MoreVertOutlined,
+  ViewListOutlined,
+  ViewModuleOutlined,
+  MapOutlined,
+  TrendingUpOutlined,
+  NotificationsOutlined,
+  GroupOutlined,
+  BusinessOutlined
+} from '@mui/icons-material';
+import { motion, AnimatePresence } from 'framer-motion';
+import { useTheme } from '@mui/material/styles';
+
+// Mock data for workstations
+const generateMockWorkstations = (count: number) => {
+  const statuses = ['online', 'offline', 'monitoring', 'error', 'maintenance'];
+  const locations = ['New York', 'London', 'Tokyo', 'Sydney', 'Frankfurt', 'Singapore', 'Toronto', 'Mumbai'];
+  const departments = ['IT', 'Finance', 'HR', 'Sales', 'Marketing', 'Operations', 'R&D', 'Support'];
+  
+  return Array.from({ length: count }, (_, i) => ({
+    id: `ws_${i.toString().padStart(4, '0')}`,
+    hostname: `workstation-${i + 1}`,
+    status: statuses[Math.floor(Math.random() * statuses.length)],
+    location: locations[Math.floor(Math.random() * locations.length)],
+    department: departments[Math.floor(Math.random() * departments.length)],
+    ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+    lastSeen: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+    cpuUsage: Math.floor(Math.random() * 100),
+    memoryUsage: Math.floor(Math.random() * 100),
+    diskUsage: Math.floor(Math.random() * 100),
+    agentCount: Math.floor(Math.random() * 5),
+    alertCount: Math.floor(Math.random() * 10),
+    platform: ['Windows', 'macOS', 'Linux'][Math.floor(Math.random() * 3)],
+    version: '1.0.0',
+    uptime: Math.floor(Math.random() * 86400),
+    networkLatency: Math.floor(Math.random() * 100),
+    coordinates: {
+      lat: -90 + Math.random() * 180,
+      lng: -180 + Math.random() * 360
+    }
+  }));
+};
+
+interface Workstation {
+  id: string;
+  hostname: string;
+  status: string;
+  location: string;
+  department: string;
+  ipAddress: string;
+  lastSeen: string;
+  cpuUsage: number;
+  memoryUsage: number;
+  diskUsage: number;
+  agentCount: number;
+  alertCount: number;
+  platform: string;
+  version: string;
+  uptime: number;
+  networkLatency: number;
+  coordinates: {
+    lat: number;
+    lng: number;
+  };
+}
+
+const getStatusColor = (status: string) => {
+  switch (status) {
+    case 'online': return 'success';
+    case 'monitoring': return 'info';
+    case 'offline': return 'default';
+    case 'error': return 'error';
+    case 'maintenance': return 'warning';
+    default: return 'default';
+  }
+};
+
+const getStatusIcon = (status: string) => {
+  switch (status) {
+    case 'online': return <CheckCircleOutlined />;
+    case 'monitoring': return <SpeedOutlined />;
+    case 'offline': return <ComputerOutlined />;
+    case 'error': return <ErrorOutlined />;
+    case 'maintenance': return <WarningOutlined />;
+    default: return <InfoOutlined />;
+  }
+};
+
+const formatUptime = (seconds: number) => {
+  const hours = Math.floor(seconds / 3600);
+  const minutes = Math.floor((seconds % 3600) / 60);
+  return `${hours}h ${minutes}m`;
+};
+
+const WorkstationCard: React.FC<{ workstation: Workstation; onSelect: (id: string) => void; selected: boolean }> = ({
+  workstation,
+  onSelect,
+  selected
+}) => {
+  const theme = useTheme();
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+
+  const handleMenuClick = (event: React.MouseEvent<HTMLElement>) => {
+    event.stopPropagation();
+    setAnchorEl(event.currentTarget);
+  };
+
+  const handleMenuClose = () => {
+    setAnchorEl(null);
+  };
+
+  return (
+    <motion.div
+      layout
+      initial={{ opacity: 0, scale: 0.9 }}
+      animate={{ opacity: 1, scale: 1 }}
+      exit={{ opacity: 0, scale: 0.9 }}
+      whileHover={{ scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+    >
+      <Card
+        sx={{
+          cursor: 'pointer',
+          border: selected ? `2px solid ${theme.palette.primary.main}` : '1px solid',
+          borderColor: selected ? 'primary.main' : 'divider',
+          '&:hover': {
+            boxShadow: theme.shadows[4],
+            borderColor: 'primary.main'
+          }
+        }}
+        onClick={() => onSelect(workstation.id)}
+      >
+        <CardHeader
+          avatar={
+            <Avatar sx={{ bgcolor: getStatusColor(workstation.status) === 'success' ? 'success.main' : 
+                                getStatusColor(workstation.status) === 'error' ? 'error.main' :
+                                getStatusColor(workstation.status) === 'warning' ? 'warning.main' :
+                                getStatusColor(workstation.status) === 'info' ? 'info.main' : 'grey.500' }}>
+              {getStatusIcon(workstation.status)}
+            </Avatar>
+          }
+          action={
+            <IconButton onClick={handleMenuClick}>
+              <MoreVertOutlined />
+            </IconButton>
+          }
+          title={
+            <Box display="flex" alignItems="center" gap={1}>
+              <Typography variant="h6" noWrap>
+                {workstation.hostname}
+              </Typography>
+              <Chip
+                label={workstation.status}
+                color={getStatusColor(workstation.status) as any}
+                size="small"
+              />
+            </Box>
+          }
+          subheader={
+            <Box>
+              <Typography variant="body2" color="text.secondary">
+                {workstation.location} • {workstation.department}
+              </Typography>
+              <Typography variant="caption" color="text.secondary">
+                {workstation.ipAddress} • {workstation.platform}
+              </Typography>
+            </Box>
+          }
+        />
+        
+        <CardContent sx={{ pt: 0 }}>
+          <Grid container spacing={2}>
+            <Grid item xs={6}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <SpeedOutlined fontSize="small" color="action" />
+                <Box flex={1}>
+                  <Typography variant="caption" color="text.secondary">
+                    CPU: {workstation.cpuUsage}%
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={workstation.cpuUsage}
+                    color={workstation.cpuUsage > 80 ? 'error' : workstation.cpuUsage > 60 ? 'warning' : 'primary'}
+                    sx={{ height: 4, borderRadius: 2 }}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+            
+            <Grid item xs={6}>
+              <Box display="flex" alignItems="center" gap={1}>
+                <MemoryOutlined fontSize="small" color="action" />
+                <Box flex={1}>
+                  <Typography variant="caption" color="text.secondary">
+                    Memory: {workstation.memoryUsage}%
+                  </Typography>
+                  <LinearProgress
+                    variant="determinate"
+                    value={workstation.memoryUsage}
+                    color={workstation.memoryUsage > 80 ? 'error' : workstation.memoryUsage > 60 ? 'warning' : 'primary'}
+                    sx={{ height: 4, borderRadius: 2 }}
+                  />
+                </Box>
+              </Box>
+            </Grid>
+            
+            <Grid item xs={12}>
+              <Box display="flex" justifyContent="space-between" alignItems="center">
+                <Box display="flex" alignItems="center" gap={1}>
+                  <ComputerOutlined fontSize="small" color="action" />
+                  <Typography variant="body2">
+                    {workstation.agentCount} agents
+                  </Typography>
+                </Box>
+                
+                <Box display="flex" alignItems="center" gap={1}>
+                  {workstation.alertCount > 0 && (
+                    <Badge badgeContent={workstation.alertCount} color="error">
+                      <NotificationsOutlined fontSize="small" />
+                    </Badge>
+                  )}
+                  <Typography variant="caption" color="text.secondary">
+                    {formatUptime(workstation.uptime)}
+                  </Typography>
+                </Box>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+
+        <Menu
+          anchorEl={anchorEl}
+          open={Boolean(anchorEl)}
+          onClose={handleMenuClose}
+        >
+          <MenuItem onClick={handleMenuClose}>
+            <ListItemIcon>
+              <PlayArrowOutlined fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Start Monitoring</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            <ListItemIcon>
+              <StopOutlined fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Stop Monitoring</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose}>
+            <ListItemIcon>
+              <RestartAltOutlined fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Restart Agent</ListItemText>
+          </MenuItem>
+          <Divider />
+          <MenuItem onClick={handleMenuClose}>
+            <ListItemIcon>
+              <SettingsOutlined fontSize="small" />
+            </ListItemIcon>
+            <ListItemText>Configure</ListItemText>
+          </MenuItem>
+          <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
+            <ListItemIcon>
+              <DeleteOutlined fontSize="small" color="error" />
+            </ListItemIcon>
+            <ListItemText>Remove</ListItemText>
+          </MenuItem>
+        </Menu>
+      </Card>
+    </motion.div>
+  );
+};
+
+const WorkstationRow: React.FC<{ workstation: Workstation; onSelect: (id: string) => void; selected: boolean }> = ({
+  workstation,
+  onSelect,
+  selected
+}) => {
+  const theme = useTheme();
+
+  return (
+    <TableRow
+      hover
+      selected={selected}
+      onClick={() => onSelect(workstation.id)}
+      sx={{ cursor: 'pointer' }}
+    >
+      <TableCell>
+        <Box display="flex" alignItems="center" gap={2}>
+          <Avatar sx={{ 
+            bgcolor: getStatusColor(workstation.status) === 'success' ? 'success.main' : 
+                     getStatusColor(workstation.status) === 'error' ? 'error.main' :
+                     getStatusColor(workstation.status) === 'warning' ? 'warning.main' :
+                     getStatusColor(workstation.status) === 'info' ? 'info.main' : 'grey.500',
+            width: 32,
+            height: 32
+          }}>
+            {getStatusIcon(workstation.status)}
+          </Avatar>
+          <Box>
+            <Typography variant="body2" fontWeight={500}>
+              {workstation.hostname}
+            </Typography>
+            <Typography variant="caption" color="text.secondary">
+              {workstation.ipAddress}
+            </Typography>
+          </Box>
+        </Box>
+      </TableCell>
+      
+      <TableCell>
+        <Chip
+          label={workstation.status}
+          color={getStatusColor(workstation.status) as any}
+          size="small"
+        />
+      </TableCell>
+      
+      <TableCell>
+        <Typography variant="body2">{workstation.location}</Typography>
+        <Typography variant="caption" color="text.secondary">
+          {workstation.department}
+        </Typography>
+      </TableCell>
+      
+      <TableCell>
+        <Box display="flex" alignItems="center" gap={1}>
+          <LinearProgress
+            variant="determinate"
+            value={workstation.cpuUsage}
+            color={workstation.cpuUsage > 80 ? 'error' : workstation.cpuUsage > 60 ? 'warning' : 'primary'}
+            sx={{ width: 60, height: 6, borderRadius: 3 }}
+          />
+          <Typography variant="caption">
+            {workstation.cpuUsage}%
+          </Typography>
+        </Box>
+      </TableCell>
+      
+      <TableCell>
+        <Box display="flex" alignItems="center" gap={1}>
+          <LinearProgress
+            variant="determinate"
+            value={workstation.memoryUsage}
+            color={workstation.memoryUsage > 80 ? 'error' : workstation.memoryUsage > 60 ? 'warning' : 'primary'}
+            sx={{ width: 60, height: 6, borderRadius: 3 }}
+          />
+          <Typography variant="caption">
+            {workstation.memoryUsage}%
+          </Typography>
+        </Box>
+      </TableCell>
+      
+      <TableCell>
+        <Typography variant="body2">{workstation.agentCount}</Typography>
+      </TableCell>
+      
+      <TableCell>
+        {workstation.alertCount > 0 ? (
+          <Badge badgeContent={workstation.alertCount} color="error">
+            <NotificationsOutlined />
+          </Badge>
+        ) : (
+          <Typography variant="body2" color="text.secondary">-</Typography>
+        )}
+      </TableCell>
+      
+      <TableCell>
+        <Typography variant="caption" color="text.secondary">
+          {formatUptime(workstation.uptime)}
+        </Typography>
+      </TableCell>
+    </TableRow>
+  );
+};
+
+export default function WorkstationsPage() {
+  const theme = useTheme();
+  const [workstations, setWorkstations] = useState<Workstation[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
+  const [departmentFilter, setDepartmentFilter] = useState('all');
+  const [viewMode, setViewMode] = useState<'grid' | 'list' | 'map'>('grid');
+  const [selectedWorkstations, setSelectedWorkstations] = useState<Set<string>>(new Set());
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const [selectedWorkstation, setSelectedWorkstation] = useState<Workstation | null>(null);
+  const [autoRefresh, setAutoRefresh] = useState(true);
+
+  // Load mock data
+  useEffect(() => {
+    const loadWorkstations = async () => {
+      setLoading(true);
+      // Simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      setWorkstations(generateMockWorkstations(150));
+      setLoading(false);
+    };
+
+    loadWorkstations();
+  }, []);
+
+  // Auto-refresh
+  useEffect(() => {
+    if (!autoRefresh) return;
+
+    const interval = setInterval(() => {
+      // Simulate real-time updates
+      setWorkstations(prev => prev.map(ws => ({
+        ...ws,
+        cpuUsage: Math.max(0, Math.min(100, ws.cpuUsage + (Math.random() - 0.5) * 10)),
+        memoryUsage: Math.max(0, Math.min(100, ws.memoryUsage + (Math.random() - 0.5) * 5)),
+        lastSeen: new Date().toISOString()
+      })));
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [autoRefresh]);
+
+  // Filter workstations
+  const filteredWorkstations = useMemo(() => {
+    return workstations.filter(ws => {
+      const matchesSearch = ws.hostname.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           ws.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           ws.department.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                           ws.ipAddress.includes(searchTerm);
+      
+      const matchesStatus = statusFilter === 'all' || ws.status === statusFilter;
+      const matchesLocation = locationFilter === 'all' || ws.location === locationFilter;
+      const matchesDepartment = departmentFilter === 'all' || ws.department === departmentFilter;
+      
+      return matchesSearch && matchesStatus && matchesLocation && matchesDepartment;
+    });
+  }, [workstations, searchTerm, statusFilter, locationFilter, departmentFilter]);
+
+  // Get unique values for filters
+  const uniqueLocations = [...new Set(workstations.map(ws => ws.location))].sort();
+  const uniqueDepartments = [...new Set(workstations.map(ws => ws.department))].sort();
+
+  // Statistics
+  const stats = useMemo(() => {
+    const total = workstations.length;
+    const online = workstations.filter(ws => ws.status === 'online').length;
+    const monitoring = workstations.filter(ws => ws.status === 'monitoring').length;
+    const offline = workstations.filter(ws => ws.status === 'offline').length;
+    const errors = workstations.filter(ws => ws.status === 'error').length;
+    const totalAlerts = workstations.reduce((sum, ws) => sum + ws.alertCount, 0);
+    const avgCpu = Math.round(workstations.reduce((sum, ws) => sum + ws.cpuUsage, 0) / total);
+    const avgMemory = Math.round(workstations.reduce((sum, ws) => sum + ws.memoryUsage, 0) / total);
+
+    return { total, online, monitoring, offline, errors, totalAlerts, avgCpu, avgMemory };
+  }, [workstations]);
+
+  const handleWorkstationSelect = (id: string) => {
+    const workstation = workstations.find(ws => ws.id === id);
+    if (workstation) {
+      setSelectedWorkstation(workstation);
+      setDetailsOpen(true);
+    }
+  };
+
+  const handleBulkSelect = (id: string) => {
+    const newSelected = new Set(selectedWorkstations);
+    if (newSelected.has(id)) {
+      newSelected.delete(id);
+    } else {
+      newSelected.add(id);
+    }
+    setSelectedWorkstations(newSelected);
+  };
+
+  const handleRefresh = () => {
+    setWorkstations(generateMockWorkstations(150));
+  };
+
+  return (
+    <Container maxWidth="xl" sx={{ py: 4 }}>
+      {/* Header */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Box>
+          <Typography variant="h4" component="h1" gutterBottom>
+            Workstation Dashboard
+          </Typography>
+          <Typography variant="body1" color="text.secondary">
+            Monitor and manage {stats.total} workstations across your enterprise
+          </Typography>
+        </Box>
+        
+        <Box display="flex" gap={2} alignItems="center">
+          <FormControlLabel
+            control={
+              <Switch
+                checked={autoRefresh}
+                onChange={(e) => setAutoRefresh(e.target.checked)}
+              />
+            }
+            label="Auto-refresh"
+          />
+          
+          <Button
+            variant="outlined"
+            startIcon={<RefreshOutlined />}
+            onClick={handleRefresh}
+          >
+            Refresh
+          </Button>
+        </Box>
+      </Box>
+
+      {/* Statistics Cards */}
+      <Grid container spacing={3} mb={4}>
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Avatar sx={{ bgcolor: 'primary.main' }}>
+                  <ComputerOutlined />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4">{stats.total}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Total Workstations
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Avatar sx={{ bgcolor: 'success.main' }}>
+                  <CheckCircleOutlined />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4">{stats.online}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Online ({Math.round((stats.online / stats.total) * 100)}%)
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Avatar sx={{ bgcolor: 'error.main' }}>
+                  <ErrorOutlined />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4">{stats.errors}</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Errors & Alerts
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+        
+        <Grid item xs={12} sm={6} md={3}>
+          <Card>
+            <CardContent>
+              <Box display="flex" alignItems="center" gap={2}>
+                <Avatar sx={{ bgcolor: 'info.main' }}>
+                  <TrendingUpOutlined />
+                </Avatar>
+                <Box>
+                  <Typography variant="h4">{stats.avgCpu}%</Typography>
+                  <Typography variant="body2" color="text.secondary">
+                    Avg CPU Usage
+                  </Typography>
+                </Box>
+              </Box>
+            </CardContent>
+          </Card>
+        </Grid>
+      </Grid>
+
+      {/* Filters and Controls */}
+      <Card sx={{ mb: 3 }}>
+        <CardContent>
+          <Grid container spacing={3} alignItems="center">
+            <Grid item xs={12} md={4}>
+              <TextField
+                fullWidth
+                placeholder="Search workstations..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                InputProps={{
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchOutlined />
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </Grid>
+            
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Status</InputLabel>
+                <Select
+                  value={statusFilter}
+                  label="Status"
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <MenuItem value="all">All Status</MenuItem>
+                  <MenuItem value="online">Online</MenuItem>
+                  <MenuItem value="monitoring">Monitoring</MenuItem>
+                  <MenuItem value="offline">Offline</MenuItem>
+                  <MenuItem value="error">Error</MenuItem>
+                  <MenuItem value="maintenance">Maintenance</MenuItem>
+                </Select>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Location</InputLabel>
+                <Select
+                  value={locationFilter}
+                  label="Location"
+                  onChange={(e) => setLocationFilter(e.target.value)}
+                >
+                  <MenuItem value="all">All Locations</MenuItem>
+                  {uniqueLocations.map(location => (
+                    <MenuItem key={location} value={location}>{location}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} md={2}>
+              <FormControl fullWidth>
+                <InputLabel>Department</InputLabel>
+                <Select
+                  value={departmentFilter}
+                  label="Department"
+                  onChange={(e) => setDepartmentFilter(e.target.value)}
+                >
+                  <MenuItem value="all">All Departments</MenuItem>
+                  {uniqueDepartments.map(dept => (
+                    <MenuItem key={dept} value={dept}>{dept}</MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            </Grid>
+            
+            <Grid item xs={12} md={2}>
+              <Box display="flex" gap={1}>
+                <Tooltip title="Grid View">
+                  <IconButton
+                    color={viewMode === 'grid' ? 'primary' : 'default'}
+                    onClick={() => setViewMode('grid')}
+                  >
+                    <ViewModuleOutlined />
+                  </IconButton>
+                </Tooltip>
+                
+                <Tooltip title="List View">
+                  <IconButton
+                    color={viewMode === 'list' ? 'primary' : 'default'}
+                    onClick={() => setViewMode('list')}
+                  >
+                    <ViewListOutlined />
+                  </IconButton>
+                </Tooltip>
+                
+                <Tooltip title="Map View">
+                  <IconButton
+                    color={viewMode === 'map' ? 'primary' : 'default'}
+                    onClick={() => setViewMode('map')}
+                  >
+                    <MapOutlined />
+                  </IconButton>
+                </Tooltip>
+              </Box>
+            </Grid>
+          </Grid>
+        </CardContent>
+      </Card>
+
+      {/* Results Summary */}
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={3}>
+        <Typography variant="body1">
+          Showing {filteredWorkstations.length} of {workstations.length} workstations
+        </Typography>
+        
+        {selectedWorkstations.size > 0 && (
+          <Box display="flex" gap={2} alignItems="center">
+            <Typography variant="body2">
+              {selectedWorkstations.size} selected
+            </Typography>
+            <Button variant="outlined" size="small">
+              Bulk Actions
+            </Button>
+          </Box>
+        )}
+      </Box>
+
+      {/* Content */}
+      {loading ? (
+        <Box display="flex" justifyContent="center" py={8}>
+          <LinearProgress sx={{ width: 300 }} />
+        </Box>
+      ) : (
+        <>
+          {/* Grid View */}
+          {viewMode === 'grid' && (
+            <Grid container spacing={3}>
+              <AnimatePresence>
+                {filteredWorkstations.map((workstation) => (
+                  <Grid item xs={12} sm={6} md={4} lg={3} key={workstation.id}>
+                    <WorkstationCard
+                      workstation={workstation}
+                      onSelect={handleWorkstationSelect}
+                      selected={selectedWorkstations.has(workstation.id)}
+                    />
+                  </Grid>
+                ))}
+              </AnimatePresence>
+            </Grid>
+          )}
+
+          {/* List View */}
+          {viewMode === 'list' && (
+            <TableContainer component={Paper}>
+              <Table>
+                <TableHead>
+                  <TableRow>
+                    <TableCell>Workstation</TableCell>
+                    <TableCell>Status</TableCell>
+                    <TableCell>Location</TableCell>
+                    <TableCell>CPU</TableCell>
+                    <TableCell>Memory</TableCell>
+                    <TableCell>Agents</TableCell>
+                    <TableCell>Alerts</TableCell>
+                    <TableCell>Uptime</TableCell>
+                  </TableRow>
+                </TableHead>
+                <TableBody>
+                  {filteredWorkstations.map((workstation) => (
+                    <WorkstationRow
+                      key={workstation.id}
+                      workstation={workstation}
+                      onSelect={handleWorkstationSelect}
+                      selected={selectedWorkstations.has(workstation.id)}
+                    />
+                  ))}
+                </TableBody>
+              </Table>
+            </TableContainer>
+          )}
+
+          {/* Map View */}
+          {viewMode === 'map' && (
+            <Card>
+              <CardContent>
+                <Box
+                  display="flex"
+                  alignItems="center"
+                  justifyContent="center"
+                  height={400}
+                  bgcolor="grey.100"
+                  borderRadius={1}
+                >
+                  <Box textAlign="center">
+                    <MapOutlined sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
+                    <Typography variant="h6" color="text.secondary">
+                      Interactive World Map
+                    </Typography>
+                    <Typography variant="body2" color="text.secondary">
+                      Geographic visualization of {filteredWorkstations.length} workstations
+                    </Typography>
+                  </Box>
+                </Box>
+              </CardContent>
+            </Card>
+          )}
+        </>
+      )}
+
+      {/* Workstation Details Dialog */}
+      <Dialog
+        open={detailsOpen}
+        onClose={() => setDetailsOpen(false)}
+        maxWidth="md"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={2}>
+            <Avatar sx={{ 
+              bgcolor: selectedWorkstation ? 
+                (getStatusColor(selectedWorkstation.status) === 'success' ? 'success.main' : 
+                 getStatusColor(selectedWorkstation.status) === 'error' ? 'error.main' :
+                 getStatusColor(selectedWorkstation.status) === 'warning' ? 'warning.main' :
+                 getStatusColor(selectedWorkstation.status) === 'info' ? 'info.main' : 'grey.500') : 'grey.500'
+            }}>
+              {selectedWorkstation && getStatusIcon(selectedWorkstation.status)}
+            </Avatar>
+            <Box>
+              <Typography variant="h6">
+                {selectedWorkstation?.hostname}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                {selectedWorkstation?.ipAddress} • {selectedWorkstation?.platform}
+              </Typography>
+            </Box>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          {selectedWorkstation && (
+            <Grid container spacing={3}>
+              <Grid item xs={12} md={6}>
+                <Typography variant="subtitle2" gutterBottom>
+                  System Information
+                </Typography>
+                <Box display="flex" flexDirection="column" gap={1}>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body2">Location:</Typography>
+                    <Typography variant="body2">{selectedWorkstation.location}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body2">Department:</Typography>
+                    <Typography variant="body2">{selectedWorkstation.department}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body2">Platform:</Typography>
+                    <Typography variant="body2">{selectedWorkstation.platform}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body2">Version:</Typography>
+                    <Typography variant="body2">{selectedWorkstation.version}</Typography>
+                  </Box>
+                  <Box display="flex" justifyContent="space-between">
+                    <Typography variant="body2">Uptime:</Typography>
+                    <Typography variant="body2">{formatUptime(selectedWorkstation.uptime)}</Typography>
+                  </Box>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12} md={6}>
+                <Typography variant="subtitle2" gutterBottom>
+                  Performance Metrics
+                </Typography>
+                <Box display="flex" flexDirection="column" gap={2}>
+                  <Box>
+                    <Box display="flex" justifyContent="space-between" mb={1}>
+                      <Typography variant="body2">CPU Usage</Typography>
+                      <Typography variant="body2">{selectedWorkstation.cpuUsage}%</Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={selectedWorkstation.cpuUsage}
+                      color={selectedWorkstation.cpuUsage > 80 ? 'error' : selectedWorkstation.cpuUsage > 60 ? 'warning' : 'primary'}
+                    />
+                  </Box>
+                  
+                  <Box>
+                    <Box display="flex" justifyContent="space-between" mb={1}>
+                      <Typography variant="body2">Memory Usage</Typography>
+                      <Typography variant="body2">{selectedWorkstation.memoryUsage}%</Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={selectedWorkstation.memoryUsage}
+                      color={selectedWorkstation.memoryUsage > 80 ? 'error' : selectedWorkstation.memoryUsage > 60 ? 'warning' : 'primary'}
+                    />
+                  </Box>
+                  
+                  <Box>
+                    <Box display="flex" justifyContent="space-between" mb={1}>
+                      <Typography variant="body2">Disk Usage</Typography>
+                      <Typography variant="body2">{selectedWorkstation.diskUsage}%</Typography>
+                    </Box>
+                    <LinearProgress
+                      variant="determinate"
+                      value={selectedWorkstation.diskUsage}
+                      color={selectedWorkstation.diskUsage > 80 ? 'error' : selectedWorkstation.diskUsage > 60 ? 'warning' : 'primary'}
+                    />
+                  </Box>
+                </Box>
+              </Grid>
+              
+              <Grid item xs={12}>
+                <Typography variant="subtitle2" gutterBottom>
+                  AI Agents & Alerts
+                </Typography>
+                <Box display="flex" gap={4}>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <ComputerOutlined color="action" />
+                    <Typography variant="body2">
+                      {selectedWorkstation.agentCount} Active Agents
+                    </Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <NotificationsOutlined color={selectedWorkstation.alertCount > 0 ? 'error' : 'action'} />
+                    <Typography variant="body2">
+                      {selectedWorkstation.alertCount} Active Alerts
+                    </Typography>
+                  </Box>
+                  <Box display="flex" alignItems="center" gap={1}>
+                    <NetworkCheckOutlined color="action" />
+                    <Typography variant="body2">
+                      {selectedWorkstation.networkLatency}ms latency
+                    </Typography>
+                  </Box>
+                </Box>
+              </Grid>
+            </Grid>
+          )}
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={() => setDetailsOpen(false)}>
+            Close
+          </Button>
+          <Button variant="contained">
+            Manage Workstation
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Floating Action Button */}
+      <Fab
+        color="primary"
+        sx={{ position: 'fixed', bottom: 24, right: 24 }}
+        onClick={() => {/* Add workstation */}}
+      >
+        <ComputerOutlined />
+      </Fab>
+    </Container>
+  );
+}
