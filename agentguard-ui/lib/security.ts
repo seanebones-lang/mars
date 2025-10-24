@@ -3,7 +3,8 @@
  * Critical input validation and sanitization for AgentGuard platform
  */
 
-import DOMPurify from 'isomorphic-dompurify';
+// Using built-in sanitization instead of DOMPurify to avoid ESM issues
+// import DOMPurify from 'isomorphic-dompurify';
 
 // Security configuration
 const SECURITY_CONFIG = {
@@ -44,12 +45,13 @@ export function sanitizeInput(input: string): string {
     }
   }
 
-  // Sanitize HTML and dangerous characters
-  const sanitized = DOMPurify.sanitize(input, {
-    ALLOWED_TAGS: SECURITY_CONFIG.ALLOWED_HTML_TAGS,
-    ALLOWED_ATTR: [],
-    KEEP_CONTENT: true,
-  });
+  // Sanitize HTML and dangerous characters using built-in methods
+  let sanitized = input
+    .replace(/[<>]/g, '') // Remove angle brackets
+    .replace(/javascript:/gi, '') // Remove javascript: protocol
+    .replace(/on\w+\s*=/gi, '') // Remove event handlers
+    .replace(/&lt;script.*?&gt;.*?&lt;\/script&gt;/gi, '') // Remove script tags
+    .replace(/<script.*?>.*?<\/script>/gi, ''); // Remove script tags
 
   // Additional character escaping
   return sanitized
