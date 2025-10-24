@@ -14,6 +14,11 @@ from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
 
 from ..models.schemas import AgentTestRequest, HallucinationReport
+from .agent_console_endpoints import (
+    get_user_agents, create_agent, get_agent, update_agent, test_agent,
+    get_agent_test_results, deploy_agent, get_agent_metrics, delete_agent,
+    AgentConfig, DeploymentRequest
+)
 
 # Load environment variables
 load_dotenv()
@@ -63,6 +68,10 @@ app = FastAPI(
         {
             "name": "analytics",
             "description": "Analytics and business intelligence"
+        },
+        {
+            "name": "agent_console",
+            "description": "Agent creation, testing, and deployment console"
         }
     ]
 )
@@ -307,6 +316,116 @@ async def get_user_profile():
         },
         "api_tokens": []
     }
+
+# Agent Console endpoints
+@app.get("/console/agents", tags=["agent_console"])
+async def list_user_agents():
+    """Get all agents for the current user."""
+    # Mock authentication for demo
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await get_user_agents(mock_user)
+
+@app.post("/console/agents", tags=["agent_console"])
+async def create_new_agent(config: AgentConfig):
+    """Create a new agent."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await create_agent(config, mock_user)
+
+@app.get("/console/agents/{agent_id}", tags=["agent_console"])
+async def get_agent_details(agent_id: str):
+    """Get details for a specific agent."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await get_agent(agent_id, mock_user)
+
+@app.put("/console/agents/{agent_id}", tags=["agent_console"])
+async def update_agent_config(agent_id: str, config: AgentConfig):
+    """Update an agent's configuration."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await update_agent(agent_id, config, mock_user)
+
+@app.post("/console/agents/{agent_id}/test", tags=["agent_console"])
+async def test_agent_endpoint(agent_id: str, test_input: dict):
+    """Test an agent with given input."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await test_agent(agent_id, test_input.get("input", ""), mock_user)
+
+@app.get("/console/agents/{agent_id}/tests", tags=["agent_console"])
+async def get_agent_tests(agent_id: str, limit: int = Query(20, ge=1, le=100)):
+    """Get test results for an agent."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await get_agent_test_results(agent_id, limit, mock_user)
+
+@app.post("/console/agents/{agent_id}/deploy", tags=["agent_console"])
+async def deploy_agent_endpoint(agent_id: str, deployment_request: DeploymentRequest, background_tasks: BackgroundTasks):
+    """Deploy an agent to production."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await deploy_agent(deployment_request, background_tasks, mock_user)
+
+@app.get("/console/agents/{agent_id}/metrics", tags=["agent_console"])
+async def get_agent_metrics_endpoint(agent_id: str, days: int = Query(7, ge=1, le=30)):
+    """Get metrics for a deployed agent."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await get_agent_metrics(agent_id, days, mock_user)
+
+@app.delete("/console/agents/{agent_id}", tags=["agent_console"])
+async def delete_agent_endpoint(agent_id: str):
+    """Delete an agent."""
+    from ..services.enhanced_auth_service import UserProfile
+    mock_user = UserProfile(
+        user_id="demo_user",
+        email="demo@example.com",
+        role="pro",
+        permissions=[]
+    )
+    return await delete_agent(agent_id, mock_user)
 
 # System metrics endpoint
 @app.get("/metrics", tags=["monitoring"])

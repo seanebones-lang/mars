@@ -45,9 +45,10 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
     setIsHydrated(true);
   }, []);
 
-  // Core navigation - just Dashboard
+  // Core navigation - Dashboard and Console
   const coreNavItems = [
     { label: 'Dashboard', href: '/', icon: <DashboardOutlined /> },
+    { label: 'Agent Console', href: '/console', icon: <CodeOutlined /> },
   ];
 
   // Monitoring & Analytics dropdown
