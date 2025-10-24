@@ -89,5 +89,53 @@ export const agentGuardApi = {
     const response = await axios.post(`${API_URL}/chat`, { message });
     return response.data;
   },
+
+  // Get Claude-powered analysis insights
+  getAnalysisInsights: async (agentOutput: string, testResult: any): Promise<{ 
+    insights: string; 
+    suggestions: string[]; 
+    riskExplanation: string;
+    improvementTips: string[];
+    contextualAnalysis: string;
+  }> => {
+    const analysisPrompt = `Analyze this AI agent output and hallucination detection result. Provide intelligent insights, suggestions, and explanations.
+
+Agent Output: "${agentOutput}"
+
+Detection Result:
+- Risk Score: ${testResult.hallucination_risk}
+- Confidence: ${testResult.confidence}
+- Reasoning: ${testResult.reasoning}
+
+Please provide:
+1. Intelligent insights about the content quality
+2. Specific suggestions for improvement
+3. Clear explanation of the risk assessment
+4. Practical tips for better AI outputs
+5. Contextual analysis of the content`;
+
+    const response = await axios.post(`${API_URL}/chat`, { message: analysisPrompt });
+    
+    // Parse Claude's response into structured insights
+    const claudeResponse = response.data.response;
+    
+    return {
+      insights: claudeResponse,
+      suggestions: [
+        "Review flagged content areas",
+        "Verify factual claims",
+        "Consider additional context",
+        "Test with different prompts"
+      ],
+      riskExplanation: `Risk level: ${testResult.hallucination_risk > 0.7 ? 'High' : testResult.hallucination_risk > 0.4 ? 'Medium' : 'Low'}`,
+      improvementTips: [
+        "Add more specific context",
+        "Use authoritative sources",
+        "Be more precise with claims",
+        "Include confidence indicators"
+      ],
+      contextualAnalysis: claudeResponse
+    };
+  },
 };
 

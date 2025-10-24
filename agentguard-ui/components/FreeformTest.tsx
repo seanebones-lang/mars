@@ -12,8 +12,34 @@ import {
   Chip,
   Stack,
   Divider,
+  Card,
+  CardContent,
+  CardHeader,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  List,
+  ListItem,
+  ListItemIcon,
+  ListItemText,
+  IconButton,
+  Tooltip,
+  LinearProgress,
 } from '@mui/material';
-import { PlayArrow, Science } from '@mui/icons-material';
+import { 
+  PlayArrow, 
+  Science, 
+  AutoAwesome, 
+  Lightbulb, 
+  TrendingUp, 
+  Warning, 
+  CheckCircle, 
+  Psychology,
+  ExpandMore,
+  Refresh,
+  ContentCopy,
+  Share
+} from '@mui/icons-material';
 import { agentGuardApi } from '@/lib/api';
 import { useStore } from '@/lib/store';
 
@@ -22,6 +48,9 @@ export default function FreeformTest() {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const [claudeInsights, setClaudeInsights] = useState<any>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [showAdvancedAnalysis, setShowAdvancedAnalysis] = useState(false);
   
   const { addResult } = useStore();
 
@@ -51,11 +80,40 @@ export default function FreeformTest() {
       addResult(resultWithLatency);
       setResult(resultWithLatency);
       
+      // Get Claude-powered insights after successful analysis
+      await getClaudeInsights(resultWithLatency);
+      
     } catch (err: any) {
       setError(err.response?.data?.detail || err.message || 'Analysis failed');
     } finally {
       setLoading(false);
     }
+  };
+
+  const getClaudeInsights = async (testResult: any) => {
+    if (!testResult || !agentOutput.trim()) return;
+    
+    setInsightsLoading(true);
+    try {
+      const insights = await agentGuardApi.getAnalysisInsights(agentOutput, testResult);
+      setClaudeInsights(insights);
+      setShowAdvancedAnalysis(true);
+    } catch (err) {
+      console.error('Failed to get Claude insights:', err);
+      // Don't show error for insights - it's supplementary
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
+
+  const handleRefreshInsights = async () => {
+    if (result) {
+      await getClaudeInsights(result);
+    }
+  };
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
   };
 
   const getRiskColor = (risk: number) => {
@@ -65,48 +123,53 @@ export default function FreeformTest() {
   };
 
   return (
-    <Paper elevation={3} sx={{ p: 3 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        <Science sx={{ mr: 1, fontSize: 30, color: 'primary.main' }} />
-        <Box>
-          <Typography variant="h5">
-            Free-form Hallucination Test
-          </Typography>
-          <Typography variant="body2" color="text.secondary">
-            Just paste what an agent said - we'll check it for hallucinations, fabrications, and suspicious claims
-          </Typography>
+    <Box>
+      <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          <Science sx={{ mr: 1, fontSize: 30, color: 'primary.main' }} />
+          <Box sx={{ flex: 1 }}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <Typography variant="h5">
+                Claude-Powered Hallucination Analysis
+              </Typography>
+              <Chip label="AI Enhanced" color="primary" size="small" icon={<AutoAwesome />} />
+            </Box>
+            <Typography variant="body2" color="text.secondary">
+              Intelligent analysis powered by Claude 4.5 Sonnet with detailed insights and recommendations
+            </Typography>
+          </Box>
         </Box>
-      </Box>
 
-      {error && (
-        <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
-          {error}
-        </Alert>
-      )}
+        {error && (
+          <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError(null)}>
+            {error}
+          </Alert>
+        )}
 
-      <TextField
-        label="Agent Output to Test"
-        multiline
-        rows={6}
-        fullWidth
-        value={agentOutput}
-        onChange={(e) => setAgentOutput(e.target.value)}
-        placeholder="Paste what the AI agent said here... For example:
-        
+        <TextField
+          label="Agent Output to Test"
+          multiline
+          rows={6}
+          fullWidth
+          value={agentOutput}
+          onChange={(e) => setAgentOutput(e.target.value)}
+          placeholder="Paste what the AI agent said here... For example:
+          
 'To fix your server issue, simply reboot the quantum router using the admin panel. This will clear the flux capacitor cache and restore normal operations within 30 seconds.'"
-        sx={{ mb: 3 }}
-      />
+          sx={{ mb: 3 }}
+        />
 
-      <Button
-        variant="contained"
-        size="large"
-        startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PlayArrow />}
-        onClick={handleTest}
-        disabled={loading || !agentOutput.trim()}
-        fullWidth
-      >
-        {loading ? 'Analyzing...' : 'Test for Hallucinations'}
-      </Button>
+        <Button
+          variant="contained"
+          size="large"
+          startIcon={loading ? <CircularProgress size={20} color="inherit" /> : <PlayArrow />}
+          onClick={handleTest}
+          disabled={loading || !agentOutput.trim()}
+          fullWidth
+        >
+          {loading ? 'Analyzing with Claude...' : 'Analyze for Hallucinations'}
+        </Button>
+      </Paper>
 
       {result && (
         <Box sx={{ mt: 4 }}>
@@ -225,7 +288,122 @@ export default function FreeformTest() {
           </Alert>
         </Box>
       )}
-    </Paper>
+
+      {/* Claude-Powered Insights Section */}
+      {result && (
+        <Paper elevation={3} sx={{ p: 3, mt: 3 }}>
+          <Box display="flex" alignItems="center" justifyContent="space-between" mb={2}>
+            <Box display="flex" alignItems="center" gap={2}>
+              <AutoAwesome color="primary" />
+              <Typography variant="h6">
+                Claude Intelligence Insights
+              </Typography>
+              <Chip label="AI Powered" color="primary" size="small" />
+            </Box>
+            <Box>
+              <Tooltip title="Refresh Insights">
+                <IconButton onClick={handleRefreshInsights} disabled={insightsLoading}>
+                  <Refresh />
+                </IconButton>
+              </Tooltip>
+            </Box>
+          </Box>
+
+          {insightsLoading && (
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Claude is analyzing your content for intelligent insights...
+              </Typography>
+              <LinearProgress />
+            </Box>
+          )}
+
+          {claudeInsights && (
+            <Accordion expanded={showAdvancedAnalysis} onChange={() => setShowAdvancedAnalysis(!showAdvancedAnalysis)}>
+              <AccordionSummary expandIcon={<ExpandMore />}>
+                <Box display="flex" alignItems="center" gap={2}>
+                  <Lightbulb color="primary" />
+                  <Typography variant="subtitle1" fontWeight={600}>
+                    Intelligent Analysis & Recommendations
+                  </Typography>
+                </Box>
+              </AccordionSummary>
+              <AccordionDetails>
+                <Stack spacing={3}>
+                  {/* Claude's Insights */}
+                  <Card variant="outlined">
+                    <CardHeader 
+                      title="Claude's Insights" 
+                      avatar={<Psychology color="primary" />}
+                    />
+                    <CardContent>
+                      <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                        {claudeInsights.insights}
+                      </Typography>
+                    </CardContent>
+                  </Card>
+
+                  {/* Improvement Suggestions */}
+                  <Card variant="outlined">
+                    <CardHeader 
+                      title="Improvement Suggestions" 
+                      avatar={<CheckCircle color="success" />}
+                    />
+                    <CardContent>
+                      <List dense>
+                        {claudeInsights.suggestions.map((suggestion: string, index: number) => (
+                          <ListItem key={index}>
+                            <ListItemIcon>
+                              <Lightbulb color="primary" fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText primary={suggestion} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </CardContent>
+                  </Card>
+
+                  {/* Practical Tips */}
+                  <Card variant="outlined">
+                    <CardHeader 
+                      title="Practical Tips" 
+                      avatar={<AutoAwesome color="secondary" />}
+                    />
+                    <CardContent>
+                      <List dense>
+                        {claudeInsights.improvementTips.map((tip: string, index: number) => (
+                          <ListItem key={index}>
+                            <ListItemIcon>
+                              <CheckCircle color="success" fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText primary={tip} />
+                          </ListItem>
+                        ))}
+                      </List>
+                    </CardContent>
+                  </Card>
+                </Stack>
+              </AccordionDetails>
+            </Accordion>
+          )}
+
+          {!claudeInsights && !insightsLoading && result && (
+            <Box textAlign="center" py={3}>
+              <Typography variant="body2" color="text.secondary" gutterBottom>
+                Get intelligent insights and recommendations from Claude
+              </Typography>
+              <Button 
+                variant="outlined" 
+                startIcon={<AutoAwesome />}
+                onClick={() => getClaudeInsights(result)}
+              >
+                Generate Claude Insights
+              </Button>
+            </Box>
+          )}
+        </Paper>
+      )}
+    </Box>
   );
 }
 
