@@ -4,6 +4,13 @@ uvicorn[standard]>=0.30.0
 pydantic>=2.9.0
 python-dotenv>=1.0.0
 
+# CRITICAL SECURITY DEPENDENCIES
+bleach>=6.1.0
+cryptography>=41.0.7
+python-multipart>=0.0.6
+bcrypt>=4.1.2
+pyotp>=2.9.0
+
 # AI/ML Core - Updated for 2025 Performance
 torch>=2.9.0
 transformers>=4.57.0
