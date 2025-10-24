@@ -32,27 +32,36 @@ export default function Home() {
     <Container maxWidth="xl" sx={{ py: 4 }}>
       <Box sx={{ mb: 4 }}>
         <Typography variant="h3" component="h1" gutterBottom fontWeight={700}>
-          Watcher-AI Dashboard
+          AI Agent Safety Platform
         </Typography>
         <Typography variant="h6" color="primary.main" fontWeight={600} gutterBottom>
-          Real-Time Hallucination Defense
+          Validate AI Agents Before Deployment
         </Typography>
         <Typography variant="body1" color="text.secondary">
-          Enterprise-grade monitoring that catches AI hallucinations before they impact your business
+          Test your AI agents for hallucinations, fabrications, and reliability issues. Prevent unsafe AI responses from reaching customers.
         </Typography>
       </Box>
 
       {/* Dashboard Tabs */}
       <Box sx={{ borderBottom: 1, borderColor: 'divider', mb: 4 }}>
         <Tabs value={activeTab} onChange={handleTabChange} aria-label="dashboard tabs">
-          <Tab label="System Health" />
-          <Tab label="Testing Interface" />
-          <Tab label="Results Analysis" />
+          <Tab label="Agent Validator" />
+          <Tab label="Safety Dashboard" />
+          <Tab label="Test Results" />
         </Tabs>
       </Box>
 
       {/* Tab Content */}
       {activeTab === 0 && (
+        <>
+          <DashboardSummary />
+          <Box sx={{ mb: 4 }}>
+            <TestAgentForm />
+          </Box>
+        </>
+      )}
+
+      {activeTab === 1 && (
         <Box sx={{ overflow: 'visible' }}>
           <SystemHealthDashboard
             overallRisk={avgRisk}
@@ -63,15 +72,6 @@ export default function Home() {
             flaggedRate={flaggedRate}
           />
         </Box>
-      )}
-
-      {activeTab === 1 && (
-        <>
-          <DashboardSummary />
-          <Box sx={{ mb: 4 }}>
-            <TestAgentForm />
-          </Box>
-        </>
       )}
 
       {activeTab === 2 && (

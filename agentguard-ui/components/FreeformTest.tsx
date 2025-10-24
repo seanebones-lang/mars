@@ -129,14 +129,14 @@ export default function FreeformTest() {
           <Science sx={{ mr: 1, fontSize: 30, color: 'primary.main' }} />
           <Box sx={{ flex: 1 }}>
             <Box display="flex" alignItems="center" gap={2}>
-              <Typography variant="h5">
-                Claude-Powered Hallucination Analysis
-              </Typography>
-              <Chip label="AI Enhanced" color="primary" size="small" icon={<AutoAwesome />} />
-            </Box>
-            <Typography variant="body2" color="text.secondary">
-              Intelligent analysis powered by Claude 4.5 Sonnet with detailed insights and recommendations
+            <Typography variant="h5">
+              AI Agent Reliability Validator
             </Typography>
+            <Chip label="Production Ready" color="success" size="small" icon={<CheckCircle />} />
+          </Box>
+          <Typography variant="body2" color="text.secondary">
+            Test your AI agents for hallucinations, fabrications, and reliability issues. Used by enterprises to validate AI before deployment.
+          </Typography>
           </Box>
         </Box>
 
@@ -147,15 +147,27 @@ export default function FreeformTest() {
         )}
 
         <TextField
-          label="Agent Output to Test"
+          label="AI Agent Output to Validate"
           multiline
-          rows={6}
+          rows={8}
           fullWidth
           value={agentOutput}
           onChange={(e) => setAgentOutput(e.target.value)}
-          placeholder="Paste what the AI agent said here... For example:
-          
-'To fix your server issue, simply reboot the quantum router using the admin panel. This will clear the flux capacitor cache and restore normal operations within 30 seconds.'"
+          placeholder="Paste your AI agent's response here to check for hallucinations and reliability issues...
+
+REAL EXAMPLES TO TRY:
+
+🔧 IT Support Agent:
+'To resolve the network connectivity issue, please restart your quantum ethernet adapter through the flux capacitor management console. This will recalibrate the photon streams and restore connectivity within 15 seconds.'
+
+🛒 E-commerce Agent:
+'This premium leather jacket is made from authentic dragon hide sourced from our exclusive partnership with Skyrim Industries. It features nano-fiber technology that makes it completely bulletproof while remaining lightweight.'
+
+👥 HR Assistant Agent:
+'According to our updated policy, all employees now receive 45 vacation days per year, plus unlimited sick leave. You can also bring your pet dragon to work on Fridays as part of our new mythical creature inclusion program.'
+
+📞 Customer Service Agent:
+'I've processed your refund of $2,847 for the item you never purchased. The money has been deposited into your account along with a bonus $500 for the inconvenience. Your order has also been upgraded to our premium platinum membership for life.'"
           sx={{ mb: 3 }}
         />
 
@@ -167,8 +179,52 @@ export default function FreeformTest() {
           disabled={loading || !agentOutput.trim()}
           fullWidth
         >
-          {loading ? 'Analyzing with Claude...' : 'Analyze for Hallucinations'}
+          {loading ? 'Validating Agent Response...' : 'Validate AI Agent'}
         </Button>
+
+        {/* Quick Test Examples */}
+        <Box sx={{ mt: 3 }}>
+          <Typography variant="subtitle2" gutterBottom>
+            Quick Test Examples - Click to try:
+          </Typography>
+          <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setAgentOutput("To fix your server issue, simply reboot the quantum router using the admin panel. This will clear the flux capacitor cache and restore normal operations within 30 seconds.")}
+            >
+              🔧 IT Support (Fabricated Tech)
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setAgentOutput("This premium leather jacket is made from authentic dragon hide sourced from our exclusive partnership with Skyrim Industries. It features nano-fiber technology that makes it completely bulletproof while remaining lightweight.")}
+            >
+              🛒 E-commerce (Fake Products)
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setAgentOutput("According to our updated policy, all employees now receive 45 vacation days per year, plus unlimited sick leave. You can also bring your pet dragon to work on Fridays as part of our new mythical creature inclusion program.")}
+            >
+              👥 HR Assistant (False Policies)
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setAgentOutput("I've processed your refund of $2,847 for the item you never purchased. The money has been deposited into your account along with a bonus $500 for the inconvenience. Your order has also been upgraded to our premium platinum membership for life.")}
+            >
+              📞 Customer Service (Fake Actions)
+            </Button>
+            <Button
+              size="small"
+              variant="outlined"
+              onClick={() => setAgentOutput("The server is running normally with 99.9% uptime. All services are operational and there are no current issues affecting performance.")}
+            >
+              ✅ Good Response (No Hallucinations)
+            </Button>
+          </Stack>
+        </Box>
       </Paper>
 
       {result && (
@@ -176,7 +232,7 @@ export default function FreeformTest() {
           <Divider sx={{ mb: 3 }} />
           
           <Typography variant="h6" gutterBottom>
-            Analysis Results
+            AI Agent Reliability Assessment
           </Typography>
 
           <Stack spacing={3}>
@@ -191,16 +247,16 @@ export default function FreeformTest() {
                 sx={{ fontSize: '1.2rem', py: 2, px: 1 }}
               />
               <Typography variant="caption" display="block" sx={{ mt: 0.5 }}>
-                {result.hallucination_risk > 0.7 ? 'High risk - Likely contains fabrications' :
-                 result.hallucination_risk > 0.4 ? 'Medium risk - Some concerns detected' :
-                 'Low risk - Appears factually sound'}
+                {result.hallucination_risk > 0.7 ? '🚨 UNSAFE - Do not deploy this agent response' :
+                 result.hallucination_risk > 0.4 ? '⚠️ CAUTION - Review before deployment' :
+                 '✅ SAFE - Agent response appears reliable'}
               </Typography>
             </Box>
 
             {/* Claude's Explanation */}
             <Box>
               <Typography variant="body2" color="text.secondary" gutterBottom>
-                AI Judge Analysis
+                Detailed Safety Analysis
               </Typography>
               <Paper variant="outlined" sx={{ p: 2, bgcolor: 'background.default' }}>
                 <Typography variant="body1">
@@ -212,9 +268,9 @@ export default function FreeformTest() {
             {/* Flagged Segments */}
             {result.details.hallucinated_segments && result.details.hallucinated_segments.length > 0 && (
               <Box>
-                <Typography variant="body2" color="error" gutterBottom>
-                  Suspicious/Fabricated Content Detected:
-                </Typography>
+              <Typography variant="body2" color="error" gutterBottom>
+                🚨 Fabricated/Hallucinated Content Detected:
+              </Typography>
                 <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
                   {result.details.hallucinated_segments.map((segment: string, i: number) => (
                     <Chip
@@ -280,10 +336,30 @@ export default function FreeformTest() {
             </Box>
           </Stack>
 
-          <Alert severity="info" sx={{ mt: 3 }}>
+          {/* Practical Next Steps */}
+          <Alert 
+            severity={result.hallucination_risk > 0.7 ? "error" : result.hallucination_risk > 0.4 ? "warning" : "success"} 
+            sx={{ mt: 3 }}
+          >
             <Typography variant="body2">
-              <strong>Note:</strong> This analysis is based on Claude AI's knowledge and statistical patterns. 
-              Always verify critical information independently.
+              <strong>
+                {result.hallucination_risk > 0.7 ? "🚨 IMMEDIATE ACTION REQUIRED:" :
+                 result.hallucination_risk > 0.4 ? "⚠️ REVIEW RECOMMENDED:" :
+                 "✅ AGENT RESPONSE APPROVED:"}
+              </strong>
+              {result.hallucination_risk > 0.7 ? 
+                " This agent response contains fabricated information and should NOT be deployed. Retrain or adjust your AI agent before use." :
+                result.hallucination_risk > 0.4 ?
+                " This response has some reliability concerns. Review the flagged content and consider additional training data." :
+                " This agent response appears safe and reliable for deployment."}
+            </Typography>
+          </Alert>
+
+          {/* Enterprise Integration CTA */}
+          <Alert severity="info" sx={{ mt: 2 }}>
+            <Typography variant="body2">
+              <strong>For Production Use:</strong> Integrate Watcher AI into your deployment pipeline via our REST API or Python SDK. 
+              Test all agent responses before they reach customers. <strong>Prevent AI hallucinations in production.</strong>
             </Typography>
           </Alert>
         </Box>
