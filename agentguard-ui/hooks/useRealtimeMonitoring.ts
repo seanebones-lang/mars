@@ -139,7 +139,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
           break;
           
         case 'monitoring_stopped':
-          toast.info('🔴 Live monitoring stopped', { duration: 3000 });
+          toast('🔴 Live monitoring stopped', { duration: 3000 });
           if (data.stats) {
             setConnectionStats(data.stats);
           }
@@ -180,19 +180,78 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
       
       reconnectTimeoutRef.current = setTimeout(() => {
         console.log(`Reconnection attempt ${reconnectAttempts + 1}/${maxReconnectAttempts}`);
-        connect();
+        // Call connect directly without dependency
+        if (socket && socket.readyState === WebSocket.OPEN) {
+          console.log('WebSocket already connected');
+          setConnectionState('connected');
+          return;
+        }
+
+        // Close existing socket if it exists
+        if (socket) {
+          socket.close();
+          setSocket(null);
+        }
+
+        setConnectionState('connecting');
+        setError(null);
+
+        try {
+          const apiUrl = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';
+          const wsUrl = apiUrl.replace(/^http/, 'ws') + '/ws/monitor';
+          
+          console.log('Reconnecting to WebSocket:', wsUrl);
+          const ws = new WebSocket(wsUrl);
+
+          ws.onopen = () => {
+            console.log('WebSocket reconnected successfully');
+            setConnectionState('connected');
+            setSocket(ws);
+            setError(null);
+            setReconnectAttempts(0);
+            
+            // Send initial ping
+            ws.send(JSON.stringify({ type: 'ping' }));
+          };
+
+          ws.onmessage = handleMessage;
+
+          ws.onclose = (event) => {
+            console.log('WebSocket closed during reconnect:', event.code, event.reason);
+            setConnectionState('disconnected');
+            setSocket(null);
+          };
+
+          ws.onerror = (error) => {
+            console.error('WebSocket error during reconnect:', error);
+            setConnectionState('error');
+            setError('WebSocket reconnection error');
+          };
+
+        } catch (error) {
+          console.error('Failed to reconnect WebSocket:', error);
+          setConnectionState('error');
+          setError('Failed to create WebSocket reconnection');
+        }
       }, reconnectDelay * Math.pow(2, reconnectAttempts)); // Exponential backoff
     } else {
       setConnectionState('error');
       setError('Maximum reconnection attempts reached');
       toast.error('Connection failed - please refresh the page');
     }
-  }, [reconnectAttempts]);
+  }, [reconnectAttempts, socket, handleMessage]);
 
   const connect = useCallback(() => {
     if (socket && socket.readyState === WebSocket.OPEN) {
       console.log('WebSocket already connected');
+      setConnectionState('connected');
       return;
+    }
+
+    // Close existing socket if it exists
+    if (socket) {
+      socket.close();
+      setSocket(null);
     }
 
     // Clear any existing reconnection timeout
@@ -230,7 +289,12 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         
         // Only attempt reconnect if it wasn't a manual disconnect
         if (event.code !== 1000 && reconnectAttempts < maxReconnectAttempts) {
-          attemptReconnect();
+          setReconnectAttempts(prev => prev + 1);
+          setTimeout(() => {
+            console.log(`Reconnection attempt after close`);
+            // Trigger reconnection
+            setConnectionState('connecting');
+          }, reconnectDelay);
         }
       };
 
@@ -241,7 +305,11 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         
         // Attempt reconnect on error
         if (reconnectAttempts < maxReconnectAttempts) {
-          attemptReconnect();
+          setReconnectAttempts(prev => prev + 1);
+          setTimeout(() => {
+            console.log(`Reconnection attempt after error`);
+            setConnectionState('connecting');
+          }, reconnectDelay);
         }
       };
 

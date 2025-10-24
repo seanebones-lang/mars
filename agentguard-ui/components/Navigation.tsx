@@ -1,12 +1,19 @@
 'use client';
 
-import { AppBar, Toolbar, Typography, Button, Box, Container } from '@mui/material';
-import { Security, Dashboard, Assessment, Science } from '@mui/icons-material';
+import { AppBar, Toolbar, Typography, Button, Box, Container, IconButton, Tooltip } from '@mui/material';
+import { Visibility, Dashboard, Assessment, Science, LightMode, DarkMode } from '@mui/icons-material';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useTheme } from '@mui/material/styles';
 
-export default function Navigation() {
+interface NavigationProps {
+  darkMode?: boolean;
+  onToggleDarkMode?: () => void;
+}
+
+export default function Navigation({ darkMode = false, onToggleDarkMode }: NavigationProps) {
   const pathname = usePathname();
+  const theme = useTheme();
 
   const navItems = [
     { label: 'Dashboard', href: '/', icon: <Dashboard /> },
@@ -20,16 +27,43 @@ export default function Navigation() {
     <AppBar position="static" elevation={0} sx={{ borderBottom: 1, borderColor: 'divider' }}>
       <Container maxWidth="xl">
         <Toolbar disableGutters>
-          <Security sx={{ mr: 1.5, fontSize: 30 }} />
-          <Typography
-            variant="h6"
-            component="div"
-            sx={{ flexGrow: 1, fontWeight: 600, letterSpacing: -0.5 }}
+          <Box
+            sx={{
+              width: 40,
+              height: 40,
+              borderRadius: '12px',
+              background: 'linear-gradient(135deg, #1976D2 0%, #1565C0 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              mr: 2,
+              boxShadow: '0 3px 10px rgba(25, 118, 210, 0.3)',
+            }}
           >
-            AgentGuard
-          </Typography>
+            <Visibility sx={{ color: 'white', fontSize: '20px' }} />
+          </Box>
+          <Box sx={{ flexGrow: 1 }}>
+            <Typography
+              variant="h6"
+              component="div"
+              sx={{ fontWeight: 700, letterSpacing: '-0.02em', lineHeight: 1.2 }}
+            >
+              Watcher-AI
+            </Typography>
+            <Typography
+              variant="caption"
+              sx={{ 
+                color: 'text.secondary', 
+                fontSize: '11px',
+                fontWeight: 500,
+                letterSpacing: '0.02em'
+              }}
+            >
+              Real-Time Hallucination Defense
+            </Typography>
+          </Box>
 
-          <Box sx={{ display: 'flex', gap: 1 }}>
+          <Box sx={{ display: 'flex', gap: 1, alignItems: 'center' }}>
             {navItems.map((item) => (
               <Button
                 key={item.href}
@@ -41,12 +75,23 @@ export default function Navigation() {
                   fontWeight: pathname === item.href ? 600 : 400,
                   borderBottom: pathname === item.href ? 2 : 0,
                   borderRadius: 0,
-                  borderColor: 'white',
+                  borderColor: 'primary.main',
                 }}
               >
                 {item.label}
               </Button>
             ))}
+            
+            {/* Dark Mode Toggle */}
+            <Tooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+              <IconButton
+                onClick={onToggleDarkMode}
+                color="inherit"
+                sx={{ ml: 1 }}
+              >
+                {darkMode ? <LightMode /> : <DarkMode />}
+              </IconButton>
+            </Tooltip>
           </Box>
         </Toolbar>
       </Container>

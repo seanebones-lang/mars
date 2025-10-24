@@ -4,7 +4,8 @@ import { useState, useEffect } from 'react';
 import {
   Container, Grid, Card, CardContent, Typography, Box, Switch,
   FormControlLabel, Button, Alert, Chip, List, ListItem, Paper,
-  Stack, IconButton, Tooltip
+  Stack, IconButton, Tooltip, Collapse, TextField, Slider,
+  Divider, FormControl, InputLabel, Select, MenuItem
 } from '@mui/material';
 import { 
   PlayArrow, Stop, Refresh, Download, Settings, 
@@ -42,19 +43,50 @@ export default function MonitorPage() {
   const [monitoringActive, setMonitoringActive] = useState(false);
   const [responseInterval, setResponseInterval] = useState(3.0);
   const [showSettings, setShowSettings] = useState(false);
+  const [jitterAmount, setJitterAmount] = useState(1.0);
+  const [alertThreshold, setAlertThreshold] = useState(0.5);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [soundEnabled, setSoundEnabled] = useState(true);
   
   const { connect, disconnect, isConnected, connectionState, error, reconnectAttempts } = useRealtimeMonitoring();
   const { realtimeResults, clearRealtimeResults, apiUrl } = useStore();
 
+  // Auto-connect WebSocket when page loads
+  useEffect(() => {
+    console.log('MonitorPage mounted, attempting WebSocket connection...');
+    connect();
+    
+    // Check if monitoring is already active on backend
+    const checkBackendStatus = async () => {
+      try {
+        const response = await fetch(`${apiUrl}/monitor/status`);
+        if (response.ok) {
+          const data = await response.json();
+          if (data.is_active) {
+            setMonitoringActive(true);
+            console.log('Backend monitoring already active');
+          }
+        }
+      } catch (error) {
+        console.error('Failed to check backend status:', error);
+      }
+    };
+    
+    checkBackendStatus();
+  }, [connect, apiUrl]);
+
   const startMonitoring = async () => {
     try {
+      // Connect WebSocket first
+      connect();
+      
       // Start backend monitoring
       const response = await fetch(`${apiUrl}/monitor/start`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           response_interval: responseInterval,
-          jitter: 2.0
+          jitter: jitterAmount
         })
       });
       
@@ -65,8 +97,6 @@ export default function MonitorPage() {
       const data = await response.json();
       
       if (data.status === 'started' || data.status === 'already_running') {
-        // Connect WebSocket
-        connect();
         setMonitoringActive(true);
         toast.success('🟢 Live monitoring started');
       } else {
@@ -193,11 +223,14 @@ export default function MonitorPage() {
       {/* Header */}
       <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 4 }}>
         <Box>
-          <Typography variant="h3" fontWeight={600} gutterBottom>
+          <Typography variant="h3" fontWeight={700} gutterBottom>
             Live Agent Monitoring
           </Typography>
+          <Typography variant="h6" color="primary.main" fontWeight={600} gutterBottom>
+            Real-Time Hallucination Defense
+          </Typography>
           <Typography variant="body1" color="text.secondary">
-            Real-time hallucination detection across multiple AI agents
+            Monitor multiple AI agents and catch hallucinations before they impact your business
           </Typography>
         </Box>
         <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
@@ -245,6 +278,136 @@ export default function MonitorPage() {
         {connectionState === 'error' && `❌ Connection error: ${error}`}
         {reconnectAttempts > 0 && ` (Reconnect attempt ${reconnectAttempts}/5)`}
       </Alert>
+
+      {/* Settings Panel */}
+      <Collapse in={showSettings}>
+        <Paper sx={{ p: 3, mb: 3 }}>
+          <Typography variant="h6" gutterBottom>
+            Monitoring Settings
+          </Typography>
+          
+          <Grid container spacing={3}>
+            <Grid xs={12} md={6}>
+              <Stack spacing={3}>
+                <Box>
+                  <Typography gutterBottom>Response Interval (seconds)</Typography>
+                  <Slider
+                    value={responseInterval}
+                    onChange={(_, value) => setResponseInterval(value as number)}
+                    min={1}
+                    max={10}
+                    step={0.5}
+                    marks={[
+                      { value: 1, label: '1s' },
+                      { value: 3, label: '3s' },
+                      { value: 5, label: '5s' },
+                      { value: 10, label: '10s' }
+                    ]}
+                    valueLabelDisplay="on"
+                    disabled={monitoringActive}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    How often agents generate responses
+                  </Typography>
+                </Box>
+
+                <Box>
+                  <Typography gutterBottom>Response Jitter (seconds)</Typography>
+                  <Slider
+                    value={jitterAmount}
+                    onChange={(_, value) => setJitterAmount(value as number)}
+                    min={0}
+                    max={3}
+                    step={0.1}
+                    marks={[
+                      { value: 0, label: '0s' },
+                      { value: 1, label: '1s' },
+                      { value: 2, label: '2s' },
+                      { value: 3, label: '3s' }
+                    ]}
+                    valueLabelDisplay="on"
+                    disabled={monitoringActive}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    Random variation in response timing
+                  </Typography>
+                </Box>
+              </Stack>
+            </Grid>
+
+            <Grid xs={12} md={6}>
+              <Stack spacing={3}>
+                <Box>
+                  <Typography gutterBottom>Alert Threshold</Typography>
+                  <Slider
+                    value={alertThreshold}
+                    onChange={(_, value) => setAlertThreshold(value as number)}
+                    min={0.1}
+                    max={1.0}
+                    step={0.1}
+                    marks={[
+                      { value: 0.3, label: '30%' },
+                      { value: 0.5, label: '50%' },
+                      { value: 0.7, label: '70%' },
+                      { value: 0.9, label: '90%' }
+                    ]}
+                    valueLabelDisplay="on"
+                    valueLabelFormat={(value) => `${(value * 100).toFixed(0)}%`}
+                  />
+                  <Typography variant="caption" color="text.secondary">
+                    Minimum risk level to trigger alerts
+                  </Typography>
+                </Box>
+
+                <Divider />
+
+                <Stack spacing={2}>
+                  <FormControlLabel
+                    control={
+                      <Switch 
+                        checked={notificationsEnabled} 
+                        onChange={(e) => setNotificationsEnabled(e.target.checked)} 
+                      />
+                    }
+                    label="Desktop Notifications"
+                  />
+                  
+                  <FormControlLabel
+                    control={
+                      <Switch 
+                        checked={soundEnabled} 
+                        onChange={(e) => setSoundEnabled(e.target.checked)} 
+                      />
+                    }
+                    label="Sound Alerts"
+                  />
+                </Stack>
+              </Stack>
+            </Grid>
+          </Grid>
+
+          <Box sx={{ mt: 3, display: 'flex', gap: 2 }}>
+            <Button 
+              variant="outlined" 
+              onClick={() => {
+                setResponseInterval(3.0);
+                setJitterAmount(1.0);
+                setAlertThreshold(0.5);
+                setNotificationsEnabled(true);
+                setSoundEnabled(true);
+              }}
+            >
+              Reset to Defaults
+            </Button>
+            <Button 
+              variant="contained" 
+              onClick={() => setShowSettings(false)}
+            >
+              Close Settings
+            </Button>
+          </Box>
+        </Paper>
+      </Collapse>
 
       {/* Metrics Summary */}
       <Grid container spacing={3} sx={{ mb: 4 }}>
