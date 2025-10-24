@@ -1,0 +1,59 @@
+# AgentGuard Configuration
+
+# Claude API Settings
+claude:
+  model: claude-sonnet-4-5-20250929
+  num_samples: 3  # Self-consistency sampling
+  temperature: 0.1
+  max_tokens: 500
+  timeout: 30
+
+# Statistical Model Settings
+statistical:
+  model_name: distilbert-base-uncased
+  max_length: 512
+  bootstrap_samples: 10
+  confidence_level: 0.9
+
+# Ensemble Settings
+ensemble:
+  claude_weight: 0.6
+  statistical_weight: 0.4
+  uncertainty_threshold: 0.3  # Flag for human review if exceeded
+  hallucination_threshold: 0.5  # Flag as hallucination if exceeded
+
+# API Settings
+api:
+  host: 0.0.0.0
+  port: 8000
+  cors_origins:
+    - "*"  # Configure appropriately for production
+  max_concurrent_requests: 10
+  request_timeout: 60
+
+# MLflow Settings
+mlflow:
+  tracking_uri: ./mlruns
+  experiment_name: agentguard_prototype
+  artifact_location: ./mlartifacts
+
+# Logging Settings
+logging:
+  level: INFO
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: ./logs/agentguard.log
+  max_bytes: 10485760  # 10MB
+  backup_count: 5
+
+# Performance Settings
+performance:
+  enable_gpu: true
+  batch_size: 1
+  num_workers: 4
+
+# Testing Settings
+testing:
+  test_data_path: ./data/sample_scenarios.json
+  accuracy_threshold: 0.92
+  coverage_threshold: 0.85
+

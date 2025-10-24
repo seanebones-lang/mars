@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  agentguard-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: agentguard-api
+    ports:
+      - "8000:8000"
+    environment:
+      - CLAUDE_API_KEY=${CLAUDE_API_KEY}
+      - MLFLOW_TRACKING_URI=./mlruns
+      - MLFLOW_EXPERIMENT_NAME=agentguard_prototype
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./mlruns:/app/mlruns
+      - ./logs:/app/logs
+    restart: unless-stopped
+    networks:
+      - agentguard-network
+
+networks:
+  agentguard-network:
+    driver: bridge
+
