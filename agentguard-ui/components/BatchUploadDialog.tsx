@@ -21,6 +21,7 @@ import {
   Card,
   CardContent
 } from '@mui/material';
+import { useTheme } from '@mui/material/styles';
 import { CloudUpload, Description, CheckCircle } from '@mui/icons-material';
 import { useDropzone } from 'react-dropzone';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -34,6 +35,7 @@ interface BatchUploadDialogProps {
 }
 
 export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUploadDialogProps) {
+  const theme = useTheme();
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
   const [options, setOptions] = useState<BatchUploadOptions>({
@@ -179,8 +181,8 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                   p: 4,
                   textAlign: 'center',
                   border: '2px dashed',
-                  borderColor: isDragActive ? 'primary.main' : 'grey.300',
-                  backgroundColor: isDragActive ? 'primary.50' : 'grey.50',
+                  borderColor: isDragActive ? 'primary.main' : (theme.palette.mode === 'dark' ? 'grey.700' : 'grey.300'),
+                  backgroundColor: isDragActive ? 'primary.50' : (theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50'),
                   cursor: 'pointer',
                   transition: 'all 0.3s ease',
                   '&:hover': {

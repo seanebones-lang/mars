@@ -796,7 +796,7 @@ export default function DebugPage() {
               
               <Box>
                 <Typography variant="subtitle2" gutterBottom>Agent Output</Typography>
-                <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
+                <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
                   <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                     {selectedSession.agentOutput}
                   </Typography>
@@ -806,7 +806,7 @@ export default function DebugPage() {
               {selectedSession.groundTruth && (
                 <Box>
                   <Typography variant="subtitle2" gutterBottom>Ground Truth</Typography>
-                  <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
+                  <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
                     <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
                       {selectedSession.groundTruth}
                     </Typography>

@@ -513,8 +513,8 @@ export default function DocsPage() {
                       <Typography variant="h5" gutterBottom>
                         Quick Example
                       </Typography>
-                      <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                        <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                      <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                        <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
 {`curl -X POST "https://api.watcher.mothership-ai.com/v1/test-agent" \\
   -H "X-API-Key: your_api_key_here" \\
   -H "Content-Type: application/json" \\
@@ -544,8 +544,8 @@ export default function DocsPage() {
                       <Typography variant="h5" gutterBottom>
                         Response Format
                       </Typography>
-                      <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                        <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                      <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                        <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
 {`{
   "flagged": false,
   "confidence": 0.92,
@@ -662,8 +662,8 @@ export default function DocsPage() {
                     <Card variant="outlined">
                       <CardHeader title="Authentication Example" />
                       <CardContent>
-                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
 {`# Using cURL
 curl -H "X-API-Key: watcher_api_key_..." \\
      https://api.watcher.mothership-ai.com/v1/test-agent
@@ -804,8 +804,8 @@ response = requests.post(
                             {endpoint.requestBody && (
                               <Box>
                                 <Typography variant="h6" gutterBottom>Request Body</Typography>
-                                <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                                  <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                                <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                                  <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
                                     {JSON.stringify(endpoint.requestBody.example, null, 2)}
                                   </Typography>
                                   <Box display="flex" justifyContent="flex-end" mt={1}>
@@ -836,8 +836,8 @@ response = requests.post(
                                       </Typography>
                                     </Box>
                                     {response.example && (
-                                      <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                                        <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                                      <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                                        <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
                                           {JSON.stringify(response.example, null, 2)}
                                         </Typography>
                                         <Box display="flex" justifyContent="flex-end" mt={1}>
@@ -882,8 +882,8 @@ response = requests.post(
                         <Typography variant="body2">
                           Official Python SDK with full API coverage and type hints.
                         </Typography>
-                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
 {`pip install watcher-ai
 
 from watcher_ai import WatcherClient
@@ -913,8 +913,8 @@ print(f"Confidence: {result.confidence}")`}
                         <Typography variant="body2">
                           JavaScript SDK for browser and Node.js applications.
                         </Typography>
-                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap' }}>
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', whiteSpace: 'pre-wrap', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
 {`npm install @watcher-ai/sdk
 
 import { WatcherClient } from '@watcher-ai/sdk';
@@ -1002,8 +1002,8 @@ console.log('Flagged:', result.flagged);`}
                         <Typography variant="body2" paragraph>
                           Every API response includes rate limit information:
                         </Typography>
-                        <Paper variant="outlined" sx={{ p: 2, bgcolor: 'grey.50' }}>
-                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace' }}>
+                        <Paper variant="outlined" sx={{ p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50' }}>
+                          <Typography variant="body2" component="pre" sx={{ fontFamily: 'monospace', color: theme.palette.mode === 'dark' ? '#e0e0e0' : '#333333' }}>
 {`X-RateLimit-Limit: 100
 X-RateLimit-Remaining: 95
 X-RateLimit-Reset: 1635724800`}

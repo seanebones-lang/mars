@@ -41,6 +41,7 @@ import {
   Info,
   MoreVert
 } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { motion } from 'framer-motion';
 
 import { BatchJob, BatchProgressUpdate, batchAPI } from '@/lib/batchApi';
@@ -60,6 +61,7 @@ export default function BatchJobDetails({
   progressUpdate,
   onExport 
 }: BatchJobDetailsProps) {
+  const theme = useTheme();
   const [exportMenuAnchor, setExportMenuAnchor] = useState<null | HTMLElement>(null);
 
   if (!job) return null;
@@ -215,7 +217,7 @@ export default function BatchJobDetails({
                 </Box>
                 
                 {progressUpdate?.current_row_data && (
-                  <Box sx={{ mt: 2, p: 2, bgcolor: 'grey.50', borderRadius: 1 }}>
+                  <Box sx={{ mt: 2, p: 2, bgcolor: theme.palette.mode === 'dark' ? 'grey.900' : 'grey.50', borderRadius: 1 }}>
                     <Typography variant="body2" fontWeight={600} gutterBottom>
                       Current Row:
                     </Typography>

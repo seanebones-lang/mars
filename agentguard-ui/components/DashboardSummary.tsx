@@ -8,9 +8,11 @@ import {
   CheckCircle,
   Speed,
 } from '@mui/icons-material';
+import { useTheme } from '@mui/material/styles';
 import { useStore } from '@/lib/store';
 
 export default function DashboardSummary() {
+  const theme = useTheme();
   const { results, metrics, updateMetrics } = useStore();
 
   useEffect(() => {
@@ -37,14 +39,14 @@ export default function DashboardSummary() {
       title: 'Total Tests',
       value: metrics.total_tests,
       icon: <Assessment sx={{ fontSize: 40 }} />,
-      color: '#2196F3',
+      color: theme.palette.primary.main,
     },
     {
       title: 'Average Accuracy',
       value: `${(metrics.avg_accuracy * 100).toFixed(1)}%`,
       subtitle: 'Target: 92%',
       icon: <CheckCircle sx={{ fontSize: 40 }} />,
-      color: metrics.avg_accuracy >= 0.92 ? '#4CAF50' : '#FF9800',
+      color: metrics.avg_accuracy >= 0.92 ? theme.palette.success.main : theme.palette.warning.main,
       status: metrics.avg_accuracy >= 0.92 ? 'success' : 'warning',
     },
     {
@@ -52,7 +54,7 @@ export default function DashboardSummary() {
       value: `${metrics.avg_latency.toFixed(3)}s`,
       subtitle: 'Target: <0.5s',
       icon: <Speed sx={{ fontSize: 40 }} />,
-      color: metrics.avg_latency < 0.5 ? '#4CAF50' : '#FF9800',
+      color: metrics.avg_latency < 0.5 ? theme.palette.success.main : theme.palette.warning.main,
       status: metrics.avg_latency < 0.5 ? 'success' : 'warning',
     },
     {
@@ -60,7 +62,7 @@ export default function DashboardSummary() {
       value: metrics.needs_review_count,
       subtitle: `${metrics.high_risk_count} high risk`,
       icon: <Warning sx={{ fontSize: 40 }} />,
-      color: metrics.needs_review_count > 0 ? '#FF5252' : '#9E9E9E',
+      color: metrics.needs_review_count > 0 ? theme.palette.error.main : theme.palette.text.disabled,
       status: metrics.needs_review_count > 0 ? 'error' : 'default',
     },
   ];
