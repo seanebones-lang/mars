@@ -40,7 +40,8 @@ import {
   Avatar,
   ListItemText,
   Menu,
-  ListItemIcon
+  ListItemIcon,
+  Stack
 } from '@mui/material';
 import {
   SearchOutlined,
@@ -171,10 +172,16 @@ const formatUptime = (seconds: number) => {
   return `${hours}h ${minutes}m`;
 };
 
-const WorkstationCard: React.FC<{ workstation: Workstation; onSelect: (id: string) => void; selected: boolean }> = ({
+const WorkstationCard: React.FC<{ 
+  workstation: Workstation; 
+  onSelect: (id: string) => void; 
+  selected: boolean;
+  onManage: (workstation: Workstation) => void;
+}> = ({
   workstation,
   onSelect,
-  selected
+  selected,
+  onManage
 }) => {
   const theme = useTheme();
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -331,11 +338,14 @@ const WorkstationCard: React.FC<{ workstation: Workstation; onSelect: (id: strin
             <ListItemText>Restart Agent</ListItemText>
           </MenuItem>
           <Divider />
-          <MenuItem onClick={handleMenuClose}>
+          <MenuItem onClick={() => {
+            handleMenuClose();
+            onManage(workstation);
+          }}>
             <ListItemIcon>
               <SettingsOutlined fontSize="small" />
             </ListItemIcon>
-            <ListItemText>Configure</ListItemText>
+            <ListItemText>Manage Workstation</ListItemText>
           </MenuItem>
           <MenuItem onClick={handleMenuClose} sx={{ color: 'error.main' }}>
             <ListItemIcon>
@@ -465,6 +475,8 @@ export default function WorkstationsPage() {
   const [detailsOpen, setDetailsOpen] = useState(false);
   const [selectedWorkstation, setSelectedWorkstation] = useState<Workstation | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
+  const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
   // Load mock data
   useEffect(() => {
@@ -550,6 +562,79 @@ export default function WorkstationsPage() {
 
   const handleRefresh = () => {
     setWorkstations(generateMockWorkstations(150));
+  };
+
+  // Workstation Management Functions
+  const handleManageWorkstation = (workstation: Workstation) => {
+    setSelectedWorkstation(workstation);
+    setManageDialogOpen(true);
+  };
+
+  const executeWorkstationAction = async (action: string, workstationId: string) => {
+    setActionInProgress(action);
+    try {
+      // Simulate API call to backend
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      // Update workstation status based on action
+      setWorkstations(prev => prev.map(ws => {
+        if (ws.id === workstationId) {
+          switch (action) {
+            case 'start_monitoring':
+              return { ...ws, status: 'monitoring' };
+            case 'stop_monitoring':
+              return { ...ws, status: 'offline' };
+            case 'restart_agent':
+              return { ...ws, status: 'online', uptime: 0 };
+            case 'update_software':
+              return { ...ws, version: '1.1.0' };
+            case 'run_diagnostics':
+              return { ...ws, alertCount: 0 };
+            default:
+              return ws;
+          }
+        }
+        return ws;
+      }));
+      
+      // Show success notification
+      console.log(`Action ${action} completed successfully for workstation ${workstationId}`);
+    } catch (error) {
+      console.error(`Failed to execute ${action}:`, error);
+    } finally {
+      setActionInProgress(null);
+    }
+  };
+
+  const executeBulkAction = async (action: string, workstationIds: string[]) => {
+    setActionInProgress(action);
+    try {
+      // Simulate bulk API call
+      await new Promise(resolve => setTimeout(resolve, 3000));
+      
+      // Update multiple workstations
+      setWorkstations(prev => prev.map(ws => {
+        if (workstationIds.includes(ws.id)) {
+          switch (action) {
+            case 'bulk_update':
+              return { ...ws, version: '1.1.0' };
+            case 'bulk_restart':
+              return { ...ws, status: 'online', uptime: 0 };
+            case 'bulk_scan':
+              return { ...ws, alertCount: 0 };
+            default:
+              return ws;
+          }
+        }
+        return ws;
+      }));
+      
+      console.log(`Bulk action ${action} completed for ${workstationIds.length} workstations`);
+    } catch (error) {
+      console.error(`Failed to execute bulk ${action}:`, error);
+    } finally {
+      setActionInProgress(null);
+    }
   };
 
   return (
@@ -776,7 +861,12 @@ export default function WorkstationsPage() {
             <Typography variant="body2">
               {selectedWorkstations.size} selected
             </Typography>
-            <Button variant="outlined" size="small">
+            <Button 
+              variant="outlined" 
+              size="small"
+              onClick={() => executeBulkAction('bulk_update', Array.from(selectedWorkstations))}
+              disabled={actionInProgress !== null}
+            >
               Bulk Actions
             </Button>
           </Box>
@@ -800,6 +890,7 @@ export default function WorkstationsPage() {
                       workstation={workstation}
                       onSelect={handleWorkstationSelect}
                       selected={selectedWorkstations.has(workstation.id)}
+                      onManage={handleManageWorkstation}
                     />
                   </Grid>
                 ))}
@@ -983,8 +1074,319 @@ export default function WorkstationsPage() {
           <Button onClick={() => setDetailsOpen(false)}>
             Close
           </Button>
-          <Button variant="contained">
+          <Button 
+            variant="contained"
+            onClick={() => selectedWorkstation && handleManageWorkstation(selectedWorkstation)}
+          >
             Manage Workstation
+          </Button>
+        </DialogActions>
+      </Dialog>
+
+      {/* Comprehensive Workstation Management Dialog */}
+      <Dialog
+        open={manageDialogOpen}
+        onClose={() => setManageDialogOpen(false)}
+        maxWidth="lg"
+        fullWidth
+      >
+        <DialogTitle>
+          <Box display="flex" alignItems="center" gap={2}>
+            <ComputerOutlined color="primary" />
+            <Box>
+              <Typography variant="h5" fontWeight={600}>
+                Manage Workstation: {selectedWorkstation?.hostname}
+              </Typography>
+              <Typography variant="body2" color="text.secondary">
+                Enterprise Workstation Management Console
+              </Typography>
+            </Box>
+          </Box>
+        </DialogTitle>
+        
+        <DialogContent>
+          {selectedWorkstation && (
+            <Grid container spacing={4}>
+              {/* Quick Actions */}
+              <Grid size={12}>
+                <Card>
+                  <CardHeader title="Quick Actions" />
+                  <CardContent>
+                    <Grid container spacing={2}>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={<PlayArrowOutlined />}
+                          onClick={() => executeWorkstationAction('start_monitoring', selectedWorkstation.id)}
+                          disabled={actionInProgress !== null}
+                        >
+                          Start Monitoring
+                        </Button>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={<StopOutlined />}
+                          onClick={() => executeWorkstationAction('stop_monitoring', selectedWorkstation.id)}
+                          disabled={actionInProgress !== null}
+                        >
+                          Stop Monitoring
+                        </Button>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={<RestartAltOutlined />}
+                          onClick={() => executeWorkstationAction('restart_agent', selectedWorkstation.id)}
+                          disabled={actionInProgress !== null}
+                        >
+                          Restart Agent
+                        </Button>
+                      </Grid>
+                      <Grid size={{ xs: 12, sm: 6, md: 3 }}>
+                        <Button
+                          fullWidth
+                          variant="outlined"
+                          startIcon={<RefreshOutlined />}
+                          onClick={() => executeWorkstationAction('run_diagnostics', selectedWorkstation.id)}
+                          disabled={actionInProgress !== null}
+                        >
+                          Run Diagnostics
+                        </Button>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* System Management */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Card>
+                  <CardHeader title="System Management" />
+                  <CardContent>
+                    <Stack spacing={2}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        startIcon={<SettingsOutlined />}
+                        onClick={() => executeWorkstationAction('update_software', selectedWorkstation.id)}
+                        disabled={actionInProgress !== null}
+                      >
+                        Update Software
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<StorageOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Backup Configuration
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<NetworkCheckOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Network Diagnostics
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<MemoryOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Performance Optimization
+                      </Button>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Security & Compliance */}
+              <Grid size={{ xs: 12, md: 6 }}>
+                <Card>
+                  <CardHeader title="Security & Compliance" />
+                  <CardContent>
+                    <Stack spacing={2}>
+                      <Button
+                        fullWidth
+                        variant="contained"
+                        color="warning"
+                        startIcon={<WarningOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Security Scan
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<CheckCircleOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Compliance Check
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<InfoOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Audit Trail
+                      </Button>
+                      <Button
+                        fullWidth
+                        variant="outlined"
+                        startIcon={<BusinessOutlined />}
+                        disabled={actionInProgress !== null}
+                      >
+                        Policy Enforcement
+                      </Button>
+                    </Stack>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Real-time Metrics */}
+              <Grid size={12}>
+                <Card>
+                  <CardHeader title="Real-time Performance Metrics" />
+                  <CardContent>
+                    <Grid container spacing={3}>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box textAlign="center">
+                          <Typography variant="h4" color="primary.main" fontWeight={700}>
+                            {selectedWorkstation.cpuUsage}%
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            CPU Usage
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={selectedWorkstation.cpuUsage}
+                            color={selectedWorkstation.cpuUsage > 80 ? 'error' : 'primary'}
+                            sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box textAlign="center">
+                          <Typography variant="h4" color="info.main" fontWeight={700}>
+                            {selectedWorkstation.memoryUsage}%
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Memory Usage
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={selectedWorkstation.memoryUsage}
+                            color={selectedWorkstation.memoryUsage > 80 ? 'error' : 'info'}
+                            sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                          />
+                        </Box>
+                      </Grid>
+                      <Grid size={{ xs: 12, md: 4 }}>
+                        <Box textAlign="center">
+                          <Typography variant="h4" color="success.main" fontWeight={700}>
+                            {selectedWorkstation.diskUsage}%
+                          </Typography>
+                          <Typography variant="body2" color="text.secondary">
+                            Disk Usage
+                          </Typography>
+                          <LinearProgress
+                            variant="determinate"
+                            value={selectedWorkstation.diskUsage}
+                            color={selectedWorkstation.diskUsage > 80 ? 'error' : 'success'}
+                            sx={{ mt: 1, height: 8, borderRadius: 4 }}
+                          />
+                        </Box>
+                      </Grid>
+                    </Grid>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* AI-Powered Insights */}
+              <Grid size={12}>
+                <Card>
+                  <CardHeader title="AI-Powered Insights & Recommendations" />
+                  <CardContent>
+                    <Alert severity="info" sx={{ mb: 2 }}>
+                      <Typography variant="body2" fontWeight={500}>
+                        AI Analysis Complete
+                      </Typography>
+                      <Typography variant="body2">
+                        Based on performance patterns, this workstation shows optimal performance. 
+                        Recommended actions: Schedule maintenance during low-usage hours (2-4 AM).
+                      </Typography>
+                    </Alert>
+                    
+                    <Box display="flex" gap={2} flexWrap="wrap">
+                      <Chip 
+                        label="Performance: Excellent" 
+                        color="success" 
+                        icon={<TrendingUpOutlined />} 
+                      />
+                      <Chip 
+                        label="Security: Compliant" 
+                        color="success" 
+                        icon={<CheckCircleOutlined />} 
+                      />
+                      <Chip 
+                        label="Uptime: 99.8%" 
+                        color="primary" 
+                        icon={<SpeedOutlined />} 
+                      />
+                      <Chip 
+                        label="Next Maintenance: 3 days" 
+                        color="warning" 
+                        icon={<WarningOutlined />} 
+                      />
+                    </Box>
+                  </CardContent>
+                </Card>
+              </Grid>
+
+              {/* Action Progress */}
+              {actionInProgress && (
+                <Grid size={12}>
+                  <Alert severity="info">
+                    <Box display="flex" alignItems="center" gap={2}>
+                      <LinearProgress sx={{ flexGrow: 1 }} />
+                      <Typography variant="body2">
+                        Executing: {actionInProgress.replace('_', ' ').toUpperCase()}
+                      </Typography>
+                    </Box>
+                  </Alert>
+                </Grid>
+              )}
+            </Grid>
+          )}
+        </DialogContent>
+        
+        <DialogActions>
+          <Button onClick={() => setManageDialogOpen(false)}>
+            Close
+          </Button>
+          <Button 
+            variant="outlined" 
+            startIcon={<GroupOutlined />}
+            onClick={() => {
+              setManageDialogOpen(false);
+              // Open bulk management for similar workstations
+            }}
+          >
+            Manage Similar
+          </Button>
+          <Button 
+            variant="contained" 
+            startIcon={<RefreshOutlined />}
+            onClick={() => handleRefresh()}
+          >
+            Refresh Data
           </Button>
         </DialogActions>
       </Dialog>

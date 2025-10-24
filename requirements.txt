@@ -1,31 +1,91 @@
+# Core Framework
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
-anthropic>=0.39.0
-torch>=2.5.0
-transformers>=4.45.0
-scikit-learn>=1.5.0
 pydantic>=2.9.0
-mlflow>=2.17.0
-pytest>=8.3.0
 python-dotenv>=1.0.0
+
+# AI/ML Core - Updated for 2025 Performance
+torch>=2.9.0
+transformers>=4.57.0
+scikit-learn>=1.7.0
+sentence-transformers>=2.2.2
+anthropic>=0.39.0
+
+# Data Processing & Analysis
 numpy>=1.26.0
 pandas>=2.0.0
 openpyxl>=3.1.0
-python-multipart>=0.0.6
+
+# Monitoring & Experimentation
+mlflow>=2.17.0
+pytest>=8.3.0
+
+# Database & Storage
 neo4j>=5.14.0
-sentence-transformers>=2.2.2
+aiosqlite>=0.19.0
+redis>=5.0.0
+
+# Web & API
 aiohttp>=3.9.0
+python-multipart>=0.0.6
 jinja2>=3.1.0
-aiosmtplib>=3.0.0
+websockets>=12.0
+
+# Security & Authentication
 pyjwt>=2.8.0
 bcrypt>=4.1.0
 pyotp>=2.9.0
 qrcode>=7.4.0
-aiosqlite>=0.19.0
-python-multipart>=0.0.6
-redis>=5.0.0
-psutil>=5.9.0
 cryptography>=41.0.0
-websockets>=12.0
-aiohttp>=3.9.0
+
+# Communication & Notifications
+aiosmtplib>=3.0.0
+
+# System Monitoring
+psutil>=5.9.0
+
+# Phase 1 Enhancements - October 2025
+datasets>=2.14.0  # SemEval-2025 and Mu-SHROOM datasets
+huggingface-hub>=0.17.0  # Dataset access
+evaluate>=0.4.0  # Model evaluation metrics
+accelerate>=0.24.0  # PyTorch acceleration
+optimum>=1.14.0  # Model optimization
+
+# UQLM Integration (Uncertainty Quantification)
+uncertainty-toolbox>=0.1.1  # Uncertainty calibration
+scipy>=1.11.0  # Statistical functions for uncertainty
+
+# Advanced RAG & Knowledge Integration
+wikipedia-api>=0.6.0  # Wikipedia grounding
+requests>=2.31.0  # API calls for external verification
+beautifulsoup4>=4.12.0  # Web scraping for fact-checking
+
+# Attention Analysis Dependencies
+einops>=0.7.0  # Tensor operations for attention analysis
+matplotlib>=3.7.0  # Visualization for attention weights
+seaborn>=0.12.0  # Statistical plotting
+
+# Phase 2 Enhancements - Agentic Pipeline (October 2025)
+crewai>=0.41.0  # Multi-agent coordination framework
+langchain>=0.1.0  # LLM orchestration and chaining
+langchain-anthropic>=0.1.0  # Anthropic integration for LangChain
+pydantic-ai>=0.0.12  # AI-powered validation and processing
+instructor>=0.4.0  # Structured outputs from LLMs
+
+# Phase 4 Enhancements - Multilingual Support (October 2025)
+langdetect>=1.0.9  # Language detection for multilingual support
+polyglot>=16.7.4  # Advanced multilingual NLP (optional)
+fasttext>=0.9.2  # Facebook's language identification (alternative)
+
+# Phase 4 Enhancements - Multimodal Support (October 2025)
+onnxruntime>=1.16.0  # ONNX runtime for multimodal processing
+onnxruntime-gpu>=1.16.0  # GPU acceleration for ONNX (optional)
+opencv-python>=4.8.0  # Computer vision processing
+pillow>=10.0.0  # Image processing and manipulation
+imageio>=2.31.0  # Video reading and processing
+av>=10.0.0  # Advanced video processing
+clip-by-openai>=1.0  # CLIP model for vision-language understanding
+timm>=0.9.7  # PyTorch image models
+torchvision>=0.16.0  # Computer vision utilities
+albumentations>=1.3.1  # Image augmentation for robustness testing
 

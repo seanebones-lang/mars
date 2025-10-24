@@ -1,0 +1,192 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentguard-config
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: config
+data:
+  # Application Configuration
+  APP_NAME: "Watcher AI"
+  APP_VERSION: "2025.10"
+  ENVIRONMENT: "production"
+  LOG_LEVEL: "INFO"
+  
+  # API Configuration
+  API_HOST: "0.0.0.0"
+  API_PORT: "8000"
+  WORKERS: "4"
+  MAX_REQUESTS: "1000"
+  MAX_REQUESTS_JITTER: "100"
+  TIMEOUT_KEEP_ALIVE: "5"
+  
+  # Performance Settings
+  MAX_UPLOAD_SIZE: "100MB"
+  RATE_LIMIT_PER_MINUTE: "1000"
+  SESSION_TIMEOUT_HOURS: "24"
+  
+  # Model Configuration
+  STATISTICAL_MODEL: "distilbert-base-uncased"
+  CLAUDE_MODEL: "claude-3-5-sonnet-20241022"
+  CLAUDE_SAMPLES: "5"
+  CLAUDE_TEMPERATURE: "0.1"
+  
+  # Feature Flags
+  ENABLE_GROUNDING: "true"
+  ENABLE_MULTILINGUAL: "true"
+  ENABLE_AGENT_PIPELINE: "true"
+  ENABLE_STREAMING: "true"
+  ENABLE_MONITORING: "true"
+  
+  # Cache Configuration
+  CACHE_TTL_HOURS: "24"
+  MODEL_CACHE_SIZE: "10"
+  
+  # Monitoring
+  PROMETHEUS_PORT: "9090"
+  METRICS_ENABLED: "true"
+  HEALTH_CHECK_INTERVAL: "30"
+  
+  # Security
+  CORS_ORIGINS: "https://watcher.mothership-ai.com,https://agentguard.mothership-ai.com"
+  ALLOWED_HOSTS: "watcher.mothership-ai.com,agentguard.mothership-ai.com,localhost"
+  
+  # Database URLs (will be overridden by secrets)
+  REDIS_URL: "redis://agentguard-redis:6379/0"
+  POSTGRES_URL: "postgresql://agentguard:password@agentguard-postgres:5432/agentguard"
+  
+  # MLflow Configuration
+  MLFLOW_TRACKING_URI: "http://agentguard-mlflow:5000"
+  MLFLOW_EXPERIMENT_NAME: "agentguard-production"
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: agentguard-nginx-config
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: nginx
+data:
+  nginx.conf: |
+    upstream agentguard_backend {
+        least_conn;
+        server agentguard-api:8000 max_fails=3 fail_timeout=30s;
+    }
+    
+    # Rate limiting
+    limit_req_zone $binary_remote_addr zone=api_limit:10m rate=100r/m;
+    limit_req_zone $binary_remote_addr zone=stream_limit:10m rate=50r/m;
+    
+    server {
+        listen 80;
+        server_name watcher.mothership-ai.com agentguard.mothership-ai.com;
+        
+        # Security headers
+        add_header X-Frame-Options "SAMEORIGIN" always;
+        add_header X-Content-Type-Options "nosniff" always;
+        add_header X-XSS-Protection "1; mode=block" always;
+        add_header Referrer-Policy "strict-origin-when-cross-origin" always;
+        add_header Content-Security-Policy "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline';" always;
+        
+        # Gzip compression
+        gzip on;
+        gzip_vary on;
+        gzip_min_length 1024;
+        gzip_types text/plain text/css application/json application/javascript text/xml application/xml application/xml+rss text/javascript;
+        
+        # Health check endpoint
+        location /health {
+            access_log off;
+            return 200 "healthy\n";
+            add_header Content-Type text/plain;
+        }
+        
+        # API endpoints with rate limiting
+        location /api/ {
+            limit_req zone=api_limit burst=20 nodelay;
+            
+            proxy_pass http://agentguard_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # Timeouts
+            proxy_connect_timeout 30s;
+            proxy_send_timeout 60s;
+            proxy_read_timeout 60s;
+            
+            # Buffer settings
+            proxy_buffering on;
+            proxy_buffer_size 4k;
+            proxy_buffers 8 4k;
+        }
+        
+        # Streaming endpoints with special handling
+        location /stream-detect {
+            limit_req zone=stream_limit burst=10 nodelay;
+            
+            proxy_pass http://agentguard_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # SSE specific settings
+            proxy_buffering off;
+            proxy_cache off;
+            proxy_set_header Connection '';
+            proxy_http_version 1.1;
+            chunked_transfer_encoding off;
+            
+            # Longer timeout for streaming
+            proxy_read_timeout 300s;
+        }
+        
+        # WebSocket endpoints
+        location /ws/ {
+            proxy_pass http://agentguard_backend;
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "upgrade";
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+            
+            # WebSocket timeouts
+            proxy_read_timeout 3600s;
+            proxy_send_timeout 3600s;
+        }
+        
+        # Metrics endpoint (internal only)
+        location /metrics {
+            allow 10.0.0.0/8;
+            allow 172.16.0.0/12;
+            allow 192.168.0.0/16;
+            deny all;
+            
+            proxy_pass http://agentguard_backend;
+            proxy_set_header Host $host;
+        }
+        
+        # Static files and documentation
+        location /docs {
+            proxy_pass http://agentguard_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+        
+        # Default location
+        location / {
+            proxy_pass http://agentguard_backend;
+            proxy_set_header Host $host;
+            proxy_set_header X-Real-IP $remote_addr;
+            proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+            proxy_set_header X-Forwarded-Proto $scheme;
+        }
+    }

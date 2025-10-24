@@ -1,0 +1,123 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentguard-api
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: api
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "8000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: ClusterIP
+  ports:
+  - port: 8000
+    targetPort: 8000
+    protocol: TCP
+    name: http
+  - port: 9090
+    targetPort: 9090
+    protocol: TCP
+    name: metrics
+  selector:
+    app: agentguard
+    component: api
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentguard-nginx
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: nginx
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+    targetPort: 80
+    protocol: TCP
+    name: http
+  selector:
+    app: agentguard
+    component: nginx
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentguard-redis
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: redis
+spec:
+  type: ClusterIP
+  ports:
+  - port: 6379
+    targetPort: 6379
+    protocol: TCP
+    name: redis
+  selector:
+    app: agentguard
+    component: redis
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentguard-postgres
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: postgres
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: agentguard
+    component: postgres
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentguard-mlflow
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: mlflow
+spec:
+  type: ClusterIP
+  ports:
+  - port: 5000
+    targetPort: 5000
+    protocol: TCP
+    name: http
+  selector:
+    app: agentguard
+    component: mlflow
+---
+# Headless service for StatefulSet components
+apiVersion: v1
+kind: Service
+metadata:
+  name: agentguard-postgres-headless
+  namespace: agentguard
+  labels:
+    app: agentguard
+    component: postgres
+spec:
+  type: ClusterIP
+  clusterIP: None
+  ports:
+  - port: 5432
+    targetPort: 5432
+    protocol: TCP
+    name: postgres
+  selector:
+    app: agentguard
+    component: postgres

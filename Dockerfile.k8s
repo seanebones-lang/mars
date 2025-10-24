@@ -1,0 +1,175 @@
+# Multi-stage Docker build for optimized Kubernetes deployment
+# October 2025 Enhancement: Production-ready container with security and performance optimizations
+
+# Stage 1: Builder stage for dependencies
+FROM python:3.11-slim as builder
+
+# Set build arguments
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION=2025.10
+
+# Add metadata
+LABEL maintainer="sean@mothership-ai.com" \
+      org.opencontainers.image.title="AgentGuard API" \
+      org.opencontainers.image.description="AI Hallucination Detection Platform" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.vendor="Mothership AI" \
+      org.opencontainers.image.url="https://watcher.mothership-ai.com" \
+      org.opencontainers.image.source="https://github.com/seanebones-lang/mars"
+
+# Install system dependencies for building
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    gcc \
+    g++ \
+    libffi-dev \
+    libssl-dev \
+    curl \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Set environment variables for pip
+ENV PIP_ROOT_USER_ACTION=ignore \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_DISABLE_PIP_VERSION_CHECK=1 \
+    PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1
+
+# Create virtual environment
+RUN python -m venv /opt/venv
+ENV PATH="/opt/venv/bin:$PATH"
+
+# Copy requirements and install Python dependencies
+COPY requirements.txt /tmp/requirements.txt
+RUN pip install --upgrade pip setuptools wheel && \
+    pip install --no-cache-dir -r /tmp/requirements.txt
+
+# Stage 2: Production stage
+FROM python:3.11-slim as production
+
+# Set build arguments
+ARG BUILD_DATE
+ARG VCS_REF
+ARG VERSION=2025.10
+
+# Add metadata
+LABEL maintainer="sean@mothership-ai.com" \
+      org.opencontainers.image.title="AgentGuard API" \
+      org.opencontainers.image.description="AI Hallucination Detection Platform" \
+      org.opencontainers.image.version="${VERSION}" \
+      org.opencontainers.image.created="${BUILD_DATE}" \
+      org.opencontainers.image.revision="${VCS_REF}" \
+      org.opencontainers.image.vendor="Mothership AI"
+
+# Install runtime dependencies only
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && apt-get clean
+
+# Create non-root user for security
+RUN groupadd -r agentguard && useradd -r -g agentguard -u 1000 agentguard
+
+# Set environment variables
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PATH="/opt/venv/bin:$PATH" \
+    PYTHONPATH="/app:$PYTHONPATH" \
+    APP_ENV=production \
+    WORKERS=4 \
+    TIMEOUT=120 \
+    KEEP_ALIVE=5 \
+    MAX_REQUESTS=1000 \
+    MAX_REQUESTS_JITTER=100
+
+# Copy virtual environment from builder stage
+COPY --from=builder /opt/venv /opt/venv
+
+# Create application directories
+RUN mkdir -p /app /app/logs /app/models /app/data /tmp/agentguard && \
+    chown -R agentguard:agentguard /app /tmp/agentguard
+
+# Set working directory
+WORKDIR /app
+
+# Copy application code
+COPY --chown=agentguard:agentguard src/ ./src/
+COPY --chown=agentguard:agentguard config/ ./config/
+COPY --chown=agentguard:agentguard data/ ./data/
+COPY --chown=agentguard:agentguard watcher_ai_sdk/ ./watcher_ai_sdk/
+COPY --chown=agentguard:agentguard agentguard_cli.py ./
+COPY --chown=agentguard:agentguard pytest.ini ./
+
+# Copy Kubernetes-specific configuration
+COPY --chown=agentguard:agentguard k8s/scripts/ ./scripts/
+
+# Create startup script
+RUN echo '#!/bin/bash\n\
+set -e\n\
+\n\
+# Health check function\n\
+health_check() {\n\
+    curl -f http://localhost:8000/health || exit 1\n\
+}\n\
+\n\
+# Graceful shutdown handler\n\
+shutdown_handler() {\n\
+    echo "Received shutdown signal, gracefully stopping..."\n\
+    kill -TERM "$child" 2>/dev/null\n\
+    wait "$child"\n\
+}\n\
+\n\
+# Set up signal handlers\n\
+trap shutdown_handler SIGTERM SIGINT\n\
+\n\
+# Pre-flight checks\n\
+echo "Starting AgentGuard API v${VERSION}..."\n\
+echo "Environment: ${APP_ENV}"\n\
+echo "Workers: ${WORKERS}"\n\
+echo "Python path: ${PYTHONPATH}"\n\
+\n\
+# Validate required environment variables\n\
+if [ -z "$CLAUDE_API_KEY" ]; then\n\
+    echo "WARNING: CLAUDE_API_KEY not set - some features will be disabled"\n\
+fi\n\
+\n\
+# Start the application\n\
+exec python -m uvicorn src.api.main_realtime:app \\\n\
+    --host 0.0.0.0 \\\n\
+    --port 8000 \\\n\
+    --workers ${WORKERS} \\\n\
+    --timeout-keep-alive ${KEEP_ALIVE} \\\n\
+    --max-requests ${MAX_REQUESTS} \\\n\
+    --max-requests-jitter ${MAX_REQUESTS_JITTER} \\\n\
+    --access-log \\\n\
+    --log-level info &\n\
+\n\
+child=$!\n\
+wait "$child"\n\
+' > /app/start.sh && chmod +x /app/start.sh
+
+# Create health check script
+RUN echo '#!/bin/bash\n\
+curl -f http://localhost:8000/health || exit 1\n\
+' > /app/healthcheck.sh && chmod +x /app/healthcheck.sh
+
+# Switch to non-root user
+USER agentguard
+
+# Expose port
+EXPOSE 8000
+
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+    CMD /app/healthcheck.sh
+
+# Set startup command
+CMD ["/app/start.sh"]
+
+# Add build info as environment variables
+ENV BUILD_DATE=${BUILD_DATE} \
+    VCS_REF=${VCS_REF} \
+    VERSION=${VERSION}

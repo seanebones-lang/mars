@@ -1,0 +1,11 @@
+# Core dependencies for AgentGuard Statistical Judge
+torch>=1.12.0
+transformers>=4.20.0
+numpy>=1.21.0
+scipy>=1.8.0
+scikit-learn>=1.1.0
+
+# Optional dependencies
+datasets>=2.0.0  # For loading evaluation datasets
+tokenizers>=0.13.0  # Fast tokenization
+huggingface-hub>=0.10.0  # Model downloading
