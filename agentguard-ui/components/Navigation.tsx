@@ -53,6 +53,7 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
   // Monitoring & Analytics dropdown
   const monitoringItems = [
     { label: 'Live Monitor', href: '/monitor', icon: <MonitorHeartOutlined />, description: 'Real-time agent monitoring' },
+    { label: 'Agent Reliability', href: '/reliability', icon: <AssessmentOutlined />, description: 'AI agent safety dashboard' },
     { label: 'Workstations', href: '/workstations', icon: <ComputerOutlined />, description: 'Enterprise workstation dashboard' },
     { label: 'Analytics', href: '/analytics', icon: <AnalyticsOutlined />, description: 'Performance insights & trends' },
     { label: 'Performance', href: '/performance', icon: <SpeedOutlined />, description: 'System health & metrics' },
@@ -71,6 +72,7 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
   const testingItems = [
     { label: 'Agent Validator', href: '/freeform', icon: <ScienceOutlined />, description: 'Instant AI agent validation' },
     { label: 'Industry Scenarios', href: '/scenarios', icon: <PlayArrowOutlined />, description: 'Real-world testing scenarios' },
+    { label: 'Batch Testing', href: '/batch-testing', icon: <CloudUploadOutlined />, description: 'Bulk agent validation' },
     { label: 'Demo Mode', href: '/demo', icon: <PlayArrowOutlined />, description: 'Interactive demonstration' },
     { label: 'Debug Tools', href: '/debug', icon: <BugReportOutlined />, description: 'Advanced debugging features' },
   ];
