@@ -74,6 +74,8 @@ import {
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
 import InteractiveWorldMap from '@/components/InteractiveWorldMap';
+import WorkstationDetailsDialog from '@/components/WorkstationDetailsDialog';
+import WorkstationDiscoveryDialog from '@/components/WorkstationDiscoveryDialog';
 
 // Mock data for workstations
 const generateMockWorkstations = (count: number) => {
@@ -547,6 +549,7 @@ export default function WorkstationsPage() {
   const [selectedWorkstation, setSelectedWorkstation] = useState<Workstation | null>(null);
   const [autoRefresh, setAutoRefresh] = useState(true);
   const [manageDialogOpen, setManageDialogOpen] = useState(false);
+  const [discoveryDialogOpen, setDiscoveryDialogOpen] = useState(false);
   const [actionInProgress, setActionInProgress] = useState<string | null>(null);
 
   // Load mock data
@@ -738,6 +741,14 @@ export default function WorkstationsPage() {
             onClick={handleRefresh}
           >
             Refresh
+          </Button>
+          
+          <Button
+            variant="contained"
+            startIcon={<SearchOutlined />}
+            onClick={() => setDiscoveryDialogOpen(true)}
+          >
+            Discovery
           </Button>
         </Box>
       </Box>
@@ -1009,150 +1020,14 @@ export default function WorkstationsPage() {
         </>
       )}
 
-      {/* Workstation Details Dialog */}
-      <Dialog
+      {/* Comprehensive Workstation Details Dialog */}
+      <WorkstationDetailsDialog
         open={detailsOpen}
+        workstation={selectedWorkstation}
         onClose={() => setDetailsOpen(false)}
-        maxWidth="md"
-        fullWidth
-      >
-        <DialogTitle>
-          <Box display="flex" alignItems="center" gap={2}>
-            <Avatar sx={{ 
-              bgcolor: selectedWorkstation ? 
-                (getStatusColor(selectedWorkstation.status) === 'success' ? 'success.main' : 
-                 getStatusColor(selectedWorkstation.status) === 'error' ? 'error.main' :
-                 getStatusColor(selectedWorkstation.status) === 'warning' ? 'warning.main' :
-                 getStatusColor(selectedWorkstation.status) === 'info' ? 'info.main' : 'grey.500') : 'grey.500'
-            }}>
-              {selectedWorkstation && getStatusIcon(selectedWorkstation.status)}
-            </Avatar>
-            <Box>
-              <Typography variant="h6">
-                {selectedWorkstation?.hostname}
-              </Typography>
-              <Typography variant="body2" color="text.secondary">
-                {selectedWorkstation?.ipAddress} • {selectedWorkstation?.platform}
-              </Typography>
-            </Box>
-          </Box>
-        </DialogTitle>
-        
-        <DialogContent>
-          {selectedWorkstation && (
-            <Grid container spacing={3}>
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  System Information
-                </Typography>
-                <Box display="flex" flexDirection="column" gap={1}>
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body2">Location:</Typography>
-                    <Typography variant="body2">{selectedWorkstation.location}</Typography>
-                  </Box>
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body2">Department:</Typography>
-                    <Typography variant="body2">{selectedWorkstation.department}</Typography>
-                  </Box>
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body2">Platform:</Typography>
-                    <Typography variant="body2">{selectedWorkstation.platform}</Typography>
-                  </Box>
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body2">Version:</Typography>
-                    <Typography variant="body2">{selectedWorkstation.version}</Typography>
-                  </Box>
-                  <Box display="flex" justifyContent="space-between">
-                    <Typography variant="body2">Uptime:</Typography>
-                    <Typography variant="body2">{formatUptime(selectedWorkstation.uptime)}</Typography>
-                  </Box>
-                </Box>
-              </Grid>
-              
-              <Grid size={{ xs: 12, md: 6 }}>
-                <Typography variant="subtitle2" gutterBottom>
-                  Performance Metrics
-                </Typography>
-                <Box display="flex" flexDirection="column" gap={2}>
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">CPU Usage</Typography>
-                      <Typography variant="body2">{selectedWorkstation.cpuUsage}%</Typography>
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={selectedWorkstation.cpuUsage}
-                      color={selectedWorkstation.cpuUsage > 80 ? 'error' : selectedWorkstation.cpuUsage > 60 ? 'warning' : 'primary'}
-                    />
-                  </Box>
-                  
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Memory Usage</Typography>
-                      <Typography variant="body2">{selectedWorkstation.memoryUsage}%</Typography>
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={selectedWorkstation.memoryUsage}
-                      color={selectedWorkstation.memoryUsage > 80 ? 'error' : selectedWorkstation.memoryUsage > 60 ? 'warning' : 'primary'}
-                    />
-                  </Box>
-                  
-                  <Box>
-                    <Box display="flex" justifyContent="space-between" mb={1}>
-                      <Typography variant="body2">Disk Usage</Typography>
-                      <Typography variant="body2">{selectedWorkstation.diskUsage}%</Typography>
-                    </Box>
-                    <LinearProgress
-                      variant="determinate"
-                      value={selectedWorkstation.diskUsage}
-                      color={selectedWorkstation.diskUsage > 80 ? 'error' : selectedWorkstation.diskUsage > 60 ? 'warning' : 'primary'}
-                    />
-                  </Box>
-                </Box>
-              </Grid>
-              
-              <Grid size={12}>
-                <Typography variant="subtitle2" gutterBottom>
-                  AI Agents & Alerts
-                </Typography>
-                <Box display="flex" gap={4}>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <ComputerOutlined color="action" />
-                    <Typography variant="body2">
-                      {selectedWorkstation.agentCount} Active Agents
-                    </Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <NotificationsOutlined color={selectedWorkstation.alertCount > 0 ? 'error' : 'action'} />
-                    <Typography variant="body2">
-                      {selectedWorkstation.alertCount} Active Alerts
-                    </Typography>
-                  </Box>
-                  <Box display="flex" alignItems="center" gap={1}>
-                    <NetworkCheckOutlined color="action" />
-                    <Typography variant="body2">
-                      {selectedWorkstation.networkLatency}ms latency
-                    </Typography>
-                  </Box>
-                </Box>
-              </Grid>
-            </Grid>
-          )}
-        </DialogContent>
-        
-        <DialogActions>
-          <Button onClick={() => setDetailsOpen(false)}>
-            Close
-          </Button>
-          <Button 
-            variant="contained"
-            onClick={() => selectedWorkstation && handleManageWorkstation(selectedWorkstation)}
-          >
-            Manage Workstation
-          </Button>
-        </DialogActions>
-      </Dialog>
+        onAction={executeWorkstationAction}
+        actionInProgress={actionInProgress}
+      />
 
       {/* Comprehensive Workstation Management Dialog */}
       <Dialog
@@ -1461,6 +1336,12 @@ export default function WorkstationsPage() {
           </Button>
         </DialogActions>
       </Dialog>
+
+      {/* Workstation Discovery Dialog */}
+      <WorkstationDiscoveryDialog
+        open={discoveryDialogOpen}
+        onClose={() => setDiscoveryDialogOpen(false)}
+      />
 
     </Container>
   );
