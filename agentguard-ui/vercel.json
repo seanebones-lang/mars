@@ -10,14 +10,14 @@
   "outputDirectory": ".next",
   "regions": ["iad1", "sfo1"],
   "env": {
-    "NEXT_PUBLIC_API_URL": "@watcher_api_url",
+    "NEXT_PUBLIC_API_URL": "https://watcher-api.onrender.com",
     "NEXT_PUBLIC_APP_NAME": "Watcher AI",
     "NEXT_PUBLIC_APP_DESCRIPTION": "Real-Time Hallucination Defense",
     "NEXT_PUBLIC_DOMAIN": "watcher.mothership-ai.com"
   },
   "build": {
     "env": {
-      "NEXT_PUBLIC_API_URL": "@watcher_api_url",
+      "NEXT_PUBLIC_API_URL": "https://watcher-api.onrender.com",
       "NEXT_PUBLIC_APP_NAME": "Watcher AI",
       "NEXT_PUBLIC_APP_DESCRIPTION": "Real-Time Hallucination Defense",
       "NEXT_PUBLIC_DOMAIN": "watcher.mothership-ai.com"
