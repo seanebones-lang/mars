@@ -22,7 +22,15 @@ import {
   ListItem,
   ListItemText,
   ListItemIcon,
-  Divider
+  Divider,
+  Button,
+  IconButton,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
+  CardHeader,
+  Avatar,
+  LinearProgress
 } from '@mui/material';
 import {
   TrendingUp,
@@ -35,7 +43,12 @@ import {
   Warning,
   CheckCircle,
   Error,
-  Info
+  Info,
+  AutoAwesome,
+  Psychology,
+  Lightbulb,
+  Assessment,
+  Refresh
 } from '@mui/icons-material';
 import {
   LineChart,
@@ -56,6 +69,7 @@ import {
 } from 'recharts';
 import { motion } from 'framer-motion';
 import { getAnalyticsOverview, getTimeSeriesData, getHallucinationPatterns, AnalyticsOverview } from '@/lib/analyticsApi';
+import { agentGuardApi } from '@/lib/api';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -93,6 +107,9 @@ export default function AnalyticsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [analyticsData, setAnalyticsData] = useState<AnalyticsOverview | null>(null);
+  const [claudeInsights, setClaudeInsights] = useState<any>(null);
+  const [insightsLoading, setInsightsLoading] = useState(false);
+  const [showInsights, setShowInsights] = useState(false);
 
   useEffect(() => {
     loadAnalyticsData();
@@ -111,6 +128,38 @@ export default function AnalyticsPage() {
     } finally {
       setLoading(false);
     }
+  };
+
+  // Claude Insights Functions
+  const getClaudeInsights = async () => {
+    if (!analyticsData) return;
+    
+    setInsightsLoading(true);
+    try {
+      const insights = await agentGuardApi.getAnalyticsInsights({
+        totalTests: analyticsData.agent_metrics?.total_responses || 0,
+        avgRiskScore: analyticsData.agent_metrics?.avg_hallucination_risk || 0,
+        accuracy: ((analyticsData.agent_metrics?.total_responses - analyticsData.agent_metrics?.flagged_responses) / analyticsData.agent_metrics?.total_responses * 100) || 0,
+        processingVolume: analyticsData.agent_metrics?.total_responses || 0,
+        falsePositiveRate: 3.2, // Mock false positive rate
+        avgLatency: analyticsData.agent_metrics?.avg_processing_time || 0,
+        highRiskDetections: analyticsData.agent_metrics?.flagged_responses || 0,
+        costPerDetection: 0.05, // Mock cost data
+        userSatisfaction: 87, // Mock satisfaction data
+        uptime: 99.8 // Mock uptime data
+      });
+      setClaudeInsights(insights);
+      setShowInsights(true);
+    } catch (err) {
+      console.error('Failed to get Claude insights:', err);
+    } finally {
+      setInsightsLoading(false);
+    }
+  };
+
+  const handleRefreshInsights = async () => {
+    setClaudeInsights(null);
+    await getClaudeInsights();
   };
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -184,22 +233,41 @@ export default function AnalyticsPage() {
               Analytics Dashboard
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
-              Graph Database & RAG-Enhanced Insights
+              Claude-Powered Business Intelligence & Insights
             </Typography>
           </Box>
           
-          <FormControl sx={{ minWidth: 120 }}>
-            <InputLabel>Time Range</InputLabel>
-            <Select
-              value={timeRange}
-              label="Time Range"
-              onChange={(e) => setTimeRange(e.target.value as number)}
+          <Box display="flex" gap={2} alignItems="center">
+            <Button
+              variant="outlined"
+              startIcon={<AutoAwesome />}
+              onClick={getClaudeInsights}
+              disabled={insightsLoading || !analyticsData}
+              sx={{ 
+                borderColor: 'primary.main',
+                color: 'primary.main',
+                '&:hover': {
+                  borderColor: 'primary.dark',
+                  backgroundColor: 'primary.light'
+                }
+              }}
             >
-              <MenuItem value={7}>Last 7 days</MenuItem>
-              <MenuItem value={30}>Last 30 days</MenuItem>
-              <MenuItem value={90}>Last 90 days</MenuItem>
-            </Select>
-          </FormControl>
+              {insightsLoading ? 'Analyzing...' : 'Claude Insights'}
+            </Button>
+            
+            <FormControl sx={{ minWidth: 120 }}>
+              <InputLabel>Time Range</InputLabel>
+              <Select
+                value={timeRange}
+                label="Time Range"
+                onChange={(e) => setTimeRange(e.target.value as number)}
+              >
+                <MenuItem value={7}>Last 7 days</MenuItem>
+                <MenuItem value={30}>Last 30 days</MenuItem>
+                <MenuItem value={90}>Last 90 days</MenuItem>
+              </Select>
+            </FormControl>
+          </Box>
         </Box>
 
         {/* Summary Cards */}
@@ -558,6 +626,232 @@ export default function AnalyticsPage() {
             </Grid>
           </Grid>
         </TabPanel>
+
+        {/* Claude Insights Section */}
+        {showInsights && (
+          <Box mt={4}>
+            <Card elevation={3}>
+              <CardHeader
+                title={
+                  <Box display="flex" alignItems="center" gap={2}>
+                    <AutoAwesome color="primary" />
+                    <Typography variant="h6">
+                      Claude Business Intelligence
+                    </Typography>
+                    <Chip label="AI Powered" color="primary" size="small" />
+                  </Box>
+                }
+                action={
+                  <IconButton 
+                    onClick={handleRefreshInsights} 
+                    disabled={insightsLoading}
+                    title="Refresh Insights"
+                  >
+                    <Refresh />
+                  </IconButton>
+                }
+              />
+              <CardContent>
+                {insightsLoading && (
+                  <Box sx={{ mb: 3, textAlign: 'center' }}>
+                    <LinearProgress />
+                    <Typography variant="body2" color="text.secondary" sx={{ mt: 2 }}>
+                      Claude is analyzing your analytics data for business insights...
+                    </Typography>
+                  </Box>
+                )}
+
+                {claudeInsights && (
+                  <Grid container spacing={3}>
+                    {/* Business Impact */}
+                    <Grid size={12}>
+                      <Card variant="outlined">
+                        <CardHeader 
+                          title="Business Impact Analysis" 
+                          avatar={<Assessment color="primary" />}
+                        />
+                        <CardContent>
+                          <Typography variant="body2" gutterBottom>
+                            {claudeInsights.businessImpact}
+                          </Typography>
+                          <Box sx={{ mt: 2 }}>
+                            <Chip 
+                              label={claudeInsights.riskAssessment} 
+                              color={claudeInsights.riskAssessment.includes('Low') ? 'success' : 
+                                     claudeInsights.riskAssessment.includes('Medium') ? 'warning' : 'error'}
+                              size="small"
+                            />
+                          </Box>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+
+                    {/* Trend Analysis */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Card variant="outlined">
+                        <CardHeader 
+                          title="Trend Analysis" 
+                          avatar={<Psychology color="primary" />}
+                        />
+                        <CardContent>
+                          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                            {claudeInsights.trendAnalysis}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+
+                    {/* Performance Insights */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Card variant="outlined">
+                        <CardHeader 
+                          title="Performance Insights" 
+                          avatar={<TrendingUp color="success" />}
+                        />
+                        <CardContent>
+                          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                            {claudeInsights.performanceInsights}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+
+                    {/* Key Findings */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Card variant="outlined">
+                        <CardHeader 
+                          title="Key Findings" 
+                          avatar={<Lightbulb color="warning" />}
+                        />
+                        <CardContent>
+                          <List dense>
+                            {claudeInsights.keyFindings.map((finding: string, index: number) => (
+                              <ListItem key={index}>
+                                <ListItemIcon>
+                                  <Info color="primary" fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText primary={finding} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+
+                    {/* Recommendations */}
+                    <Grid size={{ xs: 12, md: 6 }}>
+                      <Card variant="outlined">
+                        <CardHeader 
+                          title="Strategic Recommendations" 
+                          avatar={<CheckCircle color="success" />}
+                        />
+                        <CardContent>
+                          <List dense>
+                            {claudeInsights.recommendations.map((rec: string, index: number) => (
+                              <ListItem key={index}>
+                                <ListItemIcon>
+                                  <Lightbulb color="primary" fontSize="small" />
+                                </ListItemIcon>
+                                <ListItemText primary={rec} />
+                              </ListItem>
+                            ))}
+                          </List>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+
+                    {/* Optimization Opportunities */}
+                    <Grid size={12}>
+                      <Accordion>
+                        <AccordionSummary expandIcon={<TrendingUp />}>
+                          <Box display="flex" alignItems="center" gap={2}>
+                            <AutoAwesome color="secondary" />
+                            <Typography variant="subtitle1" fontWeight={600}>
+                              Optimization Opportunities & Action Items
+                            </Typography>
+                          </Box>
+                        </AccordionSummary>
+                        <AccordionDetails>
+                          <Grid container spacing={2}>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                              <Typography variant="subtitle2" gutterBottom>
+                                Optimization Opportunities:
+                              </Typography>
+                              <List dense>
+                                {claudeInsights.optimizationOpportunities.map((opp: string, index: number) => (
+                                  <ListItem key={index}>
+                                    <ListItemIcon>
+                                      <TrendingUp color="success" fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary={opp} />
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </Grid>
+                            <Grid size={{ xs: 12, md: 6 }}>
+                              <Typography variant="subtitle2" gutterBottom>
+                                Immediate Action Items:
+                              </Typography>
+                              <List dense>
+                                {claudeInsights.actionItems.map((action: string, index: number) => (
+                                  <ListItem key={index}>
+                                    <ListItemIcon>
+                                      <CheckCircle color="primary" fontSize="small" />
+                                    </ListItemIcon>
+                                    <ListItemText primary={action} />
+                                  </ListItem>
+                                ))}
+                              </List>
+                            </Grid>
+                          </Grid>
+                        </AccordionDetails>
+                      </Accordion>
+                    </Grid>
+
+                    {/* Forecast Insights */}
+                    <Grid size={12}>
+                      <Card variant="outlined">
+                        <CardHeader 
+                          title="Forecast & Predictive Analysis" 
+                          avatar={<Timeline color="info" />}
+                        />
+                        <CardContent>
+                          <Typography variant="body2" sx={{ whiteSpace: 'pre-wrap' }}>
+                            {claudeInsights.forecastInsights}
+                          </Typography>
+                        </CardContent>
+                      </Card>
+                    </Grid>
+                  </Grid>
+                )}
+              </CardContent>
+            </Card>
+          </Box>
+        )}
+
+        {!showInsights && !insightsLoading && analyticsData && (
+          <Box mt={4} textAlign="center">
+            <Card elevation={1} sx={{ py: 4 }}>
+              <CardContent>
+                <AutoAwesome sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
+                <Typography variant="h6" color="text.secondary" gutterBottom>
+                  Claude Business Intelligence
+                </Typography>
+                <Typography variant="body2" color="text.secondary" paragraph>
+                  Get AI-powered insights, trend analysis, and strategic recommendations for your analytics data
+                </Typography>
+                <Button 
+                  variant="contained" 
+                  size="large"
+                  startIcon={<Psychology />}
+                  onClick={getClaudeInsights}
+                >
+                  Generate Business Insights
+                </Button>
+              </CardContent>
+            </Card>
+          </Box>
+        )}
       </motion.div>
     </Container>
   );
