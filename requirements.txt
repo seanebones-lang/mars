@@ -12,9 +12,9 @@ bcrypt>=4.1.2
 pyotp>=2.9.0
 
 # AI/ML Core - Updated for 2025 Performance
-torch>=2.9.0
+torch>=2.0.0
 transformers>=4.57.0
-scikit-learn>=1.7.0
+scikit-learn>=1.0.0
 sentence-transformers>=2.2.2
 anthropic>=0.39.0
 

@@ -57,6 +57,12 @@ from .claude_endpoints import (
     get_structured_claude_insights, analyze_workstation_with_claude,
     analyze_fleet_with_claude, claude_websocket_endpoint
 )
+from .auth_endpoints import (
+    register_user, authenticate_user, setup_mfa, verify_mfa, refresh_token,
+    get_user_profile, update_user_profile, generate_api_token, revoke_api_token,
+    logout_user, request_password_reset, list_users, update_user_role,
+    admin_dashboard_data, analytics_data
+)
 
 # Load environment variables
 load_dotenv()
@@ -4945,6 +4951,139 @@ async def claude_fleet_analysis(
     return await analyze_fleet_with_claude(fleet_request, current_user)
 
 # WebSocket endpoint for real-time Claude analysis
+# Authentication & User Management Endpoints
+@app.post("/auth/register", tags=["authentication"])
+async def register_new_user(
+    request: dict,
+    client_request: Request
+):
+    """Register a new user with enhanced security validation."""
+    from ..services.enhanced_auth_service import RegisterRequest
+    register_req = RegisterRequest(**request)
+    return await register_user(register_req, client_request)
+
+@app.post("/auth/login", tags=["authentication"])
+async def login_user(
+    request: dict,
+    client_request: Request
+):
+    """Authenticate user with enhanced security checks."""
+    from ..services.enhanced_auth_service import AuthRequest
+    auth_req = AuthRequest(**request)
+    return await authenticate_user(auth_req, client_request)
+
+@app.post("/auth/mfa/setup", tags=["authentication"])
+async def setup_user_mfa(
+    request: dict,
+    current_user = Depends(get_current_user)
+):
+    """Set up multi-factor authentication for the current user."""
+    from ..services.enhanced_auth_service import MFASetupRequest
+    mfa_req = MFASetupRequest(**request)
+    return await setup_mfa(mfa_req, current_user)
+
+@app.post("/auth/mfa/verify", tags=["authentication"])
+async def verify_user_mfa(
+    mfa_code: str,
+    current_user = Depends(get_current_user)
+):
+    """Verify MFA code for the current user."""
+    return await verify_mfa(mfa_code, current_user)
+
+@app.post("/auth/refresh", tags=["authentication"])
+async def refresh_access_token(
+    refresh_token: str
+):
+    """Refresh access token using refresh token."""
+    return await refresh_token(refresh_token)
+
+@app.get("/auth/profile", tags=["user_profile"])
+async def get_current_user_profile(
+    current_user = Depends(get_current_user)
+):
+    """Get current user's profile with usage statistics and preferences."""
+    return await get_user_profile(current_user)
+
+@app.put("/auth/profile", tags=["user_profile"])
+async def update_current_user_profile(
+    updates: dict,
+    current_user = Depends(get_current_user)
+):
+    """Update user profile preferences and settings."""
+    return await update_user_profile(updates, current_user)
+
+@app.post("/auth/api-tokens", tags=["user_profile"])
+async def create_api_token(
+    token_name: str,
+    current_user = Depends(get_current_user)
+):
+    """Generate a new API token for the current user."""
+    from ..services.enhanced_auth_service import require_pro_or_higher
+    # Apply pro requirement check
+    await require_pro_or_higher(current_user)
+    return await generate_api_token(token_name, current_user)
+
+@app.delete("/auth/api-tokens/{token_id}", tags=["user_profile"])
+async def delete_api_token(
+    token_id: str,
+    current_user = Depends(get_current_user)
+):
+    """Revoke an API token for the current user."""
+    return await revoke_api_token(token_id, current_user)
+
+@app.post("/auth/logout", tags=["authentication"])
+async def logout_current_user(
+    current_user = Depends(get_current_user),
+    response: Response = None
+):
+    """Logout user and invalidate tokens."""
+    return await logout_user(current_user, response)
+
+@app.post("/auth/password-reset", tags=["authentication"])
+async def request_user_password_reset(
+    request: dict,
+    client_request: Request,
+    background_tasks: BackgroundTasks
+):
+    """Request password reset for a user account."""
+    from ..services.enhanced_auth_service import PasswordResetRequest
+    reset_req = PasswordResetRequest(**request)
+    return await request_password_reset(reset_req, client_request, background_tasks)
+
+# Admin endpoints
+@app.get("/admin/users", tags=["admin"])
+async def get_all_users(
+    limit: int = Query(50, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    role: Optional[str] = Query(None),
+    current_user = Depends(require_admin)
+):
+    """List all users (admin only)."""
+    return await list_users(limit, offset, role, current_user)
+
+@app.put("/admin/users/{user_id}/role", tags=["admin"])
+async def change_user_role(
+    user_id: str,
+    new_role: str,
+    current_user = Depends(require_admin)
+):
+    """Update user role (admin only)."""
+    return await update_user_role(user_id, new_role, current_user)
+
+@app.get("/admin/dashboard", tags=["admin"])
+async def get_admin_dashboard(
+    current_user = Depends(require_admin)
+):
+    """Get admin dashboard data."""
+    return await admin_dashboard_data(current_user)
+
+@app.get("/analytics/data", tags=["analytics"])
+async def get_analytics_data(
+    current_user = Depends(get_current_user)
+):
+    """Get analytics data (requires analytics permission)."""
+    return await analytics_data(current_user)
+
 @app.websocket("/ws/claude")
 async def websocket_claude_analysis(websocket: WebSocket):
     """WebSocket endpoint for real-time Claude analysis."""
