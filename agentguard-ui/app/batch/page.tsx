@@ -49,7 +49,7 @@ import toast from 'react-hot-toast';
 import { batchAPI, BatchJob, BatchProgressUpdate, BatchUploadOptions } from '@/lib/batchApi';
 import BatchUploadDialog from '@/components/BatchUploadDialog';
 import BatchJobDetails from '@/components/BatchJobDetails';
-import BatchProgressTracker from '@/components/BatchProgressTracker';
+// import BatchProgressTracker from '@/components/BatchProgressTracker'; // Component not implemented yet
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -263,7 +263,7 @@ export default function BatchProcessingPage() {
 
           {/* Summary Cards */}
           <Grid container spacing={3} sx={{ mb: 4 }}>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" fontWeight={700} color="primary.main">
@@ -275,7 +275,7 @@ export default function BatchProcessingPage() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" fontWeight={700} color="warning.main">
@@ -287,7 +287,7 @@ export default function BatchProcessingPage() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" fontWeight={700} color="info.main">
@@ -299,7 +299,7 @@ export default function BatchProcessingPage() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" fontWeight={700} color="success.main">
@@ -311,7 +311,7 @@ export default function BatchProcessingPage() {
                 </CardContent>
               </Card>
             </Grid>
-            <Grid item xs={12} sm={6} md={2.4}>
+            <Grid size={{ xs: 12, sm: 6, md: 2.4 }}>
               <Card>
                 <CardContent sx={{ textAlign: 'center' }}>
                   <Typography variant="h4" fontWeight={700} color="error.main">
@@ -492,8 +492,6 @@ function JobsTable({
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -20 }}
                 transition={{ duration: 0.3 }}
-                component={TableRow}
-                hover
               >
                 <TableCell>
                   <Box>

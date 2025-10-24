@@ -57,7 +57,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
   const [reconnectAttempts, setReconnectAttempts] = useState(0);
   
   const { addRealtimeResult } = useStore();
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout>();
+  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const maxReconnectAttempts = 5;
   const reconnectDelay = 2000; // 2 seconds
 
@@ -70,7 +70,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
 
   const showNotification = useCallback((data: RealtimeData) => {
     if (data.flagged && 'Notification' in window && Notification.permission === 'granted') {
-      const notification = new Notification(`🚨 Hallucination Detected: ${data.agent_id}`, {
+      const notification = new Notification(`Hallucination Detected: ${data.agent_id}`, {
         body: `Risk: ${(data.hallucination_risk * 100).toFixed(1)}% - ${data.flagged_segments.join(', ')}`,
         icon: '/warning-icon.png',
         tag: `hallucination-${data.agent_id}`, // Prevent duplicate notifications
@@ -111,7 +111,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
           // Show alerts for flagged responses
           if (data.flagged) {
             toast.error(
-              `🚨 ${data.agent_id}: ${data.flagged_segments.join(', ')}`,
+              `${data.agent_id}: ${data.flagged_segments.join(', ')}`,
               {
                 duration: 5000,
                 position: 'top-right',
@@ -138,7 +138,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
           } else {
             // Show success toast for clean responses (less prominent)
             toast.success(
-              `✅ ${data.agent_id}: Clean response`,
+              `${data.agent_id}: Clean response`,
               {
                 duration: 2000,
                 position: 'bottom-right',
@@ -152,13 +152,13 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
           break;
           
         case 'monitoring_started':
-          toast.success('🟢 Live monitoring started', { duration: 3000 });
+          toast.success('Live monitoring started', { duration: 3000 });
           audioAlerts.playSystemAlert('monitoring_started');
           setError(null);
           break;
           
         case 'monitoring_stopped':
-          toast('🔴 Live monitoring stopped', { duration: 3000 });
+          toast('Live monitoring stopped', { duration: 3000 });
           audioAlerts.playSystemAlert('monitoring_stopped');
           if (data.stats) {
             setConnectionStats(data.stats);
@@ -313,7 +313,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         if (event.code !== 1000) {
           audioAlerts.playSystemAlert('connection_lost');
           persistentAlerts.createAlert({
-            title: '🔴 Connection Lost',
+            title: 'Connection Lost',
             message: 'WebSocket connection to monitoring service has been lost',
             severity: 'high',
             category: 'connection',
@@ -338,7 +338,7 @@ export function useRealtimeMonitoring(): UseRealtimeMonitoringReturn {
         setError('WebSocket connection error');
         audioAlerts.playSystemAlert('connection_lost');
         persistentAlerts.createAlert({
-          title: '❌ Connection Error',
+          title: 'Connection Error',
           message: 'Failed to establish WebSocket connection to monitoring service',
           severity: 'critical',
           category: 'connection',

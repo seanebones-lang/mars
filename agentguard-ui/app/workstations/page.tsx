@@ -72,35 +72,52 @@ import {
 } from '@mui/icons-material';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useTheme } from '@mui/material/styles';
+import InteractiveWorldMap from '@/components/InteractiveWorldMap';
 
 // Mock data for workstations
 const generateMockWorkstations = (count: number) => {
   const statuses = ['online', 'offline', 'monitoring', 'error', 'maintenance'];
-  const locations = ['New York', 'London', 'Tokyo', 'Sydney', 'Frankfurt', 'Singapore', 'Toronto', 'Mumbai'];
+  const locationData = [
+    { name: 'New York', lat: 40.7128, lng: -74.0060 },
+    { name: 'London', lat: 51.5074, lng: -0.1278 },
+    { name: 'Tokyo', lat: 35.6762, lng: 139.6503 },
+    { name: 'Sydney', lat: -33.8688, lng: 151.2093 },
+    { name: 'Frankfurt', lat: 50.1109, lng: 8.6821 },
+    { name: 'Singapore', lat: 1.3521, lng: 103.8198 },
+    { name: 'Toronto', lat: 43.6532, lng: -79.3832 },
+    { name: 'Mumbai', lat: 19.0760, lng: 72.8777 }
+  ];
   const departments = ['IT', 'Finance', 'HR', 'Sales', 'Marketing', 'Operations', 'R&D', 'Support'];
   
-  return Array.from({ length: count }, (_, i) => ({
-    id: `ws_${i.toString().padStart(4, '0')}`,
-    hostname: `workstation-${i + 1}`,
-    status: statuses[Math.floor(Math.random() * statuses.length)],
-    location: locations[Math.floor(Math.random() * locations.length)],
-    department: departments[Math.floor(Math.random() * departments.length)],
-    ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
-    lastSeen: new Date(Date.now() - Math.random() * 86400000).toISOString(),
-    cpuUsage: Math.floor(Math.random() * 100),
-    memoryUsage: Math.floor(Math.random() * 100),
-    diskUsage: Math.floor(Math.random() * 100),
-    agentCount: Math.floor(Math.random() * 5),
-    alertCount: Math.floor(Math.random() * 10),
-    platform: ['Windows', 'macOS', 'Linux'][Math.floor(Math.random() * 3)],
-    version: '1.0.0',
-    uptime: Math.floor(Math.random() * 86400),
-    networkLatency: Math.floor(Math.random() * 100),
-    coordinates: {
-      lat: -90 + Math.random() * 180,
-      lng: -180 + Math.random() * 360
-    }
-  }));
+  return Array.from({ length: count }, (_, i) => {
+    const locationInfo = locationData[Math.floor(Math.random() * locationData.length)];
+    // Add some random offset to coordinates for realistic clustering
+    const latOffset = (Math.random() - 0.5) * 0.5; // ±0.25 degrees
+    const lngOffset = (Math.random() - 0.5) * 0.5; // ±0.25 degrees
+    
+    return {
+      id: `ws_${i.toString().padStart(4, '0')}`,
+      hostname: `workstation-${i + 1}`,
+      status: statuses[Math.floor(Math.random() * statuses.length)],
+      location: locationInfo.name,
+      department: departments[Math.floor(Math.random() * departments.length)],
+      ipAddress: `192.168.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`,
+      lastSeen: new Date(Date.now() - Math.random() * 86400000).toISOString(),
+      cpuUsage: Math.floor(Math.random() * 100),
+      memoryUsage: Math.floor(Math.random() * 100),
+      diskUsage: Math.floor(Math.random() * 100),
+      agentCount: Math.floor(Math.random() * 5),
+      alertCount: Math.floor(Math.random() * 10),
+      platform: ['Windows', 'macOS', 'Linux'][Math.floor(Math.random() * 3)],
+      version: '1.0.0',
+      uptime: Math.floor(Math.random() * 86400),
+      networkLatency: Math.floor(Math.random() * 100),
+      coordinates: {
+        lat: locationInfo.lat + latOffset,
+        lng: locationInfo.lng + lngOffset
+      }
+    };
+  });
 };
 
 interface Workstation {
@@ -232,7 +249,7 @@ const WorkstationCard: React.FC<{ workstation: Workstation; onSelect: (id: strin
         
         <CardContent sx={{ pt: 0 }}>
           <Grid container spacing={2}>
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Box display="flex" alignItems="center" gap={1}>
                 <SpeedOutlined fontSize="small" color="action" />
                 <Box flex={1}>
@@ -249,7 +266,7 @@ const WorkstationCard: React.FC<{ workstation: Workstation; onSelect: (id: strin
               </Box>
             </Grid>
             
-            <Grid item xs={6}>
+            <Grid size={6}>
               <Box display="flex" alignItems="center" gap={1}>
                 <MemoryOutlined fontSize="small" color="action" />
                 <Box flex={1}>
@@ -266,7 +283,7 @@ const WorkstationCard: React.FC<{ workstation: Workstation; onSelect: (id: strin
               </Box>
             </Grid>
             
-            <Grid item xs={12}>
+            <Grid size={12}>
               <Box display="flex" justifyContent="space-between" alignItems="center">
                 <Box display="flex" alignItems="center" gap={1}>
                   <ComputerOutlined fontSize="small" color="action" />
@@ -571,7 +588,7 @@ export default function WorkstationsPage() {
 
       {/* Statistics Cards */}
       <Grid container spacing={3} mb={4}>
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" gap={2}>
@@ -589,7 +606,7 @@ export default function WorkstationsPage() {
           </Card>
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" gap={2}>
@@ -607,7 +624,7 @@ export default function WorkstationsPage() {
           </Card>
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" gap={2}>
@@ -625,7 +642,7 @@ export default function WorkstationsPage() {
           </Card>
         </Grid>
         
-        <Grid item xs={12} sm={6} md={3}>
+        <Grid size={{ xs: 12, sm: 6, md: 3 }}>
           <Card>
             <CardContent>
               <Box display="flex" alignItems="center" gap={2}>
@@ -648,7 +665,7 @@ export default function WorkstationsPage() {
       <Card sx={{ mb: 3 }}>
         <CardContent>
           <Grid container spacing={3} alignItems="center">
-            <Grid item xs={12} md={4}>
+            <Grid size={{ xs: 12, md: 4 }}>
               <TextField
                 fullWidth
                 placeholder="Search workstations..."
@@ -664,7 +681,7 @@ export default function WorkstationsPage() {
               />
             </Grid>
             
-            <Grid item xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>Status</InputLabel>
                 <Select
@@ -682,7 +699,7 @@ export default function WorkstationsPage() {
               </FormControl>
             </Grid>
             
-            <Grid item xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>Location</InputLabel>
                 <Select
@@ -698,7 +715,7 @@ export default function WorkstationsPage() {
               </FormControl>
             </Grid>
             
-            <Grid item xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <FormControl fullWidth>
                 <InputLabel>Department</InputLabel>
                 <Select
@@ -714,7 +731,7 @@ export default function WorkstationsPage() {
               </FormControl>
             </Grid>
             
-            <Grid item xs={12} md={2}>
+            <Grid size={{ xs: 12, md: 2 }}>
               <Box display="flex" gap={1}>
                 <Tooltip title="Grid View">
                   <IconButton
@@ -778,7 +795,7 @@ export default function WorkstationsPage() {
             <Grid container spacing={3}>
               <AnimatePresence>
                 {filteredWorkstations.map((workstation) => (
-                  <Grid item xs={12} sm={6} md={4} lg={3} key={workstation.id}>
+                   <Grid size={{ xs: 12, sm: 6, md: 4, lg: 3 }} key={workstation.id}>
                     <WorkstationCard
                       workstation={workstation}
                       onSelect={handleWorkstationSelect}
@@ -822,28 +839,10 @@ export default function WorkstationsPage() {
 
           {/* Map View */}
           {viewMode === 'map' && (
-            <Card>
-              <CardContent>
-                <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  height={400}
-                  bgcolor="grey.100"
-                  borderRadius={1}
-                >
-                  <Box textAlign="center">
-                    <MapOutlined sx={{ fontSize: 64, color: 'grey.400', mb: 2 }} />
-                    <Typography variant="h6" color="text.secondary">
-                      Interactive World Map
-                    </Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Geographic visualization of {filteredWorkstations.length} workstations
-                    </Typography>
-                  </Box>
-                </Box>
-              </CardContent>
-            </Card>
+            <InteractiveWorldMap
+              workstations={filteredWorkstations}
+              onWorkstationSelect={(workstation) => handleWorkstationSelect(workstation.id)}
+            />
           )}
         </>
       )}
@@ -880,7 +879,7 @@ export default function WorkstationsPage() {
         <DialogContent>
           {selectedWorkstation && (
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="subtitle2" gutterBottom>
                   System Information
                 </Typography>
@@ -908,7 +907,7 @@ export default function WorkstationsPage() {
                 </Box>
               </Grid>
               
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Typography variant="subtitle2" gutterBottom>
                   Performance Metrics
                 </Typography>
@@ -951,7 +950,7 @@ export default function WorkstationsPage() {
                 </Box>
               </Grid>
               
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Typography variant="subtitle2" gutterBottom>
                   AI Agents & Alerts
                 </Typography>

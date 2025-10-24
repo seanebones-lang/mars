@@ -103,7 +103,7 @@ export default function MonitorPage() {
       
       if (data.status === 'started' || data.status === 'already_running') {
         setMonitoringActive(true);
-        toast.success('🟢 Live monitoring started');
+        toast.success('Live monitoring started');
       } else {
         throw new Error(data.message || 'Failed to start monitoring');
       }
@@ -126,7 +126,7 @@ export default function MonitorPage() {
       
       disconnect();
       setMonitoringActive(false);
-      toast.success('🔴 Monitoring stopped');
+      toast.success('Monitoring stopped');
     } catch (error: any) {
       console.error('Failed to stop monitoring:', error);
       toast.error(`Failed to stop monitoring: ${error.message}`);
@@ -281,10 +281,30 @@ export default function MonitorPage() {
           )
         }
       >
-        {connectionState === 'connected' && "🟢 Connected to live monitoring"}
-        {connectionState === 'connecting' && "🟡 Connecting to monitoring service..."}
-        {connectionState === 'disconnected' && "🔴 Not connected to monitoring service"}
-        {connectionState === 'error' && `❌ Connection error: ${error}`}
+        {connectionState === 'connected' && (
+          <>
+            <CheckCircle sx={{ mr: 1, color: 'success.main' }} />
+            Connected to live monitoring
+          </>
+        )}
+        {connectionState === 'connecting' && (
+          <>
+            <Warning sx={{ mr: 1, color: 'warning.main' }} />
+            Connecting to monitoring service...
+          </>
+        )}
+        {connectionState === 'disconnected' && (
+          <>
+            <Warning sx={{ mr: 1, color: 'error.main' }} />
+            Not connected to monitoring service
+          </>
+        )}
+        {connectionState === 'error' && (
+          <>
+            <Warning sx={{ mr: 1, color: 'error.main' }} />
+            Connection error: {error}
+          </>
+        )}
         {reconnectAttempts > 0 && ` (Reconnect attempt ${reconnectAttempts}/5)`}
       </Alert>
 
@@ -296,7 +316,7 @@ export default function MonitorPage() {
           </Typography>
           
           <Grid container spacing={3}>
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Stack spacing={3}>
                 <Box>
                   <Typography gutterBottom>Response Interval (seconds)</Typography>
@@ -344,7 +364,7 @@ export default function MonitorPage() {
               </Stack>
             </Grid>
 
-            <Grid xs={12} md={6}>
+            <Grid size={{ xs: 12, md: 6 }}>
               <Stack spacing={3}>
                 <Box>
                   <Typography gutterBottom>Alert Threshold</Typography>
@@ -515,7 +535,7 @@ export default function MonitorPage() {
           const lastResponse = agentResults.slice(-1)[0];
           
           return (
-            <Grid item xs={12} md={4} key={agentId} sx={{ display: 'flex', justifyContent: 'center' }}>
+            <Grid size={{ xs: 12, md: 4 }} key={agentId} sx={{ display: 'flex', justifyContent: 'center' }}>
               <motion.div
                 animate={{ 
                   scale: status === 'danger' ? [1, 1.02, 1] : 1,
@@ -576,7 +596,7 @@ export default function MonitorPage() {
 
       {/* Live Activity Stream & Charts */}
       <Grid container spacing={3}>
-        <Grid item xs={12} lg={8}>
+        <Grid size={{ xs: 12, lg: 8 }}>
           <Paper sx={{ p: 3, height: 500 }}>
             <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
               <Typography variant="h6">
@@ -688,7 +708,7 @@ export default function MonitorPage() {
           </Paper>
         </Grid>
         
-        <Grid item xs={12} lg={4}>
+        <Grid size={{ xs: 12, lg: 4 }}>
           <Stack spacing={3}>
             {/* Risk Trend Chart */}
             <Paper sx={{ p: 3, height: 240 }}>

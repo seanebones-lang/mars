@@ -77,7 +77,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
               },
             }}
           >
-            🌐 mothership-ai.com
+            mothership-ai.com
           </Link>
         </Box>
 
@@ -120,7 +120,6 @@ function AppContent({ children }: { children: React.ReactNode }) {
               },
             }}
           >
-            <Box component="span" sx={{ fontSize: '16px' }}>⚡</Box>
             GitHub
           </Link>
         </Box>

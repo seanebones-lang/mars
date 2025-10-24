@@ -279,7 +279,7 @@ export default function WebhooksPage() {
         <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
           <Box>
             <Typography variant="h4" component="h1" gutterBottom>
-              🔔 Webhook Management
+              Webhook Management
             </Typography>
             <Typography variant="subtitle1" color="text.secondary">
               Configure alerts for Slack, Teams, email, and custom endpoints
@@ -305,7 +305,7 @@ export default function WebhooksPage() {
         {/* Summary Cards */}
         {stats && (
           <Grid container spacing={3} mb={4}>
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={2}>
@@ -322,7 +322,7 @@ export default function WebhooksPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={2}>
@@ -339,7 +339,7 @@ export default function WebhooksPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={2}>
@@ -356,7 +356,7 @@ export default function WebhooksPage() {
               </Card>
             </Grid>
 
-            <Grid item xs={12} sm={6} md={3}>
+            <Grid size={{ xs: 12, sm: 6, md: 3 }}>
               <Card>
                 <CardContent>
                   <Box display="flex" alignItems="center" mb={2}>
@@ -378,9 +378,9 @@ export default function WebhooksPage() {
         {/* Tabs */}
         <Paper sx={{ mb: 3 }}>
           <Tabs value={tabValue} onChange={handleTabChange}>
-            <Tab label="🔗 Webhooks" />
-            <Tab label="📊 Statistics" />
-            <Tab label="📋 Alert History" />
+            <Tab label="Webhooks" />
+            <Tab label="Statistics" />
+            <Tab label="Alert History" />
           </Tabs>
         </Paper>
 
@@ -388,7 +388,7 @@ export default function WebhooksPage() {
         <TabPanel value={tabValue} index={0}>
           <Grid container spacing={3}>
             {webhooks.map((webhook) => (
-              <Grid item xs={12} md={6} lg={4} key={webhook.webhook_id}>
+               <Grid size={{ xs: 12, md: 6, lg: 4 }} key={webhook.webhook_id}>
                 <Card>
                   <CardContent>
                     <Box display="flex" alignItems="center" mb={2}>
@@ -446,7 +446,7 @@ export default function WebhooksPage() {
             ))}
 
             {webhooks.length === 0 && (
-              <Grid item xs={12}>
+              <Grid size={12}>
                 <Paper sx={{ p: 4, textAlign: 'center' }}>
                   <Webhook sx={{ fontSize: 64, color: 'text.secondary', mb: 2 }} />
                   <Typography variant="h6" color="text.secondary" gutterBottom>
@@ -471,7 +471,7 @@ export default function WebhooksPage() {
         <TabPanel value={tabValue} index={1}>
           {stats && (
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -500,7 +500,7 @@ export default function WebhooksPage() {
                 </Card>
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <Card>
                   <CardContent>
                     <Typography variant="h6" gutterBottom>
@@ -587,7 +587,7 @@ export default function WebhooksPage() {
         <DialogTitle>Add New Webhook</DialogTitle>
         <DialogContent>
           <Grid container spacing={2} sx={{ mt: 1 }}>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 label="Webhook ID"
@@ -596,7 +596,7 @@ export default function WebhooksPage() {
                 required
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <TextField
                 fullWidth
                 label="Name"
@@ -605,7 +605,7 @@ export default function WebhooksPage() {
                 required
               />
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <TextField
                 fullWidth
                 label="Webhook URL"
@@ -614,7 +614,7 @@ export default function WebhooksPage() {
                 required
               />
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth>
                 <InputLabel>Webhook Type</InputLabel>
                 <Select
@@ -628,7 +628,7 @@ export default function WebhooksPage() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12} sm={6}>
+            <Grid size={{ xs: 12, sm: 6 }}>
               <FormControl fullWidth>
                 <InputLabel>Severity Threshold</InputLabel>
                 <Select
@@ -642,7 +642,7 @@ export default function WebhooksPage() {
                 </Select>
               </FormControl>
             </Grid>
-            <Grid item xs={12}>
+            <Grid size={12}>
               <FormControlLabel
                 control={
                   <Switch

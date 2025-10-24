@@ -173,12 +173,12 @@ class BatchAPI {
   // Helper method to get status icon
   getStatusIcon(status: string): string {
     switch (status) {
-      case 'pending': return '⏳';
-      case 'processing': return '⚙️';
-      case 'completed': return '✅';
-      case 'failed': return '❌';
-      case 'cancelled': return '⚠️';
-      default: return '❓';
+      case 'pending': return 'PENDING';
+      case 'processing': return 'PROCESSING';
+      case 'completed': return 'COMPLETED';
+      case 'failed': return 'FAILED';
+      case 'cancelled': return 'CANCELLED';
+      default: return 'UNKNOWN';
     }
   }
 }

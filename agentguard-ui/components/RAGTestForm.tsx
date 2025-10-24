@@ -138,7 +138,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
 
           <form onSubmit={handleSubmit}>
             <Grid container spacing={3}>
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   multiline
@@ -151,7 +151,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                 />
               </Grid>
 
-              <Grid item xs={12} md={6}>
+              <Grid size={{ xs: 12, md: 6 }}>
                 <TextField
                   fullWidth
                   multiline
@@ -163,7 +163,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                 />
               </Grid>
 
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
                   fullWidth
                   label="Agent ID"
@@ -173,7 +173,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                 />
               </Grid>
 
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <TextField
                   fullWidth
                   label="Agent Name"
@@ -183,7 +183,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                 />
               </Grid>
 
-              <Grid item xs={12} md={4}>
+              <Grid size={{ xs: 12, md: 4 }}>
                 <Box display="flex" alignItems="center" height="100%">
                   <FormControlLabel
                     control={
@@ -227,11 +227,11 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
             >
               <Paper elevation={2} sx={{ mt: 4, p: 3 }}>
                 <Typography variant="h6" gutterBottom>
-                  🎯 Analysis Results
+                  Analysis Results
                 </Typography>
 
                 <Grid container spacing={3}>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Box display="flex" alignItems="center" mb={2}>
                       {getRiskIcon(result.hallucination_risk)}
                       <Typography variant="h4" sx={{ ml: 1 }} color={getRiskColor(result.hallucination_risk)}>
@@ -243,7 +243,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Box display="flex" alignItems="center" mb={2}>
                       <TrendingUp color="info" />
                       <Typography variant="h4" sx={{ ml: 1 }} color="info">
@@ -255,7 +255,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                     </Typography>
                   </Grid>
 
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Box display="flex" alignItems="center" mb={2}>
                       <Speed color="primary" />
                       <Typography variant="h4" sx={{ ml: 1 }} color="primary">
@@ -270,7 +270,7 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
 
                 {result.needs_review && (
                   <Alert severity="warning" sx={{ mt: 2 }}>
-                    ⚠️ This response requires human review due to high uncertainty or risk.
+                    This response requires human review due to high uncertainty or risk.
                   </Alert>
                 )}
 
@@ -389,20 +389,20 @@ export default function RAGTestForm({ onResult }: RAGTestFormProps) {
                   </AccordionSummary>
                   <AccordionDetails>
                     <Grid container spacing={2}>
-                      <Grid item xs={12} sm={6}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="subtitle2">Claude Explanation:</Typography>
                         <Typography variant="body2" color="text.secondary">
                           {result.details.claude_explanation || 'No explanation provided'}
                         </Typography>
                       </Grid>
-                      <Grid item xs={12} sm={6}>
+                      <Grid size={{ xs: 12, sm: 6 }}>
                         <Typography variant="subtitle2">Statistical Score:</Typography>
                         <Typography variant="body2" color="text.secondary">
                           {result.details.statistical_score?.toFixed(3) || 'N/A'}
                         </Typography>
                       </Grid>
                       {result.details.rag_confidence_adjustment && (
-                        <Grid item xs={12}>
+                        <Grid size={12}>
                           <Typography variant="subtitle2">RAG Confidence Adjustment:</Typography>
                           <Typography variant="body2" color="text.secondary">
                             {result.details.rag_confidence_adjustment > 0 ? '+' : ''}

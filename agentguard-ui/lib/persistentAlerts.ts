@@ -178,7 +178,7 @@ class PersistentAlertManager {
         
         // Create escalation alert
         this.createAlert({
-          title: `⚠️ ESCALATED: ${alert.title}`,
+          title: `ESCALATED: ${alert.title}`,
           message: `Alert has been unacknowledged for ${this.settings.autoEscalateTimeout} minutes`,
           severity: 'critical',
           category: 'system',
@@ -248,7 +248,7 @@ class PersistentAlertManager {
       riskScore >= 0.5 ? 'medium' : 'low';
 
     return this.createAlert({
-      title: `🚨 Hallucination Detected: ${agentId}`,
+      title: `Hallucination Detected: ${agentId}`,
       message: `Risk: ${(riskScore * 100).toFixed(1)}% - ${segments.join(', ')}`,
       severity,
       category: 'hallucination',

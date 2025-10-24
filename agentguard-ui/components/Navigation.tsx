@@ -39,6 +39,11 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
   const [monitoringAnchor, setMonitoringAnchor] = React.useState<null | HTMLElement>(null);
   const [integrationsAnchor, setIntegrationsAnchor] = React.useState<null | HTMLElement>(null);
   const [testingAnchor, setTestingAnchor] = React.useState<null | HTMLElement>(null);
+  const [isHydrated, setIsHydrated] = React.useState(false);
+
+  React.useEffect(() => {
+    setIsHydrated(true);
+  }, []);
 
   // Core navigation - just Dashboard
   const coreNavItems = [
@@ -337,13 +342,13 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
             </Menu>
             
             {/* Dark Mode Toggle */}
-            <Tooltip title={darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode'}>
+            <Tooltip title={isHydrated ? (darkMode ? 'Switch to Light Mode' : 'Switch to Dark Mode') : 'Theme Toggle'}>
               <IconButton
                 onClick={onToggleDarkMode}
                 color="inherit"
                 sx={{ ml: 1 }}
               >
-                {darkMode ? <LightModeOutlined /> : <DarkModeOutlined />}
+                {isHydrated ? (darkMode ? <LightModeOutlined /> : <DarkModeOutlined />) : <LightModeOutlined />}
               </IconButton>
             </Tooltip>
           </Box>

@@ -61,7 +61,7 @@ export default function SystemHealthDashboard({
       
       {/* Main Risk Gauges - Horizontal Layout */}
       <Grid container spacing={4} sx={{ mb: 6, justifyContent: 'center', mt: 2 }}>
-        <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           <motion.div variants={itemVariants}>
             <RiskGauge
               riskLevel={overallRisk}
@@ -74,7 +74,7 @@ export default function SystemHealthDashboard({
           </motion.div>
         </Grid>
         
-        <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           <motion.div variants={itemVariants}>
             <RiskGauge
               riskLevel={100 - systemHealth}
@@ -87,7 +87,7 @@ export default function SystemHealthDashboard({
           </motion.div>
         </Grid>
         
-        <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           <motion.div variants={itemVariants}>
             <RiskGauge
               riskLevel={100 - responseTimeScore}
@@ -100,7 +100,7 @@ export default function SystemHealthDashboard({
           </motion.div>
         </Grid>
         
-        <Grid item xs={12} sm={6} lg={3} sx={{ display: 'flex', justifyContent: 'center' }}>
+        <Grid size={{ xs: 12, sm: 6, lg: 3 }} sx={{ display: 'flex', justifyContent: 'center' }}>
           <motion.div variants={itemVariants}>
             <RiskGauge
               riskLevel={flaggedRate}
@@ -116,7 +116,7 @@ export default function SystemHealthDashboard({
       
       {/* Secondary Metrics */}
       <Grid container spacing={3}>
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <motion.div variants={itemVariants}>
             <Card sx={{ height: '100%' }}>
               <CardContent>
@@ -164,7 +164,7 @@ export default function SystemHealthDashboard({
           </motion.div>
         </Grid>
         
-        <Grid item xs={12} md={6}>
+        <Grid size={{ xs: 12, md: 6 }}>
           <motion.div variants={itemVariants}>
             <Card sx={{ height: '100%' }}>
               <CardContent>

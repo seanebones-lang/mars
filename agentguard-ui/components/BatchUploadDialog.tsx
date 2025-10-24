@@ -118,10 +118,10 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
   };
 
   const getFileIcon = (file: File) => {
-    if (file.name.endsWith('.csv')) return '📊';
-    if (file.name.endsWith('.json')) return '📄';
-    if (file.name.endsWith('.jsonl')) return '📋';
-    return '📁';
+    if (file.name.endsWith('.csv')) return 'CSV';
+    if (file.name.endsWith('.json')) return 'JSON';
+    if (file.name.endsWith('.jsonl')) return 'JSONL';
+    return 'FILE';
   };
 
   const formatFileSize = (bytes: number) => {
@@ -208,7 +208,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                   Expected File Formats:
                 </Typography>
                 <Grid container spacing={2}>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Card variant="outlined">
                       <CardContent sx={{ p: 2 }}>
                         <Typography variant="body2" fontWeight={600}>CSV</Typography>
@@ -218,7 +218,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                       </CardContent>
                     </Card>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Card variant="outlined">
                       <CardContent sx={{ p: 2 }}>
                         <Typography variant="body2" fontWeight={600}>JSON</Typography>
@@ -228,7 +228,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                       </CardContent>
                     </Card>
                   </Grid>
-                  <Grid item xs={12} md={4}>
+                  <Grid size={{ xs: 12, md: 4 }}>
                     <Card variant="outlined">
                       <CardContent sx={{ p: 2 }}>
                         <Typography variant="body2" fontWeight={600}>JSONL</Typography>
@@ -289,7 +289,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
               )}
 
               <Grid container spacing={2}>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     fullWidth
                     label="Agent Output Column"
@@ -299,7 +299,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                     required
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     fullWidth
                     label="Ground Truth Column"
@@ -308,7 +308,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                     helperText="Optional: Expected correct responses"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     fullWidth
                     label="Query Column"
@@ -317,7 +317,7 @@ export default function BatchUploadDialog({ open, onClose, onUpload }: BatchUplo
                     helperText="Optional: Original user queries"
                   />
                 </Grid>
-                <Grid item xs={12} sm={6}>
+                <Grid size={{ xs: 12, sm: 6 }}>
                   <TextField
                     fullWidth
                     label="Agent ID Column"

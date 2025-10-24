@@ -20,7 +20,7 @@ export default function FreeformPage() {
       
       <Box sx={{ mt: 4 }}>
         <Typography variant="h6" gutterBottom>
-          🔄 Legacy Test (Without RAG)
+          Legacy Test (Without RAG)
         </Typography>
         <FreeformTest />
       </Box>

@@ -15,13 +15,13 @@ export default function Home() {
   // Calculate system metrics
   const allResults = [...results, ...realtimeResults];
   const totalChecks = allResults.length;
-  const flaggedCount = allResults.filter(r => r.flagged || r.hallucination_risk > 0.5).length;
+  const flaggedCount = allResults.filter(r => (r as any).flagged || r.hallucination_risk > 0.5).length;
   const flaggedRate = totalChecks > 0 ? (flaggedCount / totalChecks) * 100 : 0;
   const avgRisk = totalChecks > 0 
     ? allResults.reduce((sum, r) => sum + (r.hallucination_risk || 0), 0) / totalChecks * 100
     : 0;
   const avgResponseTime = totalChecks > 0
-    ? allResults.reduce((sum, r) => sum + (r.processing_time_ms || 0), 0) / totalChecks
+    ? allResults.reduce((sum, r) => sum + ((r as any).processing_time_ms || 0), 0) / totalChecks
     : 0;
 
   const handleTabChange = (event: React.SyntheticEvent, newValue: number) => {
