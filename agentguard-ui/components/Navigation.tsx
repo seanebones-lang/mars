@@ -69,7 +69,8 @@ export default function Navigation({ darkMode = false, onToggleDarkMode }: Navig
 
   // Testing & Demo dropdown
   const testingItems = [
-    { label: 'Quick Test', href: '/freeform', icon: <ScienceOutlined />, description: 'Test agent outputs instantly' },
+    { label: 'Agent Validator', href: '/freeform', icon: <ScienceOutlined />, description: 'Instant AI agent validation' },
+    { label: 'Industry Scenarios', href: '/scenarios', icon: <PlayArrowOutlined />, description: 'Real-world testing scenarios' },
     { label: 'Demo Mode', href: '/demo', icon: <PlayArrowOutlined />, description: 'Interactive demonstration' },
     { label: 'Debug Tools', href: '/debug', icon: <BugReportOutlined />, description: 'Advanced debugging features' },
   ];
