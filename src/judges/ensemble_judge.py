@@ -42,13 +42,18 @@ class EnsembleJudge:
         self.statistical_weight = 0.3  # Includes 20% attention weighting
         self.grounding_weight = 0.2  # New: Wikipedia grounding weight
         
-        # Wikipedia grounding service
+        # Wikipedia grounding service - ENABLED for 2025 optimization
         self.enable_grounding = enable_grounding
-        # Temporarily disable grounding to avoid breaking the system
-        # if enable_grounding:
-        #     self.wikipedia_service = get_wikipedia_grounding_service()
-        # else:
-        self.wikipedia_service = None
+        if enable_grounding:
+            try:
+                from ..services.wikipedia_grounding import get_wikipedia_grounding_service
+                self.wikipedia_service = get_wikipedia_grounding_service()
+                logger.info("Wikipedia grounding service enabled successfully")
+            except ImportError as e:
+                logger.warning(f"Wikipedia grounding service not available: {e}")
+                self.wikipedia_service = None
+        else:
+            self.wikipedia_service = None
         
         # Uncertainty threshold for human review escalation
         self.uncertainty_threshold = 0.3

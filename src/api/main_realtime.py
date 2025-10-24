@@ -856,6 +856,72 @@ async def find_similar_responses(
         raise HTTPException(status_code=500, detail="Failed to find similar responses")
 
 
+@app.post("/test-agent-advanced", response_model=HallucinationReport, tags=["detection", "advanced"])
+async def test_agent_advanced_ensemble(
+    request: AgentTestRequest, 
+    agent_id: str = "unknown",
+    agent_name: str = "Unknown Agent",
+    use_advanced_ensemble: bool = True,
+    openai_api_key: Optional[str] = None,
+    google_api_key: Optional[str] = None
+):
+    """
+    Advanced ensemble detection using multiple 2025 state-of-the-art models.
+    
+    Features:
+    - Multi-model consensus (Claude 3.5, GPT-4o, Gemini 2.0)
+    - Self-consistency sampling (10 generations)
+    - Dynamic model routing
+    - Advanced uncertainty quantification
+    - Tree of Thought reasoning for complex queries
+    
+    Target Performance: 99%+ accuracy, <50ms latency
+    """
+    try:
+        if not ADVANCED_ENSEMBLE_AVAILABLE:
+            # Fallback to regular ensemble
+            return await test_agent_with_rag(request, agent_id, agent_name, True)
+        
+        # Get API keys from environment if not provided
+        if not openai_api_key:
+            openai_api_key = os.getenv("OPENAI_API_KEY")
+        if not google_api_key:
+            google_api_key = os.getenv("GOOGLE_API_KEY")
+        
+        # Initialize advanced ensemble judge
+        claude_api_key = os.getenv("CLAUDE_API_KEY")
+        if not claude_api_key:
+            raise HTTPException(status_code=500, detail="Claude API key not configured")
+        
+        advanced_judge = get_advanced_ensemble_judge(
+            claude_api_key=claude_api_key,
+            openai_api_key=openai_api_key,
+            google_api_key=google_api_key
+        )
+        
+        # Run advanced evaluation
+        result = await advanced_judge.evaluate(request)
+        
+        # Add metadata for tracking
+        if not result.metadata:
+            result.metadata = {}
+        result.metadata.update({
+            "agent_id": agent_id,
+            "agent_name": agent_name,
+            "evaluation_type": "advanced_ensemble_2025",
+            "models_available": {
+                "claude": True,
+                "openai": openai_api_key is not None,
+                "google": google_api_key is not None
+            }
+        })
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Advanced ensemble detection failed: {e}")
+        raise HTTPException(status_code=500, detail="Advanced detection analysis failed")
+
 @app.post("/test-agent-rag", response_model=HallucinationReport, tags=["detection"])
 async def test_agent_with_rag(request: AgentTestRequest, 
                              agent_id: str = "unknown",
@@ -3413,10 +3479,30 @@ async def get_streaming_status():
 
 # Advanced features temporarily disabled for core system stability
 # from ..services.agent_pipeline import get_agent_pipeline, PipelineResult
-# from ..judges.multilingual_judge import get_multilingual_judge, MultilingualResult
-# from ..judges.multimodal_judge import get_multimodal_judge, MultimodalInput, MultimodalResult
+# ENABLED: Advanced judges for 2025 optimization
+try:
+    from ..judges.multilingual_judge import get_multilingual_judge, MultilingualResult
+    MULTILINGUAL_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Multilingual judge not available: {e}")
+    MULTILINGUAL_AVAILABLE = False
+
+try:
+    from ..judges.multimodal_judge import get_multimodal_judge, MultimodalInput, MultimodalResult
+    from fastapi import File, UploadFile, Form
+    MULTIMODAL_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Multimodal judge not available: {e}")
+    MULTIMODAL_AVAILABLE = False
+
+try:
+    from ..judges.advanced_ensemble_judge import get_advanced_ensemble_judge
+    ADVANCED_ENSEMBLE_AVAILABLE = True
+except ImportError as e:
+    logger.warning(f"Advanced ensemble judge not available: {e}")
+    ADVANCED_ENSEMBLE_AVAILABLE = False
+
 from pydantic import BaseModel
-# from fastapi import File, UploadFile, Form
 
 
 class AgentPipelineRequest(BaseModel):
