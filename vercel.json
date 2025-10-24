@@ -1,0 +1,19 @@
+{
+  "version": 2,
+  "buildCommand": "cd agentguard-ui && npm install && npm run build",
+  "devCommand": "cd agentguard-ui && npm run dev",
+  "installCommand": "cd agentguard-ui && npm install",
+  "framework": "nextjs",
+  "outputDirectory": "agentguard-ui/.next",
+  "regions": ["iad1"],
+  "env": {
+    "NEXT_PUBLIC_API_URL": "@agentguard_api_url",
+    "NODE_ENV": "production"
+  },
+  "build": {
+    "env": {
+      "NEXT_PUBLIC_API_URL": "@agentguard_api_url"
+    }
+  }
+}
+

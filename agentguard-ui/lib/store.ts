@@ -30,11 +30,33 @@ export interface MetricsSummary {
   needs_review_count: number;
 }
 
+export interface RealtimeResult {
+  type: string;
+  agent_id: string;
+  query: string;
+  output: string;
+  hallucination_risk: number;
+  flagged: boolean;
+  confidence: number;
+  flagged_segments: string[];
+  mitigation?: string;
+  timestamp: string;
+  claude_explanation: string;
+  processing_time_ms: number;
+  expected_hallucination?: boolean;
+  detection_accuracy?: boolean;
+}
+
 interface AgentGuardStore {
   // Test results
   results: TestResult[];
   addResult: (result: TestResult) => void;
   clearResults: () => void;
+  
+  // Real-time results
+  realtimeResults: RealtimeResult[];
+  addRealtimeResult: (result: RealtimeResult) => void;
+  clearRealtimeResults: () => void;
   
   // Metrics
   metrics: MetricsSummary;
@@ -61,6 +83,13 @@ export const useStore = create<AgentGuardStore>((set) => ({
     return { results: newResults };
   }),
   clearResults: () => set({ results: [] }),
+  
+  // Real-time results
+  realtimeResults: [],
+  addRealtimeResult: (result) => set((state) => ({
+    realtimeResults: [...state.realtimeResults.slice(-99), result], // Keep last 100
+  })),
+  clearRealtimeResults: () => set({ realtimeResults: [] }),
   
   // Metrics
   metrics: {

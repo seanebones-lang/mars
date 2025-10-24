@@ -10,6 +10,7 @@ export default function Navigation() {
 
   const navItems = [
     { label: 'Dashboard', href: '/', icon: <Dashboard /> },
+    { label: 'Live Monitor', href: '/monitor', icon: <Assessment /> },
     { label: 'Quick Test', href: '/freeform', icon: <Science /> },
     { label: 'Demo', href: '/demo', icon: <Science /> },
     { label: 'Metrics', href: '/metrics', icon: <Assessment /> },
