@@ -45,6 +45,19 @@ from ..services.websocket_manager import get_websocket_manager, WebSocketMessage
 from ..services.alert_escalation_service import get_escalation_service, Alert, AlertSeverity, AlertStatus, EscalationRule, OnCallSchedule, EscalationLevel
 from ..services.workstation_discovery_service import get_discovery_service, NetworkRange, DiscoveryTask, DiscoveryMethod, DeviceType, OperatingSystem
 
+# Import new endpoint modules
+from .workstation_endpoints import (
+    get_workstations, get_workstation_by_id, get_workstation_insights,
+    get_discovery_ranges, start_discovery_task, get_fleet_insights
+)
+from .analytics_endpoints import (
+    get_analytics_insights, get_trend_predictions, get_analytics_overview
+)
+from .claude_endpoints import (
+    get_structured_claude_insights, analyze_workstation_with_claude,
+    analyze_fleet_with_claude, claude_websocket_endpoint
+)
+
 # Load environment variables
 load_dotenv()
 
@@ -4823,6 +4836,119 @@ Be helpful, professional, and provide specific guidance. Adapt your communicatio
             "timestamp": datetime.utcnow().isoformat()
         }
 
+
+# Workstation Management Endpoints
+@app.get("/workstations", tags=["workstations"])
+async def list_workstations(
+    status: Optional[str] = Query(None),
+    limit: int = Query(50, ge=1, le=1000),
+    offset: int = Query(0, ge=0),
+    current_user = Depends(require_authentication)
+):
+    """Get list of all workstations with optional filtering."""
+    return await get_workstations(status, limit, offset, current_user)
+
+@app.get("/workstations/{workstation_id}", tags=["workstations"])
+async def get_workstation_details(
+    workstation_id: str,
+    current_user = Depends(require_authentication)
+):
+    """Get detailed information about a specific workstation."""
+    return await get_workstation_by_id(workstation_id, current_user)
+
+@app.post("/workstations/{workstation_id}/insights", tags=["workstations"])
+async def get_workstation_claude_insights(
+    workstation_id: str,
+    current_user = Depends(require_authentication)
+):
+    """Get Claude-powered insights for a specific workstation."""
+    return await get_workstation_insights(workstation_id, current_user)
+
+@app.get("/workstations/discovery/ranges", tags=["workstations"])
+async def list_discovery_ranges(
+    current_user = Depends(require_authentication)
+):
+    """Get configured network discovery ranges."""
+    return await get_discovery_ranges(current_user)
+
+@app.post("/workstations/discovery/start", tags=["workstations"])
+async def start_workstation_discovery(
+    range_ids: List[str],
+    methods: List[str] = ["network_scan", "dhcp"],
+    current_user = Depends(require_authentication)
+):
+    """Start a new workstation discovery task."""
+    return await start_discovery_task(range_ids, methods, current_user)
+
+@app.get("/workstations/fleet/insights", tags=["workstations"])
+async def get_workstation_fleet_insights(
+    current_user = Depends(require_authentication)
+):
+    """Get Claude-powered insights for the entire workstation fleet."""
+    return await get_fleet_insights(current_user)
+
+# Analytics & Insights Endpoints
+@app.get("/analytics/insights", tags=["analytics"])
+async def get_business_intelligence_insights(
+    days: int = Query(30, ge=1, le=365),
+    current_user = Depends(require_analytics_access)
+):
+    """Get Claude-powered business intelligence insights."""
+    return await get_analytics_insights(days, current_user)
+
+@app.get("/analytics/trends/predictions", tags=["analytics"])
+async def get_predictive_analytics(
+    metric: str = Query("hallucination_risk"),
+    horizon_days: int = Query(30, ge=7, le=90),
+    current_user = Depends(require_analytics_access)
+):
+    """Get Claude-powered trend predictions and forecasting."""
+    return await get_trend_predictions(metric, horizon_days, current_user)
+
+@app.get("/analytics/overview/enhanced", tags=["analytics"])
+async def get_enhanced_analytics_overview(
+    days: int = Query(30, ge=1, le=365),
+    current_user = Depends(require_analytics_access)
+):
+    """Get comprehensive analytics overview with all metrics."""
+    return await get_analytics_overview(days, current_user)
+
+# Enhanced Claude Integration Endpoints
+@app.post("/claude/insights", tags=["claude"])
+async def get_claude_structured_insights(
+    request: dict,
+    current_user = Depends(require_authentication)
+):
+    """Get structured Claude insights for various analysis types."""
+    from .claude_endpoints import ClaudeInsightRequest
+    insight_request = ClaudeInsightRequest(**request)
+    return await get_structured_claude_insights(insight_request, current_user)
+
+@app.post("/claude/workstation-analysis", tags=["claude"])
+async def claude_workstation_analysis(
+    request: dict,
+    current_user = Depends(require_authentication)
+):
+    """Comprehensive workstation analysis using Claude."""
+    from .claude_endpoints import WorkstationAnalysisRequest
+    analysis_request = WorkstationAnalysisRequest(**request)
+    return await analyze_workstation_with_claude(analysis_request, current_user)
+
+@app.post("/claude/fleet-analysis", tags=["claude"])
+async def claude_fleet_analysis(
+    request: dict,
+    current_user = Depends(require_authentication)
+):
+    """Fleet-level analysis using Claude for strategic insights."""
+    from .claude_endpoints import FleetAnalysisRequest
+    fleet_request = FleetAnalysisRequest(**request)
+    return await analyze_fleet_with_claude(fleet_request, current_user)
+
+# WebSocket endpoint for real-time Claude analysis
+@app.websocket("/ws/claude")
+async def websocket_claude_analysis(websocket: WebSocket):
+    """WebSocket endpoint for real-time Claude analysis."""
+    await claude_websocket_endpoint(websocket)
 
 if __name__ == "__main__":
     import uvicorn
