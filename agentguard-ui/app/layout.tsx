@@ -67,7 +67,7 @@ function AppContent({ children }: { children: React.ReactNode }) {
           </Link>
           
           <Link
-            href="https://mothership-ai.com"
+            href="https://watcher.mothership-ai.com"
             target="_blank"
             rel="noopener noreferrer"
             sx={{
@@ -81,7 +81,55 @@ function AppContent({ children }: { children: React.ReactNode }) {
               },
             }}
           >
-            mothership-ai.com
+            watcher.mothership-ai.com
+          </Link>
+        </Box>
+        
+        {/* Legal Links */}
+        <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3, flexWrap: 'wrap' }}>
+          <Link
+            href="/terms"
+            sx={{
+              color: 'text.secondary',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              '&:hover': {
+                textDecoration: 'underline',
+                color: 'primary.main',
+              },
+            }}
+          >
+            Terms of Service
+          </Link>
+          
+          <Link
+            href="/privacy"
+            sx={{
+              color: 'text.secondary',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              '&:hover': {
+                textDecoration: 'underline',
+                color: 'primary.main',
+              },
+            }}
+          >
+            Privacy Policy
+          </Link>
+          
+          <Link
+            href="/license"
+            sx={{
+              color: 'text.secondary',
+              textDecoration: 'none',
+              fontSize: '0.875rem',
+              '&:hover': {
+                textDecoration: 'underline',
+                color: 'primary.main',
+              },
+            }}
+          >
+            License
           </Link>
         </Box>
 
