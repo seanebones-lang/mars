@@ -166,23 +166,23 @@ export default function AIAssistantWidget({ position = 'bottom-right' }: AIAssis
     {
       id: '1',
       type: 'assistant',
-      content: `👋 Hi there! I'm your Watcher AI Assistant, and I'm here to help you with absolutely everything about our hallucination detection platform.
+      content: `Hi there! I'm your Watcher AI Assistant, and I'm here to help you with absolutely everything about our hallucination detection platform.
 
 Before we dive in, I'd love to know a bit about your background so I can tailor my explanations perfectly for you:
 
 **Please tell me which best describes you:**
 
-🔧 **"I'm a developer/engineer"** - You're comfortable with APIs, code, and technical concepts
+**"I'm a developer/engineer"** - You're comfortable with APIs, code, and technical concepts
 
-💼 **"I'm a business user/manager"** - You focus on results, ROI, and practical applications  
+**"I'm a business user/manager"** - You focus on results, ROI, and practical applications  
 
-🌱 **"I'm new to AI/tech"** - You'd like patient, step-by-step explanations without jargon
+**"I'm new to AI/tech"** - You'd like patient, step-by-step explanations without jargon
 
-🎯 **"I'm evaluating this for my company"** - You need to understand capabilities, costs, and implementation
+**"I'm evaluating this for my company"** - You need to understand capabilities, costs, and implementation
 
 Just type your choice (or describe your role in your own words), and I'll adjust my communication style to match your needs. Don't worry - there are no wrong answers, and I can always adapt as we go!
 
-What brings you to Watcher AI today? 😊`,
+What brings you to Watcher AI today?`,
       timestamp: new Date(),
       suggestions: ["I'm a developer", "I'm a business user", "I'm new to AI/tech", "I'm evaluating for my company"]
     }

@@ -32,6 +32,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 
 # Install Python dependencies
+ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
@@ -43,6 +44,7 @@ ENV PYTHONUNBUFFERED=1
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV ENVIRONMENT=production
 ENV LOG_LEVEL=INFO
+ENV PIP_ROOT_USER_ACTION=ignore
 
 # Create non-root user
 RUN groupadd -r watcher && useradd -r -g watcher watcher

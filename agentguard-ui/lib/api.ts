@@ -57,5 +57,11 @@ export const agentGuardApi = {
     }
     return results;
   },
+  
+  // Chat with AI Assistant
+  chat: async (message: string): Promise<{ status: string; response: string; timestamp: string }> => {
+    const response = await axios.post(`${API_URL}/chat`, { message });
+    return response.data;
+  },
 };
 

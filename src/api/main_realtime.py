@@ -3527,6 +3527,79 @@ async def get_rate_limit_status(
         raise HTTPException(status_code=500, detail="Failed to retrieve rate limit status")
 
 
+# Chat Assistant Endpoint
+@app.post("/chat", tags=["assistant"])
+async def chat_with_assistant(
+    request: dict,
+    background_tasks: BackgroundTasks
+):
+    """
+    Chat with the Watcher AI Assistant using Claude API.
+    Provides intelligent responses about the platform without hallucination detection.
+    """
+    try:
+        user_message = request.get("message", "").strip()
+        if not user_message:
+            raise HTTPException(status_code=400, detail="Message is required")
+        
+        # Validate Claude API key
+        claude_api_key = os.getenv("CLAUDE_API_KEY")
+        if not claude_api_key:
+            logger.error("Claude API key not configured for chat")
+            raise HTTPException(
+                status_code=500, 
+                detail="Chat service temporarily unavailable"
+            )
+        
+        # Initialize Claude judge for chat (reuse existing infrastructure)
+        from ..judges.claude_judge import ClaudeJudge
+        claude_judge = ClaudeJudge(claude_api_key)
+        
+        # System prompt for the assistant
+        system_prompt = """You are the Watcher AI Assistant, an expert guide for the Watcher AI platform - a comprehensive hallucination detection and testing platform for AI agents. You have complete knowledge of every feature and can help users from complete beginners to tech experts.
+
+PLATFORM OVERVIEW:
+Watcher AI is an enterprise-grade platform for detecting hallucinations, fabrications, and reliability issues in AI agent outputs. It uses Claude 4.5 Sonnet with self-consistency sampling and statistical models for accurate detection.
+
+KEY FEATURES:
+- Real-time hallucination detection (<100ms latency)
+- Multi-industry compliance (Healthcare, Finance, Education, Manufacturing, Technology)
+- Enterprise integration (REST API, WebSocket, Webhooks)
+- Batch processing and analytics
+- Custom rule engines for industry-specific detection
+
+Be helpful, professional, and provide specific guidance. Adapt your communication style to the user's technical level. Always provide actionable next steps."""
+        
+        # Create a simple chat request (not for hallucination detection)
+        chat_prompt = f"{system_prompt}\n\nUser: {user_message}\n\nAssistant:"
+        
+        # Use Claude to generate response
+        response = await claude_judge.evaluate_async(
+            agent_output=chat_prompt,
+            ground_truth="This is a chat conversation, not hallucination detection.",
+            conversation_history=[]
+        )
+        
+        # Extract the assistant response from Claude's output
+        assistant_response = response.get("reasoning", "I'm here to help with Watcher AI! How can I assist you today?")
+        
+        return {
+            "status": "success",
+            "response": assistant_response,
+            "timestamp": datetime.utcnow().isoformat()
+        }
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Chat error: {e}")
+        return {
+            "status": "error",
+            "response": "I apologize, but I'm having trouble connecting right now. Please try again in a moment, or check our documentation at /docs for immediate help.",
+            "timestamp": datetime.utcnow().isoformat()
+        }
+
+
 if __name__ == "__main__":
     import uvicorn
     

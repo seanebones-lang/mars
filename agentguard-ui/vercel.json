@@ -1,6 +1,9 @@
 {
   "version": 2,
   "framework": "nextjs",
+  "projectSettings": {
+    "framework": "nextjs"
+  },
   "buildCommand": "npm run build",
   "devCommand": "npm run dev",
   "installCommand": "npm install",
