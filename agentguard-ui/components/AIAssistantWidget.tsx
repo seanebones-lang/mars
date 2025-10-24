@@ -224,9 +224,8 @@ What brings you to Watcher AI today?`,
     setIsLoading(true);
 
     try {
-      // Create a direct response based on system knowledge without using the hallucination detection API
-      // This prevents the assistant from fact-checking itself!
-      const assistantContent = generateDirectResponse(messageContent);
+      // Connect to Claude API through backend
+      const response = await agentGuardApi.chat(messageContent);
       
       // Generate contextual suggestions based on the user's question
       const suggestions = generateSuggestions(messageContent);
@@ -234,7 +233,7 @@ What brings you to Watcher AI today?`,
       const assistantMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: assistantContent,
+        content: response.response || response.message || "I'm here to help with Watcher AI! How can I assist you today?",
         timestamp: new Date(),
         suggestions: suggestions.length > 0 ? suggestions : undefined
       };
@@ -248,14 +247,19 @@ What brings you to Watcher AI today?`,
 
     } catch (error) {
       console.error('AI Assistant error:', error);
-      const errorMessage: Message = {
+      
+      // Fallback to local response if Claude API fails
+      const fallbackContent = generateDirectResponse(messageContent);
+      const suggestions = generateSuggestions(messageContent);
+      
+      const fallbackMessage: Message = {
         id: (Date.now() + 1).toString(),
         type: 'assistant',
-        content: "I apologize, but I'm having trouble connecting right now. Here are some quick tips:\n\n• Try the Quick Test at /freeform for immediate hallucination checking\n• Check the Dashboard for system overview\n• Visit /docs for API documentation\n• Use /monitor for real-time detection\n\nPlease try asking again in a moment!",
+        content: `${fallbackContent}\n\n*Note: I'm currently using offline knowledge. For the most up-to-date assistance, please try again in a moment when my connection to Claude is restored.*`,
         timestamp: new Date(),
-        suggestions: ["Go to Quick Test", "Open Dashboard", "View Documentation", "Check Live Monitor"]
+        suggestions: suggestions.length > 0 ? suggestions : ["Go to Quick Test", "Open Dashboard", "View Documentation", "Check Live Monitor"]
       };
-      setMessages(prev => [...prev, errorMessage]);
+      setMessages(prev => [...prev, fallbackMessage]);
     } finally {
       setIsLoading(false);
     }
