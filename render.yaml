@@ -8,8 +8,8 @@ services:
     env: python
     region: oregon
     plan: starter
-    buildCommand: pip install -r requirements.txt
-    startCommand: python -m uvicorn src.api.main_realtime:app --host 0.0.0.0 --port $PORT
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: python -m uvicorn src.api.main_minimal:app --host 0.0.0.0 --port $PORT --timeout-keep-alive 30
     healthCheckPath: /health
     
     # Environment Variables
