@@ -1,10 +1,11 @@
 # AgentGuard Monorepo - Render.com Deployment Configuration
 # Mothership AI - watcher.mothership-ai.com
 # COMPLETE MONOREPO: Both backend API and frontend UI deployed from this single repository on Render
-# NO VERCEL - Everything runs on Render
+# Deployment Date: October 25, 2025
+# Version: 1.0.0 Production Ready
 
 services:
-  # Backend API Service - Updated October 2025 (Final Verified Stable)
+  # Backend API Service - Production Deployment October 25, 2025
   - type: web
     name: agentguard-api
     env: python
@@ -79,7 +80,7 @@ services:
       timeoutSeconds: 10
       failureThreshold: 3
 
-  # Frontend UI Service
+  # Frontend UI Service - Production Deployment October 25, 2025
   - type: web
     name: agentguard-ui
     env: node
