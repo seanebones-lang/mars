@@ -11,7 +11,7 @@ from fastapi import HTTPException, Depends, Query
 from pydantic import BaseModel
 
 from ..services.workstation_discovery_service import get_discovery_service, NetworkRange, DiscoveryTask
-from ..services.auth_service import get_current_user
+from .auth_dependencies import get_current_user
 from ..judges.claude_judge import ClaudeJudge
 import os
 

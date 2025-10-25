@@ -11,7 +11,7 @@ from datetime import datetime
 from fastapi import HTTPException, Depends, WebSocket, WebSocketDisconnect
 from pydantic import BaseModel
 
-from ..services.auth_service import get_current_user
+from .auth_dependencies import get_current_user
 from ..judges.claude_judge import ClaudeJudge
 import os
 
