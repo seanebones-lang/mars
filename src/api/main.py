@@ -20,6 +20,7 @@ from .mcp import router as mcp_router
 from .streams import router as streams_router
 from .parental_controls import router as parental_router
 from .model_hosting import router as model_hosting_router
+from .prompt_injection import router as prompt_injection_router
 
 # Load environment variables
 load_dotenv()
@@ -80,6 +81,10 @@ app = FastAPI(
             "description": "Model hosting platform for deploying and scaling AI models"
         },
         {
+            "name": "prompt_injection",
+            "description": "Real-time prompt injection detection and prevention"
+        },
+        {
             "name": "monitoring",
             "description": "Health check and system status"
         }
@@ -91,6 +96,7 @@ app.include_router(mcp_router)
 app.include_router(streams_router)
 app.include_router(parental_router)
 app.include_router(model_hosting_router)
+app.include_router(prompt_injection_router)
 
 # CORS middleware for cross-origin requests
 app.add_middleware(
