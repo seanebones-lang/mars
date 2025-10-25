@@ -1,546 +1,376 @@
 """
-AgentGuard Python SDK Client
+AgentGuard Client
 Main client class for interacting with the AgentGuard API.
+
+Author: AgentGuard Engineering Team
+Date: October 2025
+Version: 2.0.0
 """
 
-import asyncio
-import json
-import time
-from typing import Dict, List, Optional, Union, AsyncGenerator
-from urllib.parse import urljoin
-import httpx
-import websockets
-
+import requests
+from typing import Optional, List, Dict, Any
 from .models import (
-    AgentTestRequest, HallucinationReport, Agent, AgentConfig, 
-    TestResult, DeploymentRequest, SafetyRule
+    DetectionResult,
+    MultimodalResult,
+    BiasAuditResult,
+    RedTeamReport,
+    ComplianceReport
 )
 from .exceptions import (
-    AgentGuardError, AuthenticationError, ValidationError, 
-    DeploymentError, RateLimitError
+    AgentGuardError,
+    AuthenticationError,
+    RateLimitError,
+    ValidationError
 )
 
 
 class AgentGuardClient:
     """
-    AgentGuard Python SDK Client
+    Official Python client for AgentGuard AI Safety Platform.
     
-    Provides enterprise-grade Python integration for AI agent safety validation,
-    agent management, deployment, and real-time monitoring.
+    Features:
+    - Hallucination detection
+    - Prompt injection prevention
+    - PII protection
+    - RAG security
+    - Multimodal detection
+    - Bias auditing
+    - Red teaming
+    - Compliance reporting
     
     Example:
-        ```python
-        from agentguard_sdk import AgentGuardClient
-        
-        # Initialize client
-        client = AgentGuardClient(
-            api_key="your_api_key",
-            base_url="https://api.agentguard.com"
-        )
-        
-        # Test agent output for hallucinations
-        result = await client.test_agent_output(
-            agent_output="The capital of France is Paris.",
-            context="Geography question",
-            expected_behavior="Accurate factual response"
-        )
-        
-        print(f"Safety Score: {result.confidence:.2f}")
-        print(f"Risk Level: {result.hallucination_risk:.2f}")
-        ```
+        >>> from agentguard_sdk import AgentGuardClient
+        >>> client = AgentGuardClient(api_key="your-api-key")
+        >>> result = client.detect_hallucination("Agent output to check")
+        >>> print(result.is_hallucination)
     """
     
     def __init__(
         self,
         api_key: str,
-        base_url: str = "https://api.agentguard.com",
-        timeout: int = 30,
-        max_retries: int = 3,
-        enable_websockets: bool = True
+        base_url: str = "https://agentguard.onrender.com",
+        timeout: int = 30
     ):
         """
         Initialize AgentGuard client.
         
         Args:
             api_key: Your AgentGuard API key
-            base_url: Base URL for the AgentGuard API
+            base_url: Base URL for AgentGuard API
             timeout: Request timeout in seconds
-            max_retries: Maximum number of retry attempts
-            enable_websockets: Enable WebSocket connections for real-time updates
         """
         self.api_key = api_key
-        self.base_url = base_url.rstrip('/')
+        self.base_url = base_url.rstrip("/")
         self.timeout = timeout
-        self.max_retries = max_retries
-        self.enable_websockets = enable_websockets
+        self.session = requests.Session()
+        self.session.headers.update({
+            "Authorization": f"Bearer {api_key}",
+            "Content-Type": "application/json",
+            "User-Agent": "AgentGuard-Python-SDK/2.0.0"
+        })
         
-        # HTTP client configuration
-        self.client = httpx.AsyncClient(
-            timeout=httpx.Timeout(timeout),
-            headers={
-                "Authorization": f"Bearer {api_key}",
-                "Content-Type": "application/json",
-                "User-Agent": f"AgentGuard-SDK/1.0.0"
-            }
-        )
-        
-        # WebSocket connection
-        self._ws_connection = None
-        self._ws_callbacks = {}
+        # Service clients
+        self.multimodal = MultimodalClient(self)
+        self.bias = BiasClient(self)
+        self.redteam = RedTeamClient(self)
+        self.compliance = ComplianceClient(self)
+        self.rag = RAGSecurityClient(self)
+        self.pii = PIIProtectionClient(self)
+        self.prompt_injection = PromptInjectionClient(self)
     
-    async def __aenter__(self):
-        """Async context manager entry."""
-        return self
-    
-    async def __aexit__(self, exc_type, exc_val, exc_tb):
-        """Async context manager exit."""
-        await self.close()
-    
-    async def close(self):
-        """Close all connections."""
-        await self.client.aclose()
-        if self._ws_connection:
-            await self._ws_connection.close()
-    
-    # Core Detection Methods
-    
-    async def test_agent_output(
-        self,
-        agent_output: str,
-        context: Optional[str] = None,
-        expected_behavior: Optional[str] = None,
-        custom_rules: Optional[List[str]] = None
-    ) -> HallucinationReport:
-        """
-        Test agent output for hallucinations and safety issues.
-        
-        Args:
-            agent_output: The AI agent's output to test
-            context: Optional context about the query/conversation
-            expected_behavior: Expected behavior description
-            custom_rules: Custom safety rules to apply
-            
-        Returns:
-            HallucinationReport with safety analysis results
-        """
-        request_data = AgentTestRequest(
-            agent_output=agent_output,
-            context=context or "",
-            expected_behavior=expected_behavior or "",
-            custom_rules=custom_rules or []
-        )
-        
-        response = await self._make_request(
-            "POST", 
-            "/test-agent", 
-            data=request_data.dict()
-        )
-        
-        return HallucinationReport(**response)
-    
-    async def batch_test_agents(
-        self,
-        test_requests: List[AgentTestRequest],
-        callback: Optional[callable] = None
-    ) -> List[HallucinationReport]:
-        """
-        Test multiple agent outputs in batch.
-        
-        Args:
-            test_requests: List of test requests
-            callback: Optional callback for progress updates
-            
-        Returns:
-            List of HallucinationReport results
-        """
-        # Upload batch job
-        batch_data = {
-            "tests": [req.dict() for req in test_requests],
-            "callback_url": None  # Could be implemented for webhooks
-        }
-        
-        job_response = await self._make_request(
-            "POST",
-            "/batch/upload",
-            data=batch_data
-        )
-        
-        job_id = job_response["job_id"]
-        
-        # Start processing
-        await self._make_request("POST", f"/batch/{job_id}/start")
-        
-        # Poll for completion
-        while True:
-            status_response = await self._make_request("GET", f"/batch/{job_id}")
-            
-            if callback:
-                callback(status_response)
-            
-            if status_response["status"] == "completed":
-                break
-            elif status_response["status"] == "failed":
-                raise ValidationError(f"Batch job failed: {status_response.get('error')}")
-            
-            await asyncio.sleep(2)  # Poll every 2 seconds
-        
-        # Get results
-        results_response = await self._make_request("GET", f"/batch/{job_id}/results")
-        
-        return [HallucinationReport(**result) for result in results_response["results"]]
-    
-    # Agent Management Methods
-    
-    async def create_agent(self, config: AgentConfig) -> Agent:
-        """
-        Create a new AI agent with safety validation.
-        
-        Args:
-            config: Agent configuration
-            
-        Returns:
-            Created Agent object
-        """
-        response = await self._make_request(
-            "POST",
-            "/console/agents",
-            data=config.dict()
-        )
-        
-        return Agent(**response)
-    
-    async def get_agent(self, agent_id: str) -> Agent:
-        """
-        Get agent details by ID.
-        
-        Args:
-            agent_id: Agent identifier
-            
-        Returns:
-            Agent object
-        """
-        response = await self._make_request("GET", f"/console/agents/{agent_id}")
-        return Agent(**response)
-    
-    async def list_agents(self) -> List[Agent]:
-        """
-        List all agents for the current user.
-        
-        Returns:
-            List of Agent objects
-        """
-        response = await self._make_request("GET", "/console/agents")
-        return [Agent(**agent) for agent in response]
-    
-    async def update_agent(self, agent_id: str, config: AgentConfig) -> Agent:
-        """
-        Update agent configuration.
-        
-        Args:
-            agent_id: Agent identifier
-            config: Updated configuration
-            
-        Returns:
-            Updated Agent object
-        """
-        response = await self._make_request(
-            "PUT",
-            f"/console/agents/{agent_id}",
-            data=config.dict()
-        )
-        
-        return Agent(**response)
-    
-    async def test_agent(self, agent_id: str, test_input: str) -> TestResult:
-        """
-        Test an agent with specific input.
-        
-        Args:
-            agent_id: Agent identifier
-            test_input: Input to test the agent with
-            
-        Returns:
-            TestResult object
-        """
-        response = await self._make_request(
-            "POST",
-            f"/console/agents/{agent_id}/test",
-            data={"input": test_input}
-        )
-        
-        return TestResult(**response)
-    
-    async def deploy_agent(
-        self,
-        agent_id: str,
-        environment: str = "production",
-        auto_scale: bool = True,
-        max_instances: int = 10
-    ) -> Dict[str, str]:
-        """
-        Deploy an agent to production.
-        
-        Args:
-            agent_id: Agent identifier
-            environment: Deployment environment
-            auto_scale: Enable auto-scaling
-            max_instances: Maximum number of instances
-            
-        Returns:
-            Deployment information
-        """
-        deployment_request = DeploymentRequest(
-            agent_id=agent_id,
-            environment=environment,
-            auto_scale=auto_scale,
-            max_instances=max_instances
-        )
-        
-        response = await self._make_request(
-            "POST",
-            f"/console/agents/{agent_id}/deploy",
-            data=deployment_request.dict()
-        )
-        
-        return response
-    
-    async def get_agent_metrics(
-        self,
-        agent_id: str,
-        days: int = 7
-    ) -> Dict[str, any]:
-        """
-        Get metrics for a deployed agent.
-        
-        Args:
-            agent_id: Agent identifier
-            days: Number of days of metrics to retrieve
-            
-        Returns:
-            Agent metrics data
-        """
-        response = await self._make_request(
-            "GET",
-            f"/console/agents/{agent_id}/metrics",
-            params={"days": days}
-        )
-        
-        return response
-    
-    async def delete_agent(self, agent_id: str) -> Dict[str, str]:
-        """
-        Delete an agent.
-        
-        Args:
-            agent_id: Agent identifier
-            
-        Returns:
-            Deletion confirmation
-        """
-        response = await self._make_request("DELETE", f"/console/agents/{agent_id}")
-        return response
-    
-    # Real-time Monitoring Methods
-    
-    async def monitor_agent_realtime(
-        self,
-        agent_id: str,
-        callback: callable
-    ) -> None:
-        """
-        Monitor agent in real-time via WebSocket.
-        
-        Args:
-            agent_id: Agent identifier
-            callback: Function to call with real-time updates
-        """
-        if not self.enable_websockets:
-            raise AgentGuardError("WebSocket support is disabled")
-        
-        ws_url = self.base_url.replace('http', 'ws') + f"/ws/agents/{agent_id}"
-        
-        async with websockets.connect(
-            ws_url,
-            extra_headers={"Authorization": f"Bearer {self.api_key}"}
-        ) as websocket:
-            self._ws_connection = websocket
-            
-            async for message in websocket:
-                try:
-                    data = json.loads(message)
-                    await callback(data)
-                except json.JSONDecodeError:
-                    continue
-                except Exception as e:
-                    print(f"Callback error: {e}")
-    
-    async def stream_system_metrics(self) -> AsyncGenerator[Dict[str, any], None]:
-        """
-        Stream system metrics in real-time.
-        
-        Yields:
-            System metrics data
-        """
-        if not self.enable_websockets:
-            raise AgentGuardError("WebSocket support is disabled")
-        
-        ws_url = self.base_url.replace('http', 'ws') + "/ws/metrics"
-        
-        async with websockets.connect(
-            ws_url,
-            extra_headers={"Authorization": f"Bearer {self.api_key}"}
-        ) as websocket:
-            async for message in websocket:
-                try:
-                    data = json.loads(message)
-                    yield data
-                except json.JSONDecodeError:
-                    continue
-    
-    # Analytics Methods
-    
-    async def get_analytics_overview(self, days: int = 30) -> Dict[str, any]:
-        """
-        Get analytics overview.
-        
-        Args:
-            days: Number of days to analyze
-            
-        Returns:
-            Analytics data
-        """
-        response = await self._make_request(
-            "GET",
-            "/analytics/insights",
-            params={"days": days}
-        )
-        
-        return response
-    
-    async def get_workstation_insights(self) -> Dict[str, any]:
-        """
-        Get workstation fleet insights.
-        
-        Returns:
-            Workstation insights data
-        """
-        response = await self._make_request("GET", "/workstations/fleet/insights")
-        return response
-    
-    # Utility Methods
-    
-    async def health_check(self) -> Dict[str, any]:
-        """
-        Check API health status.
-        
-        Returns:
-            Health status information
-        """
-        response = await self._make_request("GET", "/health")
-        return response
-    
-    async def get_system_metrics(self) -> Dict[str, any]:
-        """
-        Get current system metrics.
-        
-        Returns:
-            System performance metrics
-        """
-        response = await self._make_request("GET", "/metrics")
-        return response
-    
-    # Private Methods
-    
-    async def _make_request(
+    def _request(
         self,
         method: str,
         endpoint: str,
-        data: Optional[Dict] = None,
-        params: Optional[Dict] = None
-    ) -> Dict:
-        """Make HTTP request with error handling and retries."""
-        url = urljoin(self.base_url, endpoint)
+        **kwargs
+    ) -> Dict[str, Any]:
+        """Make HTTP request to AgentGuard API."""
+        url = f"{self.base_url}{endpoint}"
         
-        for attempt in range(self.max_retries + 1):
-            try:
-                if method.upper() == "GET":
-                    response = await self.client.get(url, params=params)
-                elif method.upper() == "POST":
-                    response = await self.client.post(url, json=data, params=params)
-                elif method.upper() == "PUT":
-                    response = await self.client.put(url, json=data, params=params)
-                elif method.upper() == "DELETE":
-                    response = await self.client.delete(url, params=params)
-                else:
-                    raise AgentGuardError(f"Unsupported HTTP method: {method}")
-                
-                # Handle response
-                if response.status_code == 200:
-                    return response.json()
-                elif response.status_code == 401:
-                    raise AuthenticationError("Invalid API key or authentication failed")
-                elif response.status_code == 429:
-                    if attempt < self.max_retries:
-                        wait_time = 2 ** attempt  # Exponential backoff
-                        await asyncio.sleep(wait_time)
-                        continue
-                    raise RateLimitError("Rate limit exceeded")
-                elif response.status_code == 422:
-                    raise ValidationError(f"Validation error: {response.text}")
-                elif response.status_code >= 500:
-                    if attempt < self.max_retries:
-                        wait_time = 2 ** attempt
-                        await asyncio.sleep(wait_time)
-                        continue
-                    raise AgentGuardError(f"Server error: {response.status_code}")
-                else:
-                    raise AgentGuardError(f"HTTP {response.status_code}: {response.text}")
-                    
-            except httpx.RequestError as e:
-                if attempt < self.max_retries:
-                    wait_time = 2 ** attempt
-                    await asyncio.sleep(wait_time)
-                    continue
-                raise AgentGuardError(f"Request failed: {e}")
+        try:
+            response = self.session.request(
+                method=method,
+                url=url,
+                timeout=self.timeout,
+                **kwargs
+            )
+            
+            # Handle errors
+            if response.status_code == 401:
+                raise AuthenticationError("Invalid API key")
+            elif response.status_code == 429:
+                raise RateLimitError("Rate limit exceeded")
+            elif response.status_code == 422:
+                raise ValidationError(f"Validation error: {response.text}")
+            elif response.status_code >= 400:
+                raise AgentGuardError(f"API error: {response.status_code} - {response.text}")
+            
+            return response.json()
         
-        raise AgentGuardError("Max retries exceeded")
+        except requests.exceptions.Timeout:
+            raise AgentGuardError("Request timed out")
+        except requests.exceptions.ConnectionError:
+            raise AgentGuardError("Connection error")
+        except requests.exceptions.RequestException as e:
+            raise AgentGuardError(f"Request failed: {str(e)}")
+    
+    def detect_hallucination(
+        self,
+        agent_output: str,
+        agent_input: Optional[str] = None,
+        context: Optional[str] = None,
+        strategy: str = "weighted"
+    ) -> DetectionResult:
+        """
+        Detect hallucinations in agent output.
+        
+        Args:
+            agent_output: The agent's output to check
+            agent_input: Optional input that led to the output
+            context: Optional additional context
+            strategy: Voting strategy (weighted, majority, adaptive, etc.)
+            
+        Returns:
+            DetectionResult with detection details
+        """
+        data = {
+            "agent_output": agent_output,
+            "agent_input": agent_input,
+            "context": context,
+            "strategy": strategy
+        }
+        
+        response = self._request("POST", "/multi-model/detect", json=data)
+        return DetectionResult(**response)
+    
+    def health_check(self) -> Dict[str, Any]:
+        """Check API health status."""
+        return self._request("GET", "/health")
 
 
-# Synchronous wrapper for backwards compatibility
-class AgentGuardSyncClient:
-    """
-    Synchronous wrapper for AgentGuardClient.
+class MultimodalClient:
+    """Client for multimodal detection features."""
     
-    Provides the same interface but with synchronous methods.
-    """
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
     
-    def __init__(self, *args, **kwargs):
-        self._async_client = AgentGuardClient(*args, **kwargs)
+    def detect(
+        self,
+        text_content: str,
+        image_url: Optional[str] = None,
+        video_url: Optional[str] = None,
+        audio_url: Optional[str] = None
+    ) -> MultimodalResult:
+        """
+        Detect hallucinations in multimodal content.
+        
+        Args:
+            text_content: Text description to verify
+            image_url: Optional image URL
+            video_url: Optional video URL
+            audio_url: Optional audio URL
+            
+        Returns:
+            MultimodalResult with consistency analysis
+        """
+        data = {
+            "text_content": text_content,
+            "image_url": image_url,
+            "video_url": video_url,
+            "audio_url": audio_url
+        }
+        
+        response = self.client._request("POST", "/multimodal/detect", json=data)
+        return MultimodalResult(**response)
+
+
+class BiasClient:
+    """Client for bias and fairness auditing."""
     
-    def test_agent_output(self, *args, **kwargs) -> HallucinationReport:
-        """Synchronous version of test_agent_output."""
-        return asyncio.run(self._async_client.test_agent_output(*args, **kwargs))
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
     
-    def create_agent(self, *args, **kwargs) -> Agent:
-        """Synchronous version of create_agent."""
-        return asyncio.run(self._async_client.create_agent(*args, **kwargs))
+    def audit(
+        self,
+        text: str,
+        context: Optional[str] = None,
+        check_compliance: bool = True
+    ) -> BiasAuditResult:
+        """
+        Perform bias and fairness audit.
+        
+        Args:
+            text: Text to audit for bias
+            context: Optional context
+            check_compliance: Whether to check regulatory compliance
+            
+        Returns:
+            BiasAuditResult with audit findings
+        """
+        data = {
+            "text": text,
+            "context": context,
+            "check_compliance": check_compliance
+        }
+        
+        response = self.client._request("POST", "/bias/audit", json=data)
+        return BiasAuditResult(**response)
     
-    def get_agent(self, *args, **kwargs) -> Agent:
-        """Synchronous version of get_agent."""
-        return asyncio.run(self._async_client.get_agent(*args, **kwargs))
+    def check_inclusive_language(self, text: str) -> Dict[str, Any]:
+        """Quick check for non-inclusive language."""
+        response = self.client._request(
+            "POST",
+            "/bias/check-inclusive-language",
+            params={"text": text}
+        )
+        return response
+
+
+class RedTeamClient:
+    """Client for red teaming and security testing."""
     
-    def list_agents(self, *args, **kwargs) -> List[Agent]:
-        """Synchronous version of list_agents."""
-        return asyncio.run(self._async_client.list_agents(*args, **kwargs))
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
     
-    def deploy_agent(self, *args, **kwargs) -> Dict[str, str]:
-        """Synchronous version of deploy_agent."""
-        return asyncio.run(self._async_client.deploy_agent(*args, **kwargs))
+    def simulate(
+        self,
+        attack_types: Optional[List[str]] = None,
+        severity_threshold: str = "low",
+        max_attacks: int = 50
+    ) -> RedTeamReport:
+        """
+        Run red team simulation.
+        
+        Args:
+            attack_types: Specific attack types to test
+            severity_threshold: Minimum severity (low, medium, high, critical)
+            max_attacks: Maximum number of attacks to execute
+            
+        Returns:
+            RedTeamReport with vulnerability assessment
+        """
+        data = {
+            "attack_types": attack_types,
+            "severity_threshold": severity_threshold,
+            "max_attacks": max_attacks
+        }
+        
+        response = self.client._request("POST", "/redteam/simulate", json=data)
+        return RedTeamReport(**response)
     
-    def health_check(self, *args, **kwargs) -> Dict[str, any]:
-        """Synchronous version of health_check."""
-        return asyncio.run(self._async_client.health_check(*args, **kwargs))
+    def test_single_attack(
+        self,
+        payload: str,
+        attack_type: str = "prompt_injection"
+    ) -> Dict[str, Any]:
+        """Test a single attack payload."""
+        data = {
+            "payload": payload,
+            "attack_type": attack_type
+        }
+        
+        return self.client._request("POST", "/redteam/test-single-attack", json=data)
+
+
+class ComplianceClient:
+    """Client for compliance reporting."""
     
-    def close(self):
-        """Close the client."""
-        asyncio.run(self._async_client.close())
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
+    
+    def generate_report(
+        self,
+        framework: str = "all",
+        start_date: Optional[str] = None,
+        end_date: Optional[str] = None,
+        include_details: bool = True
+    ) -> ComplianceReport:
+        """
+        Generate compliance report.
+        
+        Args:
+            framework: Framework to report on (all, eu_ai_act, nist, owasp, gdpr, ieee)
+            start_date: Optional start date (ISO format)
+            end_date: Optional end date (ISO format)
+            include_details: Whether to include detailed findings
+            
+        Returns:
+            ComplianceReport with compliance assessment
+        """
+        data = {
+            "framework": framework,
+            "start_date": start_date,
+            "end_date": end_date,
+            "include_details": include_details
+        }
+        
+        response = self.client._request("POST", "/compliance/report", json=data)
+        return ComplianceReport(**response)
+    
+    def get_status(self) -> Dict[str, Any]:
+        """Get quick compliance status."""
+        return self.client._request("GET", "/compliance/status")
+
+
+class RAGSecurityClient:
+    """Client for RAG security features."""
+    
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
+    
+    def analyze(
+        self,
+        retrieved_contexts: List[Dict[str, Any]],
+        query: str,
+        user_id: Optional[str] = None,
+        enable_sanitization: bool = True
+    ) -> Dict[str, Any]:
+        """Analyze retrieved contexts for security threats."""
+        data = {
+            "retrieved_contexts": retrieved_contexts,
+            "query": query,
+            "user_id": user_id,
+            "enable_sanitization": enable_sanitization
+        }
+        
+        return self.client._request("POST", "/rag-security/analyze", json=data)
+
+
+class PIIProtectionClient:
+    """Client for PII protection features."""
+    
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
+    
+    def detect(
+        self,
+        text: str,
+        redact: bool = True
+    ) -> Dict[str, Any]:
+        """Detect and optionally redact PII."""
+        data = {
+            "text": text,
+            "redact": redact
+        }
+        
+        return self.client._request("POST", "/pii-protection/detect", json=data)
+
+
+class PromptInjectionClient:
+    """Client for prompt injection detection."""
+    
+    def __init__(self, client: AgentGuardClient):
+        self.client = client
+    
+    def detect(
+        self,
+        prompt: str,
+        context: Optional[str] = None
+    ) -> Dict[str, Any]:
+        """Detect prompt injection attacks."""
+        data = {
+            "prompt": prompt,
+            "context": context
+        }
+        
+        return self.client._request("POST", "/prompt-injection/detect", json=data)

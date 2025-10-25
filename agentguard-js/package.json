@@ -1,0 +1,51 @@
+{
+  "name": "@agentguard/sdk",
+  "version": "1.0.0",
+  "description": "Official JavaScript/TypeScript SDK for AgentGuard AI Safety Platform",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "jest",
+    "lint": "eslint src/**/*.ts",
+    "prepublishOnly": "npm run build"
+  },
+  "keywords": [
+    "ai",
+    "safety",
+    "hallucination",
+    "detection",
+    "prompt-injection",
+    "pii",
+    "rag",
+    "security",
+    "bias",
+    "fairness",
+    "red-team",
+    "compliance"
+  ],
+  "author": "AgentGuard",
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/agentguard/agentguard"
+  },
+  "dependencies": {
+    "axios": "^1.7.0",
+    "form-data": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@typescript-eslint/eslint-plugin": "^8.0.0",
+    "@typescript-eslint/parser": "^8.0.0",
+    "eslint": "^9.0.0",
+    "jest": "^29.7.0",
+    "typescript": "^5.6.0"
+  },
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ]
+}
+

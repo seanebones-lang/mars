@@ -181,7 +181,7 @@ class PromptInjectionDetector:
         InjectionPattern(
             pattern_id="pi-010",
             name="Hypothetical Scenario",
-            regex=r"(imagine|suppose|hypothetically|what if|let's pretend)\s+.{0,50}(you (are|were|could)|there (are|were) no)",
+            regex=r"(imagine|suppose|hypothetically|what if|let's pretend)\s+.{0,50}(you (are|were|could)|there (are|were) no|unrestricted|evil\s+ai)",
             injection_type=InjectionType.ROLE_PLAY,
             risk_level=RiskLevel.MEDIUM,
             description="Uses hypothetical scenarios to bypass restrictions",
@@ -310,13 +310,14 @@ class PromptInjectionDetector:
         max_risk_level = RiskLevel.SAFE
         
         # OWASP 2025: Prioritized pattern order (specific to generic)
+        # Check hypothetical scenarios FIRST to prevent false escalation
         priority_order = [
-            InjectionType.INSTRUCTION_OVERRIDE,
+            InjectionType.ROLE_PLAY,  # Check hypothetical/role-play first
+            InjectionType.JAILBREAK,
             InjectionType.DIRECT_INJECTION,  # System prompt reveal
             InjectionType.DELIMITER_ATTACK,
             InjectionType.MULTI_TURN_ATTACK,
-            InjectionType.JAILBREAK,
-            InjectionType.ROLE_PLAY,
+            InjectionType.INSTRUCTION_OVERRIDE,  # Check after hypothetical
             InjectionType.ENCODING_ATTACK,
             InjectionType.CONTEXT_IGNORING,  # Generic fallback
             InjectionType.INDIRECT_INJECTION,
@@ -324,11 +325,22 @@ class PromptInjectionDetector:
         
         # Check patterns in priority order, stop after first match per type
         detected_types = set()
+        hypothetical_detected = False
+        
         for inj_type in priority_order:
             if inj_type in detected_types:
                 continue
             for pattern in self.patterns:
                 if pattern.injection_type == inj_type and pattern.match(prompt):
+                    # Track if hypothetical/role-play pattern detected
+                    if inj_type == InjectionType.ROLE_PLAY:
+                        hypothetical_detected = True
+                    
+                    # If hypothetical detected, skip generic INSTRUCTION_OVERRIDE patterns
+                    if hypothetical_detected and inj_type == InjectionType.INSTRUCTION_OVERRIDE:
+                        # Only skip if the override is likely within hypothetical context
+                        continue
+                    
                     matched_patterns.append(pattern.name)
                     injection_types.append(pattern.injection_type)
                     detected_types.add(inj_type)
@@ -339,17 +351,18 @@ class PromptInjectionDetector:
                         max_risk_level = pattern.risk_level
                     break  # Stop after first match for this type
         
-        # OWASP 2025: Fuzzy matching for obfuscation
-        words = re.findall(r'\b\w+\b', prompt.lower())
-        for word in words:
-            for keyword in self.fuzzy_keywords:
-                if self._is_similar_word(word, keyword):
-                    matched_patterns.append(f"Fuzzy Match: {keyword}")
-                    if InjectionType.UNKNOWN not in injection_types:
-                        injection_types.append(InjectionType.UNKNOWN)
-                    if max_risk_level == RiskLevel.SAFE:
-                        max_risk_level = RiskLevel.LOW
-                    break
+        # OWASP 2025: Fuzzy matching for obfuscation (only if no high-confidence patterns matched)
+        if max_risk_level in [RiskLevel.SAFE, RiskLevel.LOW]:
+            words = re.findall(r'\b\w+\b', prompt.lower())
+            for word in words:
+                for keyword in self.fuzzy_keywords:
+                    if self._is_similar_word(word, keyword):
+                        matched_patterns.append(f"Fuzzy Match: {keyword}")
+                        if InjectionType.UNKNOWN not in injection_types:
+                            injection_types.append(InjectionType.UNKNOWN)
+                        if max_risk_level == RiskLevel.SAFE:
+                            max_risk_level = RiskLevel.LOW
+                        break
         
         return {
             "matched_patterns": matched_patterns,

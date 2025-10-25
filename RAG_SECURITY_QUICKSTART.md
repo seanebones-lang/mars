@@ -830,15 +830,299 @@ curl -X POST https://agentguard.onrender.com/rag-security/analyze \
 
 ---
 
+---
+
+## Advanced Configuration
+
+### Performance Tuning
+
+**Optimize for Speed**:
+```python
+# Disable expensive checks for trusted sources
+response = requests.post(
+    "https://agentguard.onrender.com/rag-security/analyze",
+    json={
+        "retrieved_contexts": contexts,
+        "query": query,
+        "enable_hallucination_check": False,  # Skip for trusted KBs
+        "enable_pii_filtering": False  # Skip if already filtered
+    }
+)
+```
+
+**Batch Processing**:
+```python
+# Process multiple queries efficiently
+queries = ["query1", "query2", "query3"]
+results = []
+
+for query in queries:
+    result = requests.post(url, json={"query": query, ...})
+    results.append(result.json())
+```
+
+**Caching Strategy**:
+```python
+# Cache frequently accessed contexts
+import hashlib
+import redis
+
+cache = redis.Redis(host='localhost', port=6379)
+
+def get_cached_analysis(context_hash):
+    return cache.get(f"rag_analysis:{context_hash}")
+
+def cache_analysis(context_hash, result):
+    cache.setex(f"rag_analysis:{context_hash}", 3600, result)
+```
+
+---
+
+### Integration Patterns
+
+**LangChain Integration**:
+```python
+from langchain.retrievers import BaseRetriever
+import requests
+
+class SecureRAGRetriever(BaseRetriever):
+    def __init__(self, base_retriever, agentguard_url):
+        self.base_retriever = base_retriever
+        self.agentguard_url = agentguard_url
+    
+    def get_relevant_documents(self, query):
+        # Retrieve documents
+        docs = self.base_retriever.get_relevant_documents(query)
+        
+        # Analyze with AgentGuard
+        contexts = [{"content": doc.page_content, ...} for doc in docs]
+        response = requests.post(
+            f"{self.agentguard_url}/rag-security/analyze",
+            json={"retrieved_contexts": contexts, "query": query}
+        )
+        
+        result = response.json()
+        
+        # Filter unsafe contexts
+        if result['is_safe']:
+            return docs
+        else:
+            # Return only safe contexts
+            safe_indices = [i for i, ctx in enumerate(result['context_analysis']) 
+                          if ctx['is_safe']]
+            return [docs[i] for i in safe_indices]
+```
+
+**LlamaIndex Integration**:
+```python
+from llama_index.core import VectorStoreIndex
+from llama_index.core.postprocessor import BaseNodePostprocessor
+
+class AgentGuardPostprocessor(BaseNodePostprocessor):
+    def __init__(self, agentguard_url):
+        self.agentguard_url = agentguard_url
+    
+    def _postprocess_nodes(self, nodes, query_bundle):
+        # Analyze nodes with AgentGuard
+        contexts = [{"content": node.get_content(), ...} for node in nodes]
+        
+        response = requests.post(
+            f"{self.agentguard_url}/rag-security/analyze",
+            json={"retrieved_contexts": contexts, "query": query_bundle.query_str}
+        )
+        
+        result = response.json()
+        
+        # Filter nodes
+        safe_nodes = [node for i, node in enumerate(nodes) 
+                     if result['context_analysis'][i]['is_safe']]
+        return safe_nodes
+```
+
+---
+
+### Compliance Mapping
+
+**GDPR Compliance**:
+- ✅ PII Detection: Automatic redaction of personal data
+- ✅ Data Minimization: Filter unnecessary sensitive contexts
+- ✅ Audit Trail: Complete logging of data access
+- ✅ Right to be Forgotten: Context removal tracking
+
+**HIPAA Compliance**:
+- ✅ PHI Protection: Medical data detection and masking
+- ✅ Access Controls: User authorization enforcement
+- ✅ Encryption: Data protection in transit and at rest
+- ✅ Audit Logs: Complete access history
+
+**SOC 2 Type II**:
+- ✅ Security: Multi-layer threat detection
+- ✅ Availability: 99.9% uptime SLA
+- ✅ Confidentiality: Data encryption and access controls
+- ✅ Processing Integrity: Hallucination detection
+
+**ISO 27001**:
+- ✅ Risk Assessment: Automated threat scoring
+- ✅ Access Control: RBAC implementation
+- ✅ Incident Management: Real-time alerting
+- ✅ Continuous Monitoring: 24/7 security analysis
+
+---
+
+### Production Best Practices
+
+**1. Multi-Layer Defense**:
+```python
+# Implement defense in depth
+def secure_rag_pipeline(query, kb_id):
+    # Layer 1: Input validation
+    if not validate_query(query):
+        raise ValueError("Invalid query")
+    
+    # Layer 2: Retrieve with access control
+    contexts = retrieve_with_auth(query, kb_id, user_id)
+    
+    # Layer 3: AgentGuard analysis
+    result = analyze_contexts(contexts, query)
+    
+    # Layer 4: Output sanitization
+    if result['is_safe']:
+        return sanitize_output(result['sanitized_contexts'])
+    else:
+        log_security_event(result)
+        raise SecurityError("Unsafe contexts detected")
+```
+
+**2. Rate Limiting**:
+```python
+from ratelimit import limits, sleep_and_retry
+
+@sleep_and_retry
+@limits(calls=100, period=60)  # 100 calls per minute
+def call_agentguard(contexts, query):
+    return requests.post(url, json={...})
+```
+
+**3. Error Handling**:
+```python
+def robust_rag_analysis(contexts, query, max_retries=3):
+    for attempt in range(max_retries):
+        try:
+            response = requests.post(url, json={...}, timeout=5)
+            response.raise_for_status()
+            return response.json()
+        except requests.exceptions.Timeout:
+            if attempt == max_retries - 1:
+                # Fallback to basic filtering
+                return basic_content_filter(contexts)
+            time.sleep(2 ** attempt)  # Exponential backoff
+        except requests.exceptions.HTTPError as e:
+            logger.error(f"AgentGuard error: {e}")
+            return {"is_safe": False, "error": str(e)}
+```
+
+**4. Monitoring and Alerting**:
+```python
+import prometheus_client as prom
+
+# Metrics
+rag_requests = prom.Counter('rag_security_requests_total', 'Total RAG security requests')
+rag_threats = prom.Counter('rag_threats_detected_total', 'Total threats detected')
+rag_latency = prom.Histogram('rag_security_latency_seconds', 'Request latency')
+
+def monitored_analysis(contexts, query):
+    rag_requests.inc()
+    
+    with rag_latency.time():
+        result = analyze_contexts(contexts, query)
+    
+    if not result['is_safe']:
+        rag_threats.inc()
+        send_alert(result)
+    
+    return result
+```
+
+---
+
+### Advanced Scenarios
+
+**Scenario 1: Multi-Tenant RAG**:
+```python
+# Enforce tenant isolation
+def tenant_safe_rag(query, tenant_id, user_id):
+    # Register tenant-specific KB
+    kb_id = f"tenant-{tenant_id}"
+    
+    # Enforce access control
+    contexts = retrieve_contexts(query, kb_id)
+    
+    # Analyze with tenant context
+    result = requests.post(url, json={
+        "retrieved_contexts": contexts,
+        "query": query,
+        "user_id": user_id,
+        "metadata": {"tenant_id": tenant_id}
+    })
+    
+    return result.json()
+```
+
+**Scenario 2: Real-Time Streaming RAG**:
+```python
+import asyncio
+import aiohttp
+
+async def stream_rag_analysis(query, kb_id):
+    async with aiohttp.ClientSession() as session:
+        # Stream contexts as they're retrieved
+        async for context in retrieve_stream(query, kb_id):
+            # Analyze each context immediately
+            async with session.post(url, json={
+                "retrieved_contexts": [context],
+                "query": query
+            }) as response:
+                result = await response.json()
+                
+                if result['is_safe']:
+                    yield result['sanitized_contexts'][0]
+```
+
+**Scenario 3: Hybrid RAG (Vector + SQL)**:
+```python
+def hybrid_rag_security(query):
+    # Retrieve from multiple sources
+    vector_contexts = vector_db.search(query)
+    sql_contexts = sql_db.query(query)
+    
+    # Analyze all contexts together
+    all_contexts = [
+        {"content": c, "kb_id": "vector-db", ...} for c in vector_contexts
+    ] + [
+        {"content": c, "kb_id": "sql-db", ...} for c in sql_contexts
+    ]
+    
+    result = requests.post(url, json={
+        "retrieved_contexts": all_contexts,
+        "query": query
+    })
+    
+    return result.json()
+```
+
+---
+
 ## Support
 
 - **Documentation**: https://docs.agentguard.ai/rag-security
 - **API Reference**: https://api.agentguard.ai/docs#/rag_security
 - **Email**: support@agentguard.ai
+- **GitHub**: https://github.com/agentguard/agentguard
+- **Community**: https://community.agentguard.ai
 
 ---
 
 **AgentGuard - Secure Your RAG Systems**
 
-*RAG Security Quick Start - October 2025*
+*RAG Security Quick Start - October 2025 - Complete Edition*
 

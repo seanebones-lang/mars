@@ -1,42 +1,37 @@
 """
 AgentGuard Python SDK
-Enterprise-grade Python client library for AI agent safety validation and management.
-"""
+Official Python client for the AgentGuard AI Safety Platform.
 
-__version__ = "1.0.0"
-__author__ = "AgentGuard Team"
-__email__ = "support@agentguard.com"
+Author: AgentGuard Engineering Team
+Date: October 2025
+Version: 2.0.0
+"""
 
 from .client import AgentGuardClient
 from .models import (
-    AgentTestRequest,
-    HallucinationReport,
-    Agent,
-    AgentConfig,
-    TestResult,
-    DeploymentRequest,
-    SafetyRule
+    DetectionResult,
+    MultimodalResult,
+    BiasAuditResult,
+    RedTeamReport,
+    ComplianceReport
 )
 from .exceptions import (
     AgentGuardError,
     AuthenticationError,
-    ValidationError,
-    DeploymentError,
-    RateLimitError
+    RateLimitError,
+    ValidationError
 )
 
+__version__ = "2.0.0"
 __all__ = [
     "AgentGuardClient",
-    "AgentTestRequest",
-    "HallucinationReport", 
-    "Agent",
-    "AgentConfig",
-    "TestResult",
-    "DeploymentRequest",
-    "SafetyRule",
+    "DetectionResult",
+    "MultimodalResult",
+    "BiasAuditResult",
+    "RedTeamReport",
+    "ComplianceReport",
     "AgentGuardError",
     "AuthenticationError",
-    "ValidationError",
-    "DeploymentError",
-    "RateLimitError"
+    "RateLimitError",
+    "ValidationError"
 ]

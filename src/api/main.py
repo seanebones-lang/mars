@@ -24,6 +24,10 @@ from .prompt_injection import router as prompt_injection_router
 from .pii_protection import router as pii_protection_router
 from .multi_model_consensus import router as multi_model_router
 from .rag_security import router as rag_security_router
+from .multimodal_detection import router as multimodal_router
+from .bias_auditing import router as bias_router
+from .red_teaming import router as redteam_router
+from .compliance import router as compliance_router
 
 # Load environment variables
 load_dotenv()
@@ -100,6 +104,22 @@ app = FastAPI(
             "description": "RAG security for protecting retrieval-augmented generation systems"
         },
         {
+            "name": "multimodal",
+            "description": "Multimodal hallucination detection (image, video, audio)"
+        },
+        {
+            "name": "bias-fairness",
+            "description": "Bias detection and fairness auditing"
+        },
+        {
+            "name": "red-teaming",
+            "description": "Automated adversarial testing and vulnerability assessment"
+        },
+        {
+            "name": "compliance",
+            "description": "Regulatory compliance reporting (EU AI Act, NIST, OWASP, GDPR)"
+        },
+        {
             "name": "monitoring",
             "description": "Health check and system status"
         }
@@ -115,6 +135,12 @@ app.include_router(prompt_injection_router)
 app.include_router(pii_protection_router)
 app.include_router(multi_model_router)
 app.include_router(rag_security_router)
+
+# New routers (Phase 1 Upgrades - October 2025)
+app.include_router(multimodal_router)
+app.include_router(bias_router)
+app.include_router(redteam_router)
+app.include_router(compliance_router)
 
 # CORS middleware for cross-origin requests
 app.add_middleware(
