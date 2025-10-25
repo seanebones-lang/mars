@@ -49,12 +49,20 @@ logger = logging.getLogger(__name__)
 # Import production readiness utilities
 from ..utils.environment_validator import validate_environment
 from ..utils.health_monitor import get_health_status
+from ..utils.sentry_integration import get_sentry_monitor
+from ..utils.alert_manager import get_alert_manager
+
+# Initialize monitoring (P0-Critical)
+sentry_monitor = get_sentry_monitor()
+alert_manager = get_alert_manager()
 
 # Validate environment on startup (P0-Critical)
 try:
     validate_environment()
+    logger.info("Environment validation passed")
 except Exception as e:
     logger.critical(f"Environment validation failed: {e}")
+    alert_manager.alert_api_down("AgentGuard API", str(e))
     # In production, this should exit, but we'll allow degraded mode for now
     logger.warning("Continuing in degraded mode - some features may not work")
 
