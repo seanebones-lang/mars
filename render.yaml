@@ -1,16 +1,19 @@
-# Simplified Render.com Deployment Configuration for AgentGuard
+# AgentGuard Monorepo - Render.com Deployment Configuration
+# Deploys both backend API and frontend UI from single repository
+
 services:
-  # Main API Service
+  # Backend API Service
   - type: web
     name: agentguard-api
     env: python
     region: oregon
     plan: starter
+    rootDir: .
     buildCommand: pip install -r requirements-render.txt
     startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 2
     healthCheckPath: /health
     
-    # Environment Variables
+    # Environment Variables for Backend
     envVars:
       - key: ENVIRONMENT
         value: production
@@ -41,7 +44,7 @@ services:
       - key: API_KEY_SECRET
         generateValue: true
       
-      # CORS
+      # CORS - Allow frontend to access backend
       - key: CORS_ORIGINS
         value: "*"
       
@@ -72,3 +75,59 @@ services:
       periodSeconds: 10
       timeoutSeconds: 10
       failureThreshold: 3
+
+  # Frontend UI Service
+  - type: web
+    name: agentguard-ui
+    env: node
+    region: oregon
+    plan: starter
+    rootDir: agentguard-ui
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    
+    # Environment Variables for Frontend
+    envVars:
+      # API URL - Point to backend service
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: agentguard-api
+          envVarKey: RENDER_EXTERNAL_URL
+      
+      # Application Configuration
+      - key: NEXT_PUBLIC_APP_NAME
+        value: AgentGuard
+      - key: NEXT_PUBLIC_APP_VERSION
+        value: 1.0.0
+      - key: NEXT_PUBLIC_APP_DESCRIPTION
+        value: AI Safety Platform - Production Ready
+      
+      # Feature Flags
+      - key: NEXT_PUBLIC_ENABLE_ANALYTICS
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_MONITORING
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_WEBHOOKS
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_BATCH_PROCESSING
+        value: true
+      
+      # Security
+      - key: NEXT_PUBLIC_ENABLE_HTTPS_ONLY
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_SECURITY_HEADERS
+        value: true
+      
+      # Contact Information
+      - key: NEXT_PUBLIC_SUPPORT_EMAIL
+        value: support@agentguard.io
+      - key: NEXT_PUBLIC_COMPANY_NAME
+        value: AgentGuard
+    
+    # Auto-deploy settings
+    autoDeploy: true
+    branch: main
+    
+    # Health check
+    healthCheckPath: /
