@@ -16,6 +16,10 @@ from ..models.schemas import AgentTestRequest, HallucinationReport
 from ..judges.ensemble_judge import EnsembleJudge
 from .websocket import websocket_endpoint
 from ..demo.realtime_monitor import get_realtime_monitor
+from .mcp import router as mcp_router
+from .streams import router as streams_router
+from .parental_controls import router as parental_router
+from .model_hosting import router as model_hosting_router
 
 # Load environment variables
 load_dotenv()
@@ -60,11 +64,33 @@ app = FastAPI(
             "description": "Real-time agent monitoring and WebSocket endpoints"
         },
         {
+            "name": "mcp_gateway",
+            "description": "Model Control Plane (MCP) Gateway for real-time interventions"
+        },
+        {
+            "name": "stream_handling",
+            "description": "Dynamic data source handling for real-time streams"
+        },
+        {
+            "name": "parental_controls",
+            "description": "Family-friendly content filtering and age prediction"
+        },
+        {
+            "name": "model_hosting",
+            "description": "Model hosting platform for deploying and scaling AI models"
+        },
+        {
             "name": "monitoring",
             "description": "Health check and system status"
         }
     ]
 )
+
+# Include routers
+app.include_router(mcp_router)
+app.include_router(streams_router)
+app.include_router(parental_router)
+app.include_router(model_hosting_router)
 
 # CORS middleware for cross-origin requests
 app.add_middleware(

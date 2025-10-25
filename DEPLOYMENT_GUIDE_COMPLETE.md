@@ -1,21 +1,32 @@
-# 🚀 Complete Deployment Guide: Watcher AI
+# 🚀 Complete Deployment Guide: AgentGuard
 
 ## Overview
-This guide will help you deploy your Watcher AI platform with:
-- **Frontend**: Vercel (watcher.mothership-ai.com)
-- **Backend**: Render (watcher-api.onrender.com)
+**UPDATED: October 2025** - Both frontend and backend now deployed on Render for unified infrastructure management.
+
+This guide will help you deploy your AgentGuard platform with:
+- **Frontend**: Render Static Site (agentguard-ui.onrender.com)
+- **Backend**: Render Web Service (agentguard-api.onrender.com)
+- **Database**: Render PostgreSQL (Managed)
+- **Cache**: Render Redis (Managed)
+
+**Architecture Benefits**:
+- Unified platform management
+- Simplified CORS configuration
+- Consistent monitoring and logging
+- Cost-effective scaling
+- Single vendor relationship
 
 ## 📋 Prerequisites
 
 ### Required Accounts
-1. **Vercel Account**: [vercel.com](https://vercel.com)
-2. **Render Account**: [render.com](https://render.com)
-3. **GitHub Repository**: Already set up ✅
-4. **Claude API Key**: From Anthropic ✅
+1. **Render Account**: [render.com](https://render.com) ✅
+2. **GitHub Repository**: Already set up ✅
+3. **Claude API Key**: From Anthropic ✅
+4. **Optional**: Custom domain for production deployment
 
-### Domain Setup
-- **Primary Domain**: `watcher.mothership-ai.com`
-- **API Subdomain**: `api.watcher.mothership-ai.com` (optional, can use Render URL)
+### Domain Setup (Optional)
+- **Primary Domain**: `agentguard.mothership-ai.com` (or your custom domain)
+- **API Subdomain**: `api.agentguard.mothership-ai.com` (or use Render URL)
 
 ---
 
@@ -44,17 +55,17 @@ This guide will help you deploy your Watcher AI platform with:
    - **Plan**: Starter ($7/month)
    - Click "Create Redis"
 
-4. **Create Web Service**
+4. **Create Backend Web Service**
    - Click "New +" → "Web Service"
    - Connect to your GitHub repository: `seanebones-lang/mars`
-   - **Name**: `watcher-api`
+   - **Name**: `agentguard-api`
    - **Region**: Oregon (US West)
    - **Branch**: `main`
    - **Root Directory**: Leave empty (uses root)
    - **Runtime**: Python 3
    - **Build Command**: `pip install -r requirements.txt`
-   - **Start Command**: `python -m uvicorn src.api.main_realtime:app --host 0.0.0.0 --port $PORT`
-   - **Plan**: Starter ($7/month)
+   - **Start Command**: `python -m uvicorn src.api.main:app --host 0.0.0.0 --port $PORT`
+   - **Plan**: Starter ($7/month) or higher for production
 
 ### Step 2: Configure Environment Variables
 
@@ -78,11 +89,12 @@ DATABASE_URL=postgresql://watcher_admin:PASSWORD@HOST:PORT/watcher_ai
 # Redis Configuration (use your actual Render Redis URL)
 REDIS_URL=redis://red-xxxxx:PORT
 
-# CORS Configuration
-CORS_ORIGINS=https://watcher.mothership-ai.com,https://watcher-ai.vercel.app
+# CORS Configuration (update with your actual frontend URL)
+CORS_ORIGINS=https://agentguard-ui.onrender.com,https://agentguard.mothership-ai.com
 
 # Claude API (use your actual key)
 CLAUDE_API_KEY=your_claude_api_key_here
+OPENAI_API_KEY=your_openai_api_key_here_optional
 
 # Security Keys (generate secure random strings)
 JWT_SECRET_KEY=your_jwt_secret_key_here_64_chars_minimum
@@ -111,48 +123,44 @@ SESSION_TIMEOUT_HOURS=24
    - Monitor the build logs for any errors
 
 2. **Verify Deployment**
-   - Once deployed, your API will be available at: `https://watcher-api.onrender.com`
-   - Test the health endpoint: `https://watcher-api.onrender.com/health`
+   - Once deployed, your API will be available at: `https://agentguard-api.onrender.com`
+   - Test the health endpoint: `https://agentguard-api.onrender.com/health`
 
 ---
 
-## 🌐 Part 2: Frontend Deployment on Vercel
+## 🌐 Part 2: Frontend Deployment on Render
 
-### Step 1: Prepare Vercel Deployment
+### Step 1: Create Frontend Static Site
 
-1. **Install Vercel CLI** (optional)
-   ```bash
-   npm i -g vercel
-   ```
-
-2. **Log into Vercel Dashboard**
-   - Go to [vercel.com/dashboard](https://vercel.com/dashboard)
-   - Connect your GitHub account
-
-### Step 2: Create Vercel Project
-
-1. **Import Project**
-   - Click "New Project"
-   - Import from GitHub: `seanebones-lang/mars`
-   - **Framework Preset**: Next.js
+1. **Create Static Site Service**
+   - Click "New +" → "Static Site"
+   - Connect to your GitHub repository: `seanebones-lang/mars`
+   - **Name**: `agentguard-ui`
+   - **Region**: Oregon (US West)
+   - **Branch**: `main`
    - **Root Directory**: `agentguard-ui`
-   - **Build Command**: `npm run build`
-   - **Output Directory**: `.next`
-   - **Install Command**: `npm install`
+   - **Build Command**: `npm install && npm run build`
+   - **Publish Directory**: `out` (for Next.js static export) or `.next` (for Next.js server)
+   - **Plan**: Starter (Free for static sites)
 
-### Step 3: Configure Environment Variables
+**Note**: If using Next.js with server-side features, deploy as a Web Service instead:
+   - **Runtime**: Node
+   - **Build Command**: `cd agentguard-ui && npm install && npm run build`
+   - **Start Command**: `cd agentguard-ui && npm start`
 
-In Vercel project settings, add these environment variables:
+### Step 2: Configure Environment Variables
+
+In Render static site/web service settings, add these environment variables:
 
 ```bash
-# API Configuration (update with your actual Render URL)
-NEXT_PUBLIC_API_URL=https://watcher-api.onrender.com
-NEXT_PUBLIC_WS_URL=wss://watcher-api.onrender.com
+# API Configuration (update with your actual Render backend URL)
+NEXT_PUBLIC_API_URL=https://agentguard-api.onrender.com
+NEXT_PUBLIC_WS_URL=wss://agentguard-api.onrender.com
 
 # Application Configuration
-NEXT_PUBLIC_APP_NAME=Watcher AI
-NEXT_PUBLIC_APP_DESCRIPTION=Real-Time Hallucination Defense for Enterprise AI Systems
-NEXT_PUBLIC_DOMAIN=watcher.mothership-ai.com
+NEXT_PUBLIC_APP_NAME=AgentGuard
+NEXT_PUBLIC_APP_DESCRIPTION=Enterprise AI Agent Safety and Hallucination Detection Platform
+NEXT_PUBLIC_DOMAIN=agentguard.mothership-ai.com
 NEXT_PUBLIC_COMPANY_NAME=Mothership AI
 NEXT_PUBLIC_COMPANY_URL=https://mothership-ai.com
 
@@ -185,30 +193,31 @@ NEXT_PUBLIC_GITHUB_URL=https://github.com/seanebones-lang
 
 # Version Information
 NEXT_PUBLIC_APP_VERSION=1.0.0
-NEXT_PUBLIC_BUILD_DATE=2025-01-25
-NEXT_PUBLIC_COMMIT_SHA=2bff0f6
+NEXT_PUBLIC_BUILD_DATE=2025-10-24
+NEXT_PUBLIC_COMMIT_SHA=latest
 ```
 
-### Step 4: Configure Custom Domain
+### Step 3: Configure Custom Domain (Optional)
 
-1. **Add Domain in Vercel**
-   - Go to Project Settings → Domains
-   - Add `watcher.mothership-ai.com`
-   - Follow Vercel's DNS configuration instructions
+1. **Add Domain in Render**
+   - Go to Service Settings → Custom Domains
+   - Add `agentguard.mothership-ai.com`
+   - Follow Render's DNS configuration instructions
 
 2. **DNS Configuration**
-   - Add CNAME record: `watcher` → `cname.vercel-dns.com`
-   - Or A record pointing to Vercel's IP addresses
+   - Add CNAME record: `agentguard` → `agentguard-ui.onrender.com`
+   - Or use Render's provided DNS instructions
 
-### Step 5: Deploy Frontend
+### Step 4: Deploy Frontend
 
-1. **Deploy**
-   - Click "Deploy" in Vercel dashboard
-   - Monitor build logs for any errors
+1. **Trigger Deployment**
+   - Click "Create Static Site" or "Create Web Service"
+   - Render will automatically deploy from your GitHub repository
+   - Monitor the build logs for any errors
 
 2. **Verify Deployment**
-   - Test at your Vercel URL first
-   - Then test at `watcher.mothership-ai.com` once DNS propagates
+   - Test at your Render URL: `https://agentguard-ui.onrender.com`
+   - Test at custom domain once DNS propagates (if configured)
 
 ---
 
@@ -216,16 +225,18 @@ NEXT_PUBLIC_COMMIT_SHA=2bff0f6
 
 ### Step 1: Update CORS Settings
 
-Update your Render backend environment variables:
+Update your Render backend environment variables to include your frontend URL:
 ```bash
-CORS_ORIGINS=https://watcher.mothership-ai.com,https://your-vercel-app.vercel.app
+CORS_ORIGINS=https://agentguard-ui.onrender.com,https://agentguard.mothership-ai.com
 ```
+
+**Note**: With both services on Render, CORS configuration is simplified and more secure.
 
 ### Step 2: Test Integration
 
 1. **Health Checks**
-   - Backend: `https://watcher-api.onrender.com/health`
-   - Frontend: `https://watcher.mothership-ai.com`
+   - Backend: `https://agentguard-api.onrender.com/health`
+   - Frontend: `https://agentguard-ui.onrender.com`
 
 2. **API Integration**
    - Test API calls from frontend to backend
@@ -246,9 +257,9 @@ CORS_ORIGINS=https://watcher.mothership-ai.com,https://your-vercel-app.vercel.ap
    - Configure Redis caching
 
 2. **Frontend Optimization**
-   - Monitor Vercel analytics
+   - Monitor Render analytics
    - Optimize bundle size
-   - Configure CDN settings
+   - Configure caching headers
 
 ---
 
@@ -265,15 +276,23 @@ CORS_ORIGINS=https://watcher.mothership-ai.com,https://your-vercel-app.vercel.ap
 
 ### Monitoring Setup
 
-1. **Render Monitoring**
-   - Enable health checks
-   - Set up alerts for downtime
-   - Monitor resource usage
+1. **Render Backend Monitoring**
+   - Enable health checks for API service
+   - Set up alerts for downtime and errors
+   - Monitor resource usage (CPU, memory, requests)
+   - Configure log aggregation
 
-2. **Vercel Monitoring**
-   - Enable Vercel Analytics
-   - Monitor Core Web Vitals
+2. **Render Frontend Monitoring**
+   - Enable health checks for frontend service
+   - Monitor deployment status
+   - Track build times and errors
    - Set up deployment notifications
+
+3. **Unified Monitoring Benefits**
+   - Single dashboard for all services
+   - Consistent logging format
+   - Simplified alert management
+   - Integrated metrics across stack
 
 ---
 
@@ -298,9 +317,10 @@ CORS_ORIGINS=https://watcher.mothership-ai.com,https://your-vercel-app.vercel.ap
 
 ### Support Resources
 
-- **Vercel Docs**: [vercel.com/docs](https://vercel.com/docs)
 - **Render Docs**: [render.com/docs](https://render.com/docs)
+- **Render Community**: [community.render.com](https://community.render.com)
 - **Next.js Docs**: [nextjs.org/docs](https://nextjs.org/docs)
+- **FastAPI Docs**: [fastapi.tiangolo.com](https://fastapi.tiangolo.com)
 
 ---
 
@@ -308,24 +328,46 @@ CORS_ORIGINS=https://watcher.mothership-ai.com,https://your-vercel-app.vercel.ap
 
 If you encounter any issues during deployment:
 
-1. **Check the logs** in both Vercel and Render dashboards
-2. **Verify environment variables** are correctly set
+1. **Check the logs** in Render dashboard for both services
+2. **Verify environment variables** are correctly set in both frontend and backend
 3. **Test locally** to isolate deployment-specific issues
-4. **Contact support** if needed:
-   - Vercel: [vercel.com/support](https://vercel.com/support)
-   - Render: [render.com/support](https://render.com/support)
+4. **Verify CORS configuration** matches your deployed URLs
+5. **Contact support** if needed:
+   - Render Support: [render.com/support](https://render.com/support)
+   - Render Community: [community.render.com](https://community.render.com)
 
 ---
 
 ## 🎉 Congratulations!
 
-Once deployed, your Watcher AI platform will be live at:
-- **Frontend**: https://watcher.mothership-ai.com
-- **Backend**: https://watcher-api.onrender.com
-- **API Docs**: https://watcher-api.onrender.com/docs
+Once deployed, your AgentGuard platform will be live at:
+- **Frontend**: https://agentguard-ui.onrender.com (or your custom domain)
+- **Backend**: https://agentguard-api.onrender.com (or your custom domain)
+- **API Docs**: https://agentguard-api.onrender.com/docs
+- **Health Check**: https://agentguard-api.onrender.com/health
 
-Your enterprise-grade AI hallucination detection platform is now ready for production use!
+Your enterprise-grade AI agent safety and hallucination detection platform is now ready for production use!
+
+## 🚀 Next Steps
+
+1. **Configure Custom Domains** (if not already done)
+2. **Set up monitoring and alerts** in Render dashboard
+3. **Configure backup strategies** for database
+4. **Implement CI/CD pipelines** for automated deployments
+5. **Review security settings** and enable additional protections
+6. **Load test your deployment** to verify scalability
+7. **Document your deployment** for team reference
+
+## 📊 Render-Specific Advantages
+
+- **Unified Infrastructure**: All services on one platform
+- **Auto-scaling**: Automatic resource scaling based on demand
+- **Zero-downtime Deploys**: Rolling deployments with health checks
+- **Managed Services**: PostgreSQL and Redis fully managed
+- **DDoS Protection**: Built-in security features
+- **Global CDN**: Fast content delivery worldwide
+- **Cost Efficiency**: Pay only for what you use
 
 ---
 
-*This deployment guide was created for the Watcher AI project by Sean McDonnell - Mothership AI*
+*This deployment guide was updated October 2025 for the AgentGuard project by Sean McDonnell - Mothership AI*
