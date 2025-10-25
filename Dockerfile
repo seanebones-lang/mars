@@ -19,12 +19,15 @@ LABEL commit-sha="${COMMIT_SHA}"
 # Set working directory
 WORKDIR /app
 
-# Install system dependencies
+# Install system dependencies including build tools for fasttext/pybind11
 RUN apt-get update && apt-get install -y \
     gcc \
     g++ \
+    make \
     libffi-dev \
     libssl-dev \
+    python3-dev \
+    build-essential \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
@@ -34,6 +37,7 @@ COPY requirements.txt .
 # Install Python dependencies
 ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir pybind11 && \
     pip install --no-cache-dir -r requirements.txt
 
 # Production stage
