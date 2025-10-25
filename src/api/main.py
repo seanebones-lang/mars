@@ -23,6 +23,7 @@ from .model_hosting import router as model_hosting_router
 from .prompt_injection import router as prompt_injection_router
 from .pii_protection import router as pii_protection_router
 from .multi_model_consensus import router as multi_model_router
+from .rag_security import router as rag_security_router
 
 # Load environment variables
 load_dotenv()
@@ -95,6 +96,10 @@ app = FastAPI(
             "description": "Multi-model ensemble voting for improved accuracy"
         },
         {
+            "name": "rag_security",
+            "description": "RAG security for protecting retrieval-augmented generation systems"
+        },
+        {
             "name": "monitoring",
             "description": "Health check and system status"
         }
@@ -109,6 +114,7 @@ app.include_router(model_hosting_router)
 app.include_router(prompt_injection_router)
 app.include_router(pii_protection_router)
 app.include_router(multi_model_router)
+app.include_router(rag_security_router)
 
 # CORS middleware for cross-origin requests
 app.add_middleware(
