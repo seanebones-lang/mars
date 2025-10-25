@@ -1,320 +1,257 @@
-# Render Deployment Troubleshooting & Fix
+# Render Deployment Issues & Fixes
 
-**AgentGuard Platform**  
-**Issue**: Render hasn't deployed properly since Sprint 2 started  
-**Date**: October 25, 2025
+## Issues Identified
 
----
+### 1. **MLflow Dependency Missing from requirements-render.txt**
+The main app imports `mlflow` but it's not in the lightweight requirements file.
 
-## 🚨 Identified Issues
+**Error**: `ModuleNotFoundError: No module named 'mlflow'`
 
-### 1. Import Errors (Most Likely)
+### 2. **Heavy Dependencies in requirements-render.txt**
+Some dependencies might cause build timeouts or memory issues:
+- `torch` (huge, not needed for API)
+- `transformers` (large)
+- `sentence-transformers` (large)
 
-**Problem**: New modules not being imported correctly
-- `src/api/prompt_injection.py` - New file
-- `src/api/pii_protection.py` - New file
-- `src/services/prompt_injection_detector.py` - New file
-- `src/services/pii_protection.py` - New file
+### 3. **Static Site Build Will Fail**
+The render.yaml includes a static site for docs that tries to import the app, which will fail if dependencies are missing.
 
-**Symptoms**:
-- Build succeeds but app crashes on startup
-- Import errors in logs
-- Health check fails
+### 4. **Missing PIL/Pillow for Multimodal**
+Multimodal detection needs Pillow for image processing.
 
----
+### 5. **Database Connection String Format**
+Render uses a specific format for PostgreSQL connection strings.
 
-### 2. Missing Dependencies
+## Fixes Required
 
-**Problem**: `requirements-render.txt` might be missing dependencies
+### Fix 1: Update requirements-render.txt
 
-**Missing from render requirements**:
-- No explicit `sqlalchemy` (if used by services)
-- No `hashlib` (built-in, but check)
-- Might need `regex` library
+Add missing dependencies and remove heavy ones:
 
----
+```txt
+# Core Framework
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.9.0
+python-dotenv>=1.0.0
 
-### 3. Environment Variables
+# CRITICAL SECURITY
+bleach>=6.1.0
+cryptography>=41.0.7
+python-multipart>=0.0.6
+bcrypt>=4.1.2
+pyotp>=2.9.0
 
-**Problem**: Missing required env vars
-- `CLAUDE_API_KEY` - Must be set manually in Render dashboard
-- `OPENAI_API_KEY` - Optional but recommended
-- Database/Redis URLs - Should auto-configure
+# AI/ML - Lightweight
+anthropic>=0.39.0
 
----
+# MLflow (REQUIRED for main.py)
+mlflow>=2.17.0
 
-### 4. Health Check Path
+# Data Processing
+numpy>=1.26.0
+pandas>=2.0.0
 
-**Problem**: Health check might be failing
-- Current: `/health`
-- Might need: `/api/health` or root `/`
+# Image Processing (for multimodal)
+Pillow>=10.0.0
 
----
+# Database & Storage
+aiosqlite>=0.19.0
+redis>=5.0.0
+psycopg2-binary>=2.9.0  # PostgreSQL adapter
 
-## 🔧 Quick Fixes
+# Web & API
+aiohttp>=3.9.0
+jinja2>=3.1.0
+websockets>=12.0
 
-### Fix 1: Check Render Logs
+# Security & Authentication
+pyjwt>=2.8.0
+qrcode>=7.4.0
 
-1. Go to Render Dashboard
-2. Select `watcher-api` service
-3. Click "Logs" tab
-4. Look for:
-   - `ImportError`
-   - `ModuleNotFoundError`
-   - `AttributeError`
-   - `Failed to start`
+# Communication
+aiosmtplib>=3.0.0
 
-### Fix 2: Verify Build Command
+# System Monitoring
+psutil>=5.9.0
 
-Current build command:
+# Essential utilities
+requests>=2.31.0
+scipy>=1.11.0
+```
+
+### Fix 2: Make MLflow Optional in main.py
+
+Wrap MLflow imports to make them optional:
+
+```python
+# Try to import MLflow, but don't fail if it's not available
+try:
+    import mlflow
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    MLFLOW_AVAILABLE = False
+    logger.warning("MLflow not available - experiment tracking disabled")
+
+# Configure MLflow only if available
+if MLFLOW_AVAILABLE:
+    try:
+        mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME", "agentguard_prototype"))
+    except Exception as e:
+        logger.warning(f"MLflow configuration failed: {e}")
+```
+
+### Fix 3: Simplify render.yaml
+
+Remove the static site build (it's complex and not critical):
+
+```yaml
+services:
+  - type: web
+    name: agentguard-api
+    env: python
+    region: oregon
+    plan: starter
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    
+    envVars:
+      - key: ENVIRONMENT
+        value: production
+      - key: LOG_LEVEL
+        value: INFO
+      - key: CLAUDE_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+    
+    autoDeploy: true
+    branch: main
+```
+
+### Fix 4: Add Procfile (Alternative Start Method)
+
+Create a `Procfile` for Render:
+
+```
+web: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 2
+```
+
+### Fix 5: Add runtime.txt
+
+Specify Python version:
+
+```
+python-3.11.0
+```
+
+## Deployment Steps
+
+1. **Update requirements-render.txt** with the fixed version
+2. **Make MLflow optional** in main.py
+3. **Simplify render.yaml** to remove complex builds
+4. **Add Procfile** for explicit start command
+5. **Add runtime.txt** for Python version
+6. **Set environment variables** in Render dashboard:
+   - `CLAUDE_API_KEY`
+   - `OPENAI_API_KEY` (optional)
+   - `GOOGLE_API_KEY` (optional)
+   - `DATABASE_URL` (if using database)
+   - `REDIS_URL` (if using Redis)
+
+7. **Commit and push** changes
+8. **Trigger manual deploy** in Render dashboard
+
+## Quick Fix Commands
+
 ```bash
-pip install -r requirements-render.txt
-```
+# Update requirements
+cat > requirements-render.txt << 'EOF'
+fastapi>=0.115.0
+uvicorn[standard]>=0.30.0
+pydantic>=2.9.0
+python-dotenv>=1.0.0
+bleach>=6.1.0
+cryptography>=41.0.7
+python-multipart>=0.0.6
+bcrypt>=4.1.2
+pyotp>=2.9.0
+anthropic>=0.39.0
+mlflow>=2.17.0
+numpy>=1.26.0
+pandas>=2.0.0
+Pillow>=10.0.0
+aiosqlite>=0.19.0
+redis>=5.0.0
+psycopg2-binary>=2.9.0
+aiohttp>=3.9.0
+jinja2>=3.1.0
+websockets>=12.0
+pyjwt>=2.8.0
+qrcode>=7.4.0
+aiosmtplib>=3.0.0
+psutil>=5.9.0
+requests>=2.31.0
+scipy>=1.11.0
+EOF
 
-Should work, but verify it completes successfully.
+# Create Procfile
+echo "web: uvicorn src.api.main:app --host 0.0.0.0 --port \$PORT --workers 2" > Procfile
 
-### Fix 3: Verify Start Command
+# Create runtime.txt
+echo "python-3.11.0" > runtime.txt
 
-Current start command:
-```bash
-python -m uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --timeout-keep-alive 30
-```
-
-This should work if:
-- `src/__init__.py` exists
-- `src/api/__init__.py` exists
-- All imports are correct
-
-### Fix 4: Check Python Version
-
-Render default: Python 3.7  
-**Required**: Python 3.9+
-
-**Fix**: Add `runtime.txt` with:
-```
-python-3.10.12
-```
-
----
-
-## 🎯 Most Likely Issue: Python Version
-
-Render uses Python 3.7 by default, but we need 3.9+ for:
-- Pydantic 2.x
-- FastAPI 0.115+
-- Type hints we're using
-
----
-
-## 📋 Step-by-Step Fix
-
-### Step 1: Create runtime.txt
-
-```bash
-echo "python-3.10.12" > runtime.txt
-git add runtime.txt
-git commit -m "Add Python 3.10 runtime for Render"
+# Commit and push
+git add requirements-render.txt Procfile runtime.txt
+git commit -m "fix: Update Render deployment configuration"
 git push origin main
 ```
 
-### Step 2: Verify Environment Variables
+## Verification
 
-In Render Dashboard:
-1. Go to `watcher-api` service
-2. Click "Environment" tab
-3. Verify these are set:
-   - `CLAUDE_API_KEY` (must set manually)
-   - `DATABASE_URL` (auto from postgres)
-   - `REDIS_URL` (auto from redis)
-   - `JWT_SECRET_KEY` (auto-generated)
-
-### Step 3: Check Build Logs
-
-After push, watch build logs for:
-- ✅ Python 3.10.12 installed
-- ✅ All requirements installed
-- ✅ No import errors
-- ✅ Server starts successfully
-
-### Step 4: Test Health Check
-
-Once deployed:
-```bash
-curl https://watcher-api.onrender.com/health
-```
-
-Should return:
-```json
-{
-  "status": "healthy",
-  "timestamp": "2025-10-25T...",
-  "version": "1.0.0"
-}
-```
-
----
-
-## 🔍 Debugging Commands
-
-### Check if service is running:
-```bash
-curl -I https://watcher-api.onrender.com/health
-```
-
-### Check API docs:
-```bash
-curl https://watcher-api.onrender.com/docs
-```
-
-### Check specific endpoint:
-```bash
-curl https://watcher-api.onrender.com/prompt-injection/health
-```
-
----
-
-## 📊 Expected Render Configuration
-
-### Service: watcher-api
-
-| Setting | Value |
-|---------|-------|
-| **Type** | Web Service |
-| **Environment** | Python |
-| **Region** | Oregon |
-| **Plan** | Starter (or higher) |
-| **Python Version** | 3.10.12 |
-| **Build Command** | `pip install -r requirements-render.txt` |
-| **Start Command** | `python -m uvicorn src.api.main:app --host 0.0.0.0 --port $PORT` |
-| **Health Check** | `/health` |
-| **Auto Deploy** | Yes (main branch) |
-
-### Required Environment Variables
-
-| Variable | Source | Required |
-|----------|--------|----------|
-| `CLAUDE_API_KEY` | Manual | ✅ Yes |
-| `DATABASE_URL` | Auto (postgres) | ✅ Yes |
-| `REDIS_URL` | Auto (redis) | ✅ Yes |
-| `JWT_SECRET_KEY` | Auto-generated | ✅ Yes |
-| `OPENAI_API_KEY` | Manual | ⚠️ Optional |
-| `ENVIRONMENT` | Set to `production` | ✅ Yes |
-| `LOG_LEVEL` | Set to `INFO` | ✅ Yes |
-
----
-
-## 🚀 Alternative: Manual Deploy
-
-If auto-deploy keeps failing:
-
-### Option 1: Deploy from Render Dashboard
-
-1. Go to Render Dashboard
-2. Click "Manual Deploy"
-3. Select "Deploy latest commit"
-4. Watch logs
-
-### Option 2: Rollback
-
-1. Go to "Deploys" tab
-2. Find last working deploy
-3. Click "Rollback"
-
-### Option 3: Fresh Service
-
-1. Delete current service
-2. Create new service
-3. Connect to GitHub repo
-4. Configure from scratch
-
----
-
-## 📝 Checklist
-
-Before deploying:
-- [ ] `runtime.txt` exists with Python 3.10.12
-- [ ] All `__init__.py` files exist in directories
-- [ ] `requirements-render.txt` has all dependencies
-- [ ] `CLAUDE_API_KEY` set in Render dashboard
-- [ ] Health check endpoint works locally
-- [ ] All imports are correct
-- [ ] No syntax errors
-
-After deploying:
-- [ ] Build succeeds
-- [ ] Service starts
-- [ ] Health check passes
-- [ ] API docs accessible at `/docs`
-- [ ] Test endpoint works
-
----
-
-## 🆘 If Still Failing
-
-### Get Detailed Logs
-
-1. Render Dashboard → watcher-api → Logs
-2. Look for the FIRST error (not cascading errors)
-3. Common errors:
-   - `ModuleNotFoundError: No module named 'src'`
-     - Fix: Ensure `src/__init__.py` exists
-   - `ImportError: cannot import name 'router'`
-     - Fix: Check router imports in `main.py`
-   - `AttributeError: module has no attribute 'app'`
-     - Fix: Check `main.py` exports `app`
-
-### Test Locally
+After deployment, test these endpoints:
 
 ```bash
-# Use same Python version as Render
-pyenv install 3.10.12
-pyenv local 3.10.12
+# Health check
+curl https://your-app.onrender.com/health
 
-# Install render requirements
-pip install -r requirements-render.txt
+# API docs
+curl https://your-app.onrender.com/docs
 
-# Test start command
-python -m uvicorn src.api.main:app --host 0.0.0.0 --port 8000
-
-# Test health check
-curl http://localhost:8000/health
+# Test detection
+curl -X POST https://your-app.onrender.com/prompt-injection/detect \
+  -H "Content-Type: application/json" \
+  -d '{"prompt": "test"}'
 ```
 
----
+## Common Render Errors
 
-## 💡 Quick Win: Simplify First
+### "Build failed"
+- Check build logs for missing dependencies
+- Ensure requirements-render.txt has all imports used in code
 
-If nothing works, simplify to get SOMETHING deployed:
+### "Health check failed"
+- Verify `/health` endpoint works locally
+- Check if app is binding to correct port (`$PORT`)
+- Increase `initialDelaySeconds` in health check config
 
-### Minimal main.py
+### "Application error"
+- Check application logs in Render dashboard
+- Verify all environment variables are set
+- Check for import errors or missing dependencies
 
-```python
-from fastapi import FastAPI
+### "Timeout during build"
+- Remove heavy dependencies (torch, transformers)
+- Use lighter alternatives
+- Increase build timeout in Render settings
 
-app = FastAPI(title="AgentGuard")
+## Support
 
-@app.get("/health")
-def health():
-    return {"status": "healthy"}
-
-@app.get("/")
-def root():
-    return {"message": "AgentGuard API"}
-```
-
-Once this works, add routers one by one.
-
----
-
-## 📞 Support
-
-- **Render Docs**: https://render.com/docs/deploy-fastapi
-- **Render Support**: support@render.com
-- **Our Logs**: Check Render dashboard logs
-
----
-
-**Most Likely Fix**: Add `runtime.txt` with Python 3.10.12
-
-This will solve 90% of deployment issues!
-
+If issues persist:
+1. Check Render logs: Dashboard → Your Service → Logs
+2. Check build logs: Dashboard → Your Service → Events
+3. Test locally: `uvicorn src.api.main:app --port 8000`
+4. Verify all imports work: `python -c "from src.api.main import app"`

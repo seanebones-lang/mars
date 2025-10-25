@@ -10,7 +10,13 @@ from fastapi import FastAPI, HTTPException, WebSocket, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from dotenv import load_dotenv
-import mlflow
+
+# Try to import MLflow, but don't fail if it's not available
+try:
+    import mlflow
+    MLFLOW_AVAILABLE = True
+except ImportError:
+    MLFLOW_AVAILABLE = False
 
 from ..models.schemas import AgentTestRequest, HallucinationReport
 from ..judges.ensemble_judge import EnsembleJudge
@@ -39,8 +45,15 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configure MLflow
-mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME", "agentguard_prototype"))
+# Configure MLflow (optional)
+if MLFLOW_AVAILABLE:
+    try:
+        mlflow.set_experiment(os.getenv("MLFLOW_EXPERIMENT_NAME", "agentguard_prototype"))
+        logger.info("MLflow experiment tracking enabled")
+    except Exception as e:
+        logger.warning(f"MLflow configuration failed: {e}")
+else:
+    logger.warning("MLflow not available - experiment tracking disabled")
 
 
 @asynccontextmanager
@@ -438,6 +451,12 @@ async def get_metrics():
     Retrieve MLflow experiment metrics.
     Returns summary of recent evaluations.
     """
+    if not MLFLOW_AVAILABLE:
+        return {
+            "message": "MLflow not available",
+            "experiment_tracking": "disabled"
+        }
+    
     try:
         experiment = mlflow.get_experiment_by_name(
             os.getenv("MLFLOW_EXPERIMENT_NAME", "agentguard_prototype")

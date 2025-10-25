@@ -1,4 +1,4 @@
-# Lightweight requirements for Render deployment
+# Optimized requirements for Render deployment
 # Core Framework
 fastapi>=0.115.0
 uvicorn[standard]>=0.30.0
@@ -12,31 +12,32 @@ python-multipart>=0.0.6
 bcrypt>=4.1.2
 pyotp>=2.9.0
 
-# AI/ML Core - Lightweight versions for deployment
+# AI/ML Core - Lightweight for deployment
 anthropic>=0.39.0
-scikit-learn>=1.7.0
-sentence-transformers>=2.2.2
+
+# MLflow (required by main.py)
+mlflow>=2.17.0
 
 # Data Processing & Analysis
 numpy>=1.26.0
 pandas>=2.0.0
 
+# Image Processing (for multimodal detection)
+Pillow>=10.0.0
+
 # Database & Storage
 aiosqlite>=0.19.0
 redis>=5.0.0
+psycopg2-binary>=2.9.0
 
 # Web & API
 aiohttp>=3.9.0
-python-multipart>=0.0.6
 jinja2>=3.1.0
 websockets>=12.0
 
 # Security & Authentication
 pyjwt>=2.8.0
-bcrypt>=4.1.0
-pyotp>=2.9.0
 qrcode>=7.4.0
-cryptography>=41.0.0
 
 # Communication & Notifications
 aiosmtplib>=3.0.0
