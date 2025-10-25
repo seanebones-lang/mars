@@ -176,6 +176,10 @@ app.include_router(bias_router)
 app.include_router(redteam_router)
 app.include_router(compliance_router)
 
+# Rate limiting middleware (P0-Critical)
+from ..middleware.rate_limiter import rate_limit_middleware
+app.middleware("http")(rate_limit_middleware)
+
 # CORS middleware for cross-origin requests
 # Monorepo deployment on Render - frontend and backend on same domain
 app.add_middleware(
