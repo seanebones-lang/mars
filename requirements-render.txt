@@ -12,8 +12,14 @@ python-multipart>=0.0.6,<1.0.0
 bcrypt>=4.1.2,<5.0.0
 pyotp>=2.9.0,<3.0.0
 
-# AI/ML Core - Lightweight for deployment
+# AI/ML Core - Required for judges and analytics
 anthropic>=0.39.0,<1.0.0
+torch>=2.0.0,<3.0.0
+transformers>=4.30.0,<5.0.0
+sentence-transformers>=2.2.0,<3.0.0
+scikit-learn>=1.3.0,<2.0.0
+langchain>=0.1.0,<1.0.0
+langchain-anthropic>=0.1.0,<1.0.0
 
 # MLflow (required by main.py)
 mlflow>=2.17.0,<3.0.0
