@@ -449,7 +449,7 @@ Settings:
 
 ### Rule 3: Force HTTPS
 ```yaml
-URL: http://watcher.mothership-ai.com/*
+URL: https://watcher.mothership-ai.com/*
 Settings:
   - Always Use HTTPS: On
 ```

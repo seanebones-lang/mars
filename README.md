@@ -279,26 +279,34 @@ See [LICENSE](LICENSE) for details.
 
 ---
 
-##  Acknowledgments
+## Contact Information
 
-Built with ❤ by the AgentGuard team.
+**Company:** Mothership AI  
+**Product URL:** https://watcher.mothership-ai.com  
+**Company Website:** https://mothership-ai.com  
+**Contact Email:** info@mothership-ai.com
 
-Special thanks to:
-- Our beta users for invaluable feedback
-- The open source community
-- Our investors and advisors
-- Everyone who believed in making AI safer
-
----
-
-##  Launch Status
-
-**Status**: PRODUCTION READY   
-**Launch**: December 1, 2025, 9:00 AM PST  
-**Confidence**: 99%
-
-**See you at launch! **
+**Chief Engineer:** Sean McDonnell  
+**Engineering Team:** Mothership AI
 
 ---
 
-*"Making AI development safe, one query at a time."*
+## Launch Status
+
+**Status:** PRODUCTION READY  
+**Launch Date:** December 1, 2025  
+**Version:** 1.0.0
+
+---
+
+## License
+
+Copyright 2025 Mothership AI. All rights reserved.
+
+See LICENSE file for details.
+
+---
+
+**Mothership AI**  
+Enterprise AI Safety & Governance Platform  
+[mothership-ai.com](https://mothership-ai.com) • [watcher.mothership-ai.com](https://watcher.mothership-ai.com) • [info@mothership-ai.com](mailto:info@mothership-ai.com)

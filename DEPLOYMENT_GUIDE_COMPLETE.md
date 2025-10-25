@@ -109,7 +109,7 @@ MLFLOW_EXPERIMENT_NAME=agentguard_production
 APP_NAME=Watcher AI
 APP_VERSION=1.0.0
 COMPANY_NAME=Mothership AI
-SUPPORT_EMAIL=support@mothership-ai.com
+SUPPORT_EMAIL=info@mothership-ai.com
 MAX_UPLOAD_SIZE=100MB
 RATE_LIMIT_PER_MINUTE=1000
 SESSION_TIMEOUT_HOURS=24
@@ -181,7 +181,7 @@ NEXT_PUBLIC_ENABLE_COMPRESSION=true
 NEXT_PUBLIC_ENABLE_CACHING=true
 
 # Contact Information
-NEXT_PUBLIC_SUPPORT_EMAIL=support@mothership-ai.com
+NEXT_PUBLIC_SUPPORT_EMAIL=info@mothership-ai.com
 NEXT_PUBLIC_SALES_EMAIL=sales@mothership-ai.com
 NEXT_PUBLIC_LEGAL_EMAIL=legal@mothership-ai.com
 NEXT_PUBLIC_PRIVACY_EMAIL=privacy@mothership-ai.com

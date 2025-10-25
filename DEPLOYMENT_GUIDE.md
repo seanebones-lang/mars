@@ -97,7 +97,7 @@ NEXT_PUBLIC_ENABLE_BATCH_PROCESSING=true
 NEXT_PUBLIC_ENABLE_MULTI_TENANT=true
 
 # Contact Information
-NEXT_PUBLIC_SUPPORT_EMAIL=support@mothership-ai.com
+NEXT_PUBLIC_SUPPORT_EMAIL=info@mothership-ai.com
 NEXT_PUBLIC_SALES_EMAIL=sales@mothership-ai.com
 NEXT_PUBLIC_LINKEDIN_URL=https://linkedin.com/in/seanmcdonnell
 NEXT_PUBLIC_GITHUB_URL=https://github.com/seanebones-lang
@@ -178,7 +178,7 @@ MAX_UPLOAD_SIZE=100MB
 SESSION_TIMEOUT_HOURS=24
 
 # Contact Information
-SUPPORT_EMAIL=support@mothership-ai.com
+SUPPORT_EMAIL=info@mothership-ai.com
 COMPANY_NAME=Mothership AI
 ```
 
@@ -356,7 +356,7 @@ curl https://watcher-api.onrender.com/docs
 4. **Rollback**: Git revert + redeploy
 
 ### **Support Contacts**
-- **Technical Support**: support@mothership-ai.com
+- **Technical Support**: info@mothership-ai.com
 - **Emergency**: [Phone number]
 - **Documentation**: GitHub repository
 - **Status Page**: [Status page URL]

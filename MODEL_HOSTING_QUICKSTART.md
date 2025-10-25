@@ -649,7 +649,7 @@ curl -X POST https://agentguard-api.onrender.com/models/{model_id}/deploy \
 ## Support
 
 - **Documentation**: [docs.agentguard.ai/model-hosting](https://docs.agentguard.ai/model-hosting)
-- **Email**: support@mothership-ai.com
+- **Email**: info@mothership-ai.com
 - **GitHub**: [github.com/agentguard/model-hosting](https://github.com/agentguard/model-hosting)
 - **Community**: [community.agentguard.ai](https://community.agentguard.ai)
 

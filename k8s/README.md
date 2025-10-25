@@ -472,7 +472,7 @@ kubectl logs -n agentguard deployment/agentguard-api --since=1h > agentguard.log
 ```
 
 ### Contact Information
-- **Technical Support**: support@mothership-ai.com
+- **Technical Support**: info@mothership-ai.com
 - **Documentation**: https://docs.agentguard.mothership-ai.com
 - **Status Page**: https://status.agentguard.mothership-ai.com
 

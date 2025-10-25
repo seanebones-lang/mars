@@ -481,7 +481,7 @@ AgentGuard is the enterprise-grade platform for detecting and preventing AI agen
 ##  Contact
 
 **Sean McDonnell** - Founder & CEO  
-Email: sean@mothership-ai.com  
+Email: info@mothership-ai.com  
 LinkedIn: linkedin.com/in/sean-mcdonnell-077b15b8  
 GitHub: github.com/seanebones-lang  
 Website: agentguard.ai

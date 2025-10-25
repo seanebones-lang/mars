@@ -15,7 +15,7 @@ Usage:
 
 __version__ = "1.0.0"
 __author__ = "Mothership AI"
-__email__ = "support@mothership-ai.com"
+__email__ = "info@mothership-ai.com"
 
 from .client import WatcherClient
 from .models import (

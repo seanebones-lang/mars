@@ -905,8 +905,8 @@ async def safe_generate(text: str, threshold: float = 0.7):
 
 ### Support
 
-- **Email**: support@mothership-ai.com
-- **Beta Support**: beta-support@mothership-ai.com
+- **Email**: info@mothership-ai.com
+- **Beta Support**: beta-info@mothership-ai.com
 - **Enterprise**: enterprise@mothership-ai.com
 
 ### Status Page

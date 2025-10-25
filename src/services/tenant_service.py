@@ -383,7 +383,7 @@ class TenantService:
                 display_name="Mothership AI - Watcher Demo",
                 subdomain="demo",
                 admin_email="admin@mothership-ai.com",
-                support_email="support@mothership-ai.com",
+                support_email="info@mothership-ai.com",
                 billing_email="billing@mothership-ai.com",
                 subscription_tier=SubscriptionTier.ENTERPRISE,
                 max_users=100,

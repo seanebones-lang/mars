@@ -511,7 +511,7 @@ curl -X POST https://agentguard-api.onrender.com/parental-controls/filter-conten
 ## Support
 
 - **Documentation**: [docs.agentguard.ai/parental-controls](https://docs.agentguard.ai/parental-controls)
-- **Email**: support@mothership-ai.com
+- **Email**: info@mothership-ai.com
 - **GitHub**: [github.com/agentguard/parental-controls](https://github.com/agentguard/parental-controls)
 - **Community**: [community.agentguard.ai](https://community.agentguard.ai)
 

@@ -501,7 +501,7 @@ Status: Running with auto-scaling (1-10 instances)
 ### We will Build the Future of AI Safety Together
 
 **Contact Information**:
-- **Email**: sean@mothership-ai.com
+- **Email**: info@mothership-ai.com
 - **Phone**: [Phone Number]
 - **Website**: agentguard.ai
 - **LinkedIn**: linkedin.com/in/sean-mcdonnell-077b15b8

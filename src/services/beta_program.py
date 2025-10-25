@@ -384,7 +384,7 @@ class NotificationService:
                 <h3>Support</h3>
                 <p>Need help? We're here for you:</p>
                 <ul>
-                    <li>Email: beta-support@mothership-ai.com</li>
+                    <li>Email: beta-info@mothership-ai.com</li>
                     <li>Discord: <a href="https://discord.gg/agentguard">Join our community</a></li>
                     <li>Feedback: Use the feedback form in your dashboard</li>
                 </ul>
