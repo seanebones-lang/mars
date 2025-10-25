@@ -2,7 +2,7 @@
 # Multi-stage build for optimized production deployment
 
 # Build stage
-FROM python:3.14-slim as builder
+FROM python:3.13-slim as builder
 
 # Set build arguments
 ARG BUILD_DATE
@@ -37,7 +37,7 @@ RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
 # Production stage
-FROM python:3.14-slim as production
+FROM python:3.13-slim as production
 
 # Set environment variables
 ENV PYTHONUNBUFFERED=1
@@ -58,7 +58,7 @@ RUN apt-get update && apt-get install -y \
     && rm -rf /var/lib/apt/lists/*
 
 # Copy Python packages from builder
-COPY --from=builder /usr/local/lib/python3.14/site-packages /usr/local/lib/python3.14/site-packages
+COPY --from=builder /usr/local/lib/python3.13/site-packages /usr/local/lib/python3.13/site-packages
 COPY --from=builder /usr/local/bin /usr/local/bin
 
 # Copy application code

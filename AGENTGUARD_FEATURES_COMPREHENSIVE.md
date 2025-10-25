@@ -9,7 +9,7 @@
 
 ## Executive Overview
 
-AgentGuard is an enterprise-grade AI safety and governance platform providing real-time hallucination detection, multimodal content analysis, and comprehensive AI risk management. Built on cutting-edge technology stack (Python 3.14.0, FastAPI 0.120.0, PostgreSQL 18, Redis 8.0.4), AgentGuard delivers 40-60% cost savings compared to competitors while maintaining sub-100ms response times and 99.9% uptime.
+AgentGuard is an enterprise-grade AI safety and governance platform providing real-time hallucination detection, multimodal content analysis, and comprehensive AI risk management. Built on cutting-edge technology stack (Python 3.13.0, FastAPI 0.120.0, PostgreSQL 18, Redis 8.0.4), AgentGuard delivers 40-60% cost savings compared to competitors while maintaining sub-100ms response times and 99.9% uptime.
 
 ---
 
@@ -421,7 +421,7 @@ AgentGuard is an enterprise-grade AI safety and governance platform providing re
 ### Infrastructure Stack
 
 **Backend:**
-- Python 3.14.0 (latest stable, improved async performance)
+- Python 3.13.0 (latest stable, improved async performance)
 - FastAPI 0.120.0 (enhanced Pydantic v2 support)
 - Pydantic 2.12.3 (validation speed optimizations)
 - Uvicorn 0.38.0 (HTTP/2 improvements)
@@ -430,7 +430,7 @@ AgentGuard is an enterprise-grade AI safety and governance platform providing re
 - PostgreSQL 18 (20% faster complex queries)
 - Redis 8.0.4 OSS (+49% throughput, +18% memory efficiency)
 - AsyncPG 0.30.0 (high-performance async driver)
-- SQLAlchemy 2.0.44 (Python 3.14 compatibility)
+- SQLAlchemy 2.0.44 (Python 3.13 compatibility)
 
 **Frontend:**
 - Next.js 16.0.0 (82% CDN hit rates)

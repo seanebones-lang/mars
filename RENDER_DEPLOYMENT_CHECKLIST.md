@@ -12,14 +12,14 @@
 - [x] render.yaml exists and configured for monorepo
 - [x] Backend service configured (agentguard-api)
 - [x] Frontend service configured (agentguard-ui)
-- [x] Python runtime specified (python-3.14.0)
+- [x] Python runtime specified (python-3.13.0)
 - [x] Node runtime auto-detected (20.x)
 - [x] Health checks configured
 - [x] Auto-deploy enabled on main branch
 
 ### Backend Files
 - [x] requirements-render.txt exists with all dependencies
-- [x] runtime.txt specifies python-3.14.0
+- [x] runtime.txt specifies python-3.13.0
 - [x] src/api/main.py exists with FastAPI app
 - [x] Health endpoint at /health
 - [x] CORS middleware configured
@@ -186,7 +186,7 @@
 
 ### If Backend Fails
 1. Check build logs for errors
-2. Verify Python version (3.14.0)
+2. Verify Python version (3.13.0)
 3. Check requirements-render.txt
 4. Verify environment variables
 5. Check health endpoint code

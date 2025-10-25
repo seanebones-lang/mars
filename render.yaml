@@ -9,7 +9,7 @@ services:
   - type: web
     name: agentguard-api
     env: python
-    runtime: python-3.14.0
+    runtime: python-3.13.0
     region: oregon
     plan: starter
     rootDir: .

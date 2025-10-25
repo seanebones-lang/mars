@@ -57,7 +57,7 @@ AWS S3 (Backups)
 ```
 
 ### Tech Stack
-- **Backend**: FastAPI 0.120.0, Python 3.14.0, PostgreSQL 18, Redis 8.0.4
+- **Backend**: FastAPI 0.120.0, Python 3.13.0, PostgreSQL 18, Redis 8.0.4
 - **Frontend**: Next.js 16.0.0, React 19.2.0, Material-UI, TypeScript 5.9.3
 - **AI/ML**: OpenAI, Anthropic, Google, Meta, Cohere, Hugging Face
 - **Infrastructure**: Render, Cloudflare WAF, AWS S3

@@ -40,7 +40,7 @@ This guide provides complete instructions for deploying AgentGuard as a monorepo
 mars/
 ├── render.yaml                 # Render configuration (monorepo)
 ├── requirements-render.txt     # Backend dependencies
-├── runtime.txt                 # Python version (3.14.0)
+├── runtime.txt                 # Python version (3.13.0)
 ├── src/                        # Backend source code
 │   └── api/
 │       └── main.py            # FastAPI application
@@ -79,7 +79,7 @@ mars/
 #### Service Configuration (Auto-configured from render.yaml)
 - **Name:** agentguard-api
 - **Environment:** Python
-- **Runtime:** python-3.14.0
+- **Runtime:** python-3.13.0
 - **Region:** Oregon (us-west)
 - **Plan:** Starter ($7/month)
 - **Root Directory:** `.` (repository root)
@@ -124,7 +124,7 @@ ENABLE_COMPLIANCE_REPORTING=true
 
 #### Deployment Process
 1. Render builds backend from `requirements-render.txt`
-2. Installs Python 3.14.0 and dependencies
+2. Installs Python 3.13.0 and dependencies
 3. Starts FastAPI application with Uvicorn
 4. Health check validates `/health` endpoint
 5. Service becomes available at: `https://agentguard-api.onrender.com`
@@ -339,9 +339,9 @@ npx lighthouse https://agentguard-ui.onrender.com --view
 
 **Solutions:**
 1. Check `requirements-render.txt` for syntax errors
-2. Verify Python version in `runtime.txt` (should be `python-3.14.0`)
+2. Verify Python version in `runtime.txt` (should be `python-3.13.0`)
 3. Check Render logs for specific error messages
-4. Ensure all dependencies are compatible with Python 3.14
+4. Ensure all dependencies are compatible with Python 3.13
 
 #### Issue: Health Check Fails
 **Symptoms:** Service shows as unhealthy
@@ -597,7 +597,7 @@ Render offers free tier with limitations:
 ## Conclusion
 
 AgentGuard is now deployed as a monorepo on Render with:
-- **Backend API:** FastAPI 0.120.0, Python 3.14.0, PostgreSQL 18, Redis 8.0.4
+- **Backend API:** FastAPI 0.120.0, Python 3.13.0, PostgreSQL 18, Redis 8.0.4
 - **Frontend UI:** Next.js 16.0.0, React 19.2.0, TypeScript 5.9.3
 - **Deployment:** Zero-downtime, automatic from Git
 - **Monitoring:** Real-time logs and metrics
