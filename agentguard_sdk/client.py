@@ -2,6 +2,9 @@
 AgentGuard Client
 Main client class for interacting with the AgentGuard API.
 
+Company: Mothership AI
+Product: watcher.mothership-ai.com
+Contact: info@mothership-ai.com
 Author: AgentGuard Engineering Team
 Date: October 2025
 Version: 2.0.0

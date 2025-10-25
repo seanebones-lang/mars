@@ -53,7 +53,7 @@ const nextConfig = {
 
   // Image optimization
   images: {
-    domains: ['localhost', 'agentguard-api.onrender.com'],
+    domains: ['localhost', 'watcher-api.onrender.com', 'mothership-ai.com'],
     formats: ['image/webp', 'image/avif'],
   },
 
@@ -66,6 +66,9 @@ const nextConfig = {
     NEXT_PUBLIC_API_URL: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000',
     NEXT_PUBLIC_APP_NAME: 'AgentGuard',
     NEXT_PUBLIC_APP_VERSION: '1.0.0',
+    NEXT_PUBLIC_COMPANY_NAME: 'Mothership AI',
+    NEXT_PUBLIC_DOMAIN: 'watcher.mothership-ai.com',
+    NEXT_PUBLIC_SUPPORT_EMAIL: 'info@mothership-ai.com',
   },
 };
 

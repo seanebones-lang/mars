@@ -30,17 +30,18 @@ def read_requirements():
 setup(
     name="agentguard-sdk",
     version="1.0.0",
-    author="AgentGuard Team",
-    author_email="support@agentguard.com",
+    author="Mothership AI",
+    author_email="info@mothership-ai.com",
     description="Enterprise-grade Python SDK for AI agent safety validation and management",
     long_description=read_readme(),
     long_description_content_type="text/markdown",
-    url="https://github.com/agentguard/python-sdk",
+    url="https://github.com/seanebones-lang/mars",
     project_urls={
-        "Documentation": "https://docs.agentguard.com/sdk/python",
-        "Source": "https://github.com/agentguard/python-sdk",
-        "Tracker": "https://github.com/agentguard/python-sdk/issues",
-        "Homepage": "https://agentguard.com"
+        "Documentation": "https://watcher.mothership-ai.com/docs",
+        "Source": "https://github.com/seanebones-lang/mars",
+        "Tracker": "https://github.com/seanebones-lang/mars/issues",
+        "Homepage": "https://watcher.mothership-ai.com",
+        "Company": "https://mothership-ai.com"
     },
     packages=find_packages(include=['agentguard_sdk', 'agentguard_sdk.*']),
     classifiers=[
@@ -106,8 +107,8 @@ setup(
     license="MIT",
     
     # Metadata for PyPI
-    maintainer="AgentGuard Team",
-    maintainer_email="support@agentguard.com",
+    maintainer="Mothership AI",
+    maintainer_email="info@mothership-ai.com",
     
     # Security and quality badges
     # These would be displayed on PyPI

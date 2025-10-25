@@ -1,11 +1,21 @@
 # AgentGuard System Status Report
+
+**Company:** Mothership AI  
+**Product URL:** [watcher.mothership-ai.com](https://watcher.mothership-ai.com)  
 **Date**: October 25, 2025  
 **Version**: 1.0.0  
-**Status**: Production Ready
+**Status**: Production Ready  
+**Contact:** [info@mothership-ai.com](mailto:info@mothership-ai.com)
 
 ## Executive Summary
 
-AgentGuard is now a fully functional, production-ready AI safety platform with comprehensive features for hallucination detection, prompt injection prevention, bias auditing, red teaming, and compliance reporting. The system includes complete API endpoints, SDKs, documentation, and deployment configurations.
+AgentGuard (Watcher AI) is now a fully functional, production-ready AI safety platform with comprehensive features for hallucination detection, prompt injection prevention, bias auditing, red teaming, and compliance reporting. The system includes complete API endpoints, SDKs, documentation, and deployment configurations.
+
+### Investment Opportunity
+- **Investment Slots:** 50 available
+- **Funding Goal:** $500,000 (whichever comes first)
+- **Investor Deadline:** November 30, 2025
+- **Hard Launch:** January 1, 2026
 
 ## System Architecture
 

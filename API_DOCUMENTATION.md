@@ -1,8 +1,11 @@
 # AgentGuard API Documentation
 
+**Company:** Mothership AI  
+**Product URL:** [watcher.mothership-ai.com](https://watcher.mothership-ai.com)  
 **Version:** 2.0.0  
 **Base URL:** `https://watcher-api.onrender.com`  
-**Authentication:** API Key (Header: `X-API-Key`)
+**Authentication:** API Key (Header: `X-API-Key`)  
+**Contact:** [info@mothership-ai.com](mailto:info@mothership-ai.com)
 
 ---
 

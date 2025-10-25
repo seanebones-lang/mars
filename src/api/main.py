@@ -156,9 +156,10 @@ app.include_router(redteam_router)
 app.include_router(compliance_router)
 
 # CORS middleware for cross-origin requests
+# Monorepo deployment on Render - frontend and backend on same domain
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Configure appropriately for production
+    allow_origins=["*"],  # Same origin deployment on Render
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -190,16 +191,27 @@ async def root():
     """Root endpoint with API information."""
     return {
         "name": "AgentGuard API",
+        "company": "Mothership AI",
+        "product_url": "https://watcher.mothership-ai.com",
+        "company_url": "https://mothership-ai.com",
+        "contact": "info@mothership-ai.com",
         "version": "1.0.0",
         "status": "operational",
-        "description": "AI Agent Hallucination Detection Platform with Real-time Monitoring",
+        "description": "Enterprise AI Safety Platform - Real-time Hallucination Detection & Prevention",
+        "investment": {
+            "slots_available": 50,
+            "funding_goal": 500000,
+            "deadline": "2025-11-30",
+            "launch_date": "2026-01-01"
+        },
         "endpoints": {
             "test_agent": "/test-agent",
             "websocket_monitor": "/ws/monitor",
             "start_monitoring": "/monitor/start",
             "stop_monitoring": "/monitor/stop",
             "health": "/health",
-            "docs": "/docs"
+            "docs": "/docs",
+            "api_documentation": "https://watcher-api.onrender.com/docs"
         }
     }
 

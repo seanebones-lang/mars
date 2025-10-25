@@ -1,6 +1,9 @@
 {
   "name": "agentguard-ui",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "AgentGuard - Enterprise AI Safety Platform by Mothership AI",
+  "author": "Mothership AI <info@mothership-ai.com>",
+  "homepage": "https://watcher.mothership-ai.com",
   "private": true,
   "scripts": {
     "dev": "next dev",

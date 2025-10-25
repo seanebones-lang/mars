@@ -1,7 +1,8 @@
 {
   "name": "@agentguard/sdk",
   "version": "1.0.0",
-  "description": "Official JavaScript/TypeScript SDK for AgentGuard AI Safety Platform",
+  "description": "Official JavaScript/TypeScript SDK for AgentGuard AI Safety Platform by Mothership AI",
+  "homepage": "https://watcher.mothership-ai.com",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "scripts": {
@@ -24,11 +25,15 @@
     "red-team",
     "compliance"
   ],
-  "author": "AgentGuard",
+  "author": "Mothership AI <info@mothership-ai.com>",
   "license": "Apache-2.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/agentguard/agentguard"
+    "url": "https://github.com/seanebones-lang/mars"
+  },
+  "bugs": {
+    "url": "https://github.com/seanebones-lang/mars/issues",
+    "email": "info@mothership-ai.com"
   },
   "dependencies": {
     "axios": "^1.7.0",

@@ -1,5 +1,9 @@
 # AgentGuard Production Deployment Guide
 
+**Mothership AI - Watcher Platform**  
+**Product URL:** [watcher.mothership-ai.com](https://watcher.mothership-ai.com)  
+**Contact:** [info@mothership-ai.com](mailto:info@mothership-ai.com)
+
 ## Overview
 
 This guide provides comprehensive instructions for deploying AgentGuard to production environments, including configuration, security hardening, monitoring, and maintenance procedures.
