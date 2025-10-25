@@ -1,4 +1,4 @@
-# 🚀 AgentGuard Production Deployment Guide
+#  AgentGuard Production Deployment Guide
 ## Complete Step-by-Step Deployment to Render & Cloudflare
 
 **Version**: 1.0  
@@ -7,7 +7,7 @@
 
 ---
 
-## 📋 PRE-DEPLOYMENT CHECKLIST
+##  PRE-DEPLOYMENT CHECKLIST
 
 ### Code Readiness
 - [x] All P0 features complete
@@ -36,7 +36,7 @@
 
 ---
 
-## 🎯 DEPLOYMENT ARCHITECTURE
+##  DEPLOYMENT ARCHITECTURE
 
 ```
 ┌─────────────────────────────────────────────────────────────┐
@@ -74,7 +74,7 @@
 
 ---
 
-## 🔧 STEP 1: RENDER SETUP
+##  STEP 1: RENDER SETUP
 
 ### 1.1 Create Render Account
 ```bash
@@ -230,7 +230,7 @@ render env set agentguard-api \
 
 ---
 
-## ☁️ STEP 2: CLOUDFLARE SETUP
+## ☁ STEP 2: CLOUDFLARE SETUP
 
 ### 2.1 Add Domain to Cloudflare
 ```bash
@@ -397,7 +397,7 @@ Action: Challenge
 
 ---
 
-## 🔐 STEP 3: SECURITY CONFIGURATION
+##  STEP 3: SECURITY CONFIGURATION
 
 ### 3.1 Configure Security Headers
 ```python
@@ -440,7 +440,7 @@ app.add_middleware(
 
 ---
 
-## 📊 STEP 4: MONITORING SETUP
+##  STEP 4: MONITORING SETUP
 
 ### 4.1 Configure Prometheus
 ```bash
@@ -483,7 +483,7 @@ curl http://prometheus:9090/api/v1/alerts
 
 ---
 
-## 🗄️ STEP 5: DATABASE SETUP
+##  STEP 5: DATABASE SETUP
 
 ### 5.1 Run Migrations
 ```bash
@@ -530,8 +530,8 @@ crontab -l
 
 # Expected jobs:
 # - Daily backup at 2:00 AM
-# - Hourly backup every hour
-# - Backup monitoring every 6 hours
+# - Hourly backup ehighly hour
+# - Backup monitoring ehighly 6 hours
 ```
 
 ### 5.4 Test Backup Restore
@@ -610,7 +610,7 @@ locust -f tests/load/locustfile.py \
 
 ---
 
-## 📱 STEP 7: STATUS PAGE SETUP
+##  STEP 7: STATUS PAGE SETUP
 
 ### 7.1 Configure Status Page
 ```bash
@@ -644,7 +644,7 @@ locust -f tests/load/locustfile.py \
 
 ---
 
-## 🚀 STEP 8: LAUNCH SEQUENCE
+##  STEP 8: LAUNCH SEQUENCE
 
 ### 8.1 Pre-Launch (T-24 hours)
 ```bash
@@ -760,7 +760,7 @@ render scale agentguard-api --replicas 3
 
 ---
 
-## 📊 STEP 10: POST-DEPLOYMENT MONITORING
+##  STEP 10: POST-DEPLOYMENT MONITORING
 
 ### 10.1 Key Metrics to Watch
 ```bash
@@ -795,7 +795,7 @@ render scale agentguard-api --replicas 3
 
 ---
 
-## ✅ DEPLOYMENT COMPLETE CHECKLIST
+##  DEPLOYMENT COMPLETE CHECKLIST
 
 - [ ] Render services deployed
 - [ ] Database provisioned and migrated
@@ -817,21 +817,21 @@ render scale agentguard-api --replicas 3
 
 ---
 
-## 🎉 SUCCESS CRITERIA
+##  SUCCESS CRITERIA
 
 **Deployment is successful when**:
-- ✅ All services responding (200 OK)
-- ✅ API response time < 100ms (p95)
-- ✅ Error rate < 1%
-- ✅ Uptime > 99.9%
-- ✅ First signup completed
-- ✅ First payment processed
-- ✅ Monitoring showing green
-- ✅ No critical alerts
+-  All services responding (200 OK)
+-  API response time < 100ms (p95)
+-  Error rate < 1%
+-  Uptime > 99.9%
+-  First signup completed
+-  First payment processed
+-  Monitoring showing green
+-  No critical alerts
 
 ---
 
-**Status**: READY FOR DEPLOYMENT ✅  
+**Status**: READY FOR DEPLOYMENT   
 **Estimated Time**: 4-6 hours  
 **Recommended Date**: December 1, 2025  
 **Team**: DevOps + Engineering

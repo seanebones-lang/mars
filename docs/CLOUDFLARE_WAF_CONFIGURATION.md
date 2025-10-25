@@ -1,4 +1,4 @@
-# 🛡️ Cloudflare WAF Configuration for AgentGuard
+# 🛡 Cloudflare WAF Configuration for AgentGuard
 ## Complete Web Application Firewall Setup
 
 **Version**: 1.0  
@@ -7,7 +7,7 @@
 
 ---
 
-## 📋 OVERVIEW
+##  OVERVIEW
 
 This document provides complete Cloudflare WAF configuration for AgentGuard, including:
 - OWASP Top 10 protection
@@ -20,7 +20,7 @@ This document provides complete Cloudflare WAF configuration for AgentGuard, inc
 
 ---
 
-## 🎯 SECURITY OBJECTIVES
+##  SECURITY OBJECTIVES
 
 - **Block 99.9%** of malicious traffic
 - **< 0.1%** false positive rate
@@ -30,7 +30,7 @@ This document provides complete Cloudflare WAF configuration for AgentGuard, inc
 
 ---
 
-## 🔧 STEP 1: ENABLE OWASP CORE RULE SET
+##  STEP 1: ENABLE OWASP CORE RULE SET
 
 ### 1.1 Enable Managed Rules
 ```bash
@@ -50,16 +50,16 @@ Action: Log (monitor first, then Block)
 ```
 
 ### 1.2 OWASP Categories Enabled
-- ✅ SQL Injection (SQLi)
-- ✅ Cross-Site Scripting (XSS)
-- ✅ Local File Inclusion (LFI)
-- ✅ Remote File Inclusion (RFI)
-- ✅ Remote Code Execution (RCE)
-- ✅ PHP Injection
-- ✅ Session Fixation
-- ✅ Scanner Detection
-- ✅ Protocol Enforcement
-- ✅ Protocol Attack
+-  SQL Injection (SQLi)
+-  Cross-Site Scripting (XSS)
+-  Local File Inclusion (LFI)
+-  Remote File Inclusion (RFI)
+-  Remote Code Execution (RCE)
+-  PHP Injection
+-  Session Fixation
+-  Scanner Detection
+-  Protocol Enforcement
+-  Protocol Attack
 
 ---
 
@@ -180,7 +180,7 @@ Action: Block
 
 ---
 
-## 🔒 STEP 4: CUSTOM SECURITY RULES
+##  STEP 4: CUSTOM SECURITY RULES
 
 ### 4.1 SQL Injection Protection
 ```javascript
@@ -323,7 +323,7 @@ Description: "Blocks traffic from sanctioned countries"
 
 ---
 
-## 🚨 STEP 6: DDOS PROTECTION
+##  STEP 6: DDOS PROTECTION
 
 ### 6.1 HTTP DDoS Protection
 ```bash
@@ -365,7 +365,7 @@ Action: Block
 
 ---
 
-## 📊 STEP 7: MONITORING & ALERTING
+##  STEP 7: MONITORING & ALERTING
 
 ### 7.1 Configure Security Analytics
 ```bash
@@ -461,7 +461,7 @@ ab -n 10000 -c 100 https://api.agentguard.ai/health
 
 ---
 
-## 📈 STEP 9: PERFORMANCE OPTIMIZATION
+##  STEP 9: PERFORMANCE OPTIMIZATION
 
 ### 9.1 Cache Rules
 ```javascript
@@ -530,7 +530,7 @@ Enable: Yes
 
 ---
 
-## 📊 EXPECTED RESULTS
+##  EXPECTED RESULTS
 
 ### Security Metrics
 - **Blocked Attacks**: 99.9%
@@ -546,7 +546,7 @@ Enable: Yes
 
 ---
 
-## ✅ CONFIGURATION CHECKLIST
+##  CONFIGURATION CHECKLIST
 
 - [ ] OWASP Core Ruleset enabled
 - [ ] Rate limiting configured (5 rules)
@@ -563,7 +563,7 @@ Enable: Yes
 
 ---
 
-## 🚨 INCIDENT RESPONSE
+##  INCIDENT RESPONSE
 
 ### If Attack Detected
 1. **Verify** attack in Cloudflare Analytics
@@ -583,7 +583,7 @@ Enable: Yes
 
 ---
 
-**Status**: READY FOR DEPLOYMENT ✅  
+**Status**: READY FOR DEPLOYMENT   
 **Security Level**: Enterprise-Grade  
 **Estimated Setup Time**: 2-3 hours  
 **Maintenance**: Weekly reviews required

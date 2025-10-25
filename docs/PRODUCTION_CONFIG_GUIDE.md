@@ -1,10 +1,10 @@
-# 🚀 Production Configuration Guide
+#  Production Configuration Guide
 
 Complete guide for configuring AgentGuard for production deployment on Render with Cloudflare.
 
 ---
 
-## 📋 Prerequisites
+##  Prerequisites
 
 - [ ] Render account created
 - [ ] Cloudflare account created
@@ -14,7 +14,7 @@ Complete guide for configuring AgentGuard for production deployment on Render wi
 
 ---
 
-## 🔧 Step 1: Render Configuration (30 minutes)
+##  Step 1: Render Configuration (30 minutes)
 
 ### 1.1 Create Web Service
 
@@ -145,7 +145,7 @@ Plan: Starter ($10/month)
 
 ---
 
-## 🌐 Step 2: Cloudflare Configuration (30 minutes)
+##  Step 2: Cloudflare Configuration (30 minutes)
 
 ### 2.1 Add Domain to Cloudflare
 
@@ -206,7 +206,7 @@ nslookup agentguard-api.onrender.com
 
 ---
 
-## 🛡️ Step 3: Cloudflare WAF Rules (1 hour)
+## 🛡 Step 3: Cloudflare WAF Rules (1 hour)
 
 ### 3.1 Rate Limiting Rules
 
@@ -282,7 +282,7 @@ Challenge Type: Managed Challenge
 
 ---
 
-## 🔗 Step 4: Connect Render to Cloudflare (15 minutes)
+##  Step 4: Connect Render to Cloudflare (15 minutes)
 
 ### 4.1 Custom Domain in Render
 
@@ -301,7 +301,7 @@ Challenge Type: Managed Challenge
 
 ---
 
-## 🗄️ Step 5: Database Setup (30 minutes)
+##  Step 5: Database Setup (30 minutes)
 
 ### 5.1 Run Migrations
 
@@ -341,7 +341,7 @@ python scripts/seed_data.py
 
 ---
 
-## 📊 Step 6: Monitoring Setup (30 minutes)
+##  Step 6: Monitoring Setup (30 minutes)
 
 ### 6.1 Sentry Configuration
 
@@ -433,7 +433,7 @@ Expected grade: **A or A+**
 
 ---
 
-## 📝 Step 8: Documentation Updates (15 minutes)
+##  Step 8: Documentation Updates (15 minutes)
 
 ### 8.1 Update API Documentation
 
@@ -462,7 +462,7 @@ const client = new AgentGuardClient({
 
 ---
 
-## ✅ Verification Checklist
+##  Verification Checklist
 
 ### Infrastructure
 - [ ] Render web service deployed
@@ -502,7 +502,7 @@ const client = new AgentGuardClient({
 
 ---
 
-## 🚨 Troubleshooting
+##  Troubleshooting
 
 ### Issue: "502 Bad Gateway"
 
@@ -552,7 +552,7 @@ psql $DATABASE_URL -c "SELECT 1"
 
 ---
 
-## 🎉 Success!
+##  Success!
 
 Your AgentGuard instance is now running in production!
 
@@ -566,5 +566,5 @@ Your AgentGuard instance is now running in production!
 
 **Last Updated**: October 25, 2025  
 **Version**: 1.0  
-**Status**: Production Ready ✅
+**Status**: Production Ready 
 

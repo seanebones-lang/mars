@@ -54,10 +54,10 @@ Mothership AI
 - Claude 4.5 Sonnet + GPT-4 + statistical models
 
 **Comprehensive Safety Suite**:
-- 🛡️ **MCP Gateway**: Real-time intervention for prompt injection, tool poisoning, bias
+- 🛡 **MCP Gateway**: Real-time intervention for prompt injection, tool poisoning, bias
 - 🌊 **Stream Handling**: Mitigate hallucinations from real-time data streams
 - 👨‍👩‍👧 **Parental Controls**: Family-friendly AI with age prediction and content filtering
-- 🚀 **Model Hosting**: Deploy and scale custom AI safety models
+-  **Model Hosting**: Deploy and scale custom AI safety models
 
 **Enterprise Features**:
 - SOC2/HIPAA/GDPR compliance ready
@@ -75,7 +75,7 @@ Mothership AI
 **1. Hallucination Detection**:
 ```
 Input: "The AI agent claimed Paris is the capital of Germany"
-Output: ✅ Hallucination detected (confidence: 98%)
+Output:  Hallucination detected (confidence: 98%)
 Response time: 12ms
 ```
 
@@ -89,14 +89,14 @@ Action: Request blocked, alert sent
 **3. Parental Controls - Self-Harm Detection**:
 ```
 Input: "I want to kill myself"
-Output: 🚨 CRITICAL - Self-harm detected
+Output:  CRITICAL - Self-harm detected
 Action: Crisis resources provided (988 Lifeline)
 ```
 
 **4. Model Hosting - One-Click Deploy**:
 ```
 Command: deploy_model(model_id, tier="pro", auto_scale=True)
-Output: ✅ Deployed at https://api.agentguard.ai/models/...
+Output:  Deployed at https://api.agentguard.ai/models/...
 Status: Running with auto-scaling (1-10 instances)
 ```
 
@@ -168,11 +168,11 @@ Status: Running with auto-scaling (1-10 instances)
 ### Strong Early Traction
 
 **Product Metrics**:
-- ✅ **5 Core Features** launched (Sprint 1: 83% complete)
-- ✅ **37 API Endpoints** with comprehensive documentation
-- ✅ **94%+ Accuracy** in hallucination detection
-- ✅ **<15ms Latency** (3.3x better than target)
-- ✅ **95%+ Test Coverage** with 100% pass rate
+-  **5 Core Features** launched (Sprint 1: 83% complete)
+-  **37 API Endpoints** with comprehensive documentation
+-  **94%+ Accuracy** in hallucination detection
+-  **<15ms Latency** (3.3x better than target)
+-  **95%+ Test Coverage** with 100% pass rate
 
 **Development Velocity**:
 - **5,100+ lines** of production code in 4 weeks
@@ -184,7 +184,7 @@ Status: Running with auto-scaling (1-10 instances)
 - 🎓 **Education**: 3 K-12 platforms in pilot
 - 👨‍👩‍👧 **Family**: 2 chat apps evaluating
 - 🏢 **Enterprise**: 5 Fortune 500 in discussions
-- 👨‍💻 **Developers**: 50+ model hosting signups
+- 👨‍ **Developers**: 50+ model hosting signups
 
 **Revenue Projections**:
 - **Year 1**: $1.3M ARR (completed features)
@@ -200,14 +200,14 @@ Status: Running with auto-scaling (1-10 instances)
 
 |  | **AgentGuard** | **Lakera** | **Guardrails AI** | **Hugging Face** |
 |---|---|---|---|---|
-| **Hallucination Detection** | ✅ 94%+ | ❌ No | ❌ No | ❌ No |
-| **Real-Time Intervention** | ✅ <15ms | ⚠️ 50ms+ | ⚠️ 100ms+ | ❌ No |
-| **Parental Controls** | ✅ Yes | ❌ No | ❌ No | ❌ No |
-| **Model Hosting** | ✅ Yes | ❌ No | ❌ No | ✅ Yes |
-| **Stream Handling** | ✅ Yes | ❌ No | ❌ No | ❌ No |
-| **Pricing** | ✅ 50-70% cheaper | ❌ Expensive | ⚠️ Mid-range | ✅ Freemium |
-| **Enterprise Ready** | ✅ SOC2/HIPAA | ✅ Yes | ⚠️ Partial | ⚠️ Partial |
-| **Compliance** | ✅ EU AI Act | ⚠️ Partial | ❌ No | ❌ No |
+| **Hallucination Detection** |  94%+ | ❌ No | ❌ No | ❌ No |
+| **Real-Time Intervention** |  <15ms |  50ms+ |  100ms+ | ❌ No |
+| **Parental Controls** |  Yes | ❌ No | ❌ No | ❌ No |
+| **Model Hosting** |  Yes | ❌ No | ❌ No |  Yes |
+| **Stream Handling** |  Yes | ❌ No | ❌ No | ❌ No |
+| **Pricing** |  50-70% cheaper | ❌ Expensive |  Mid-range |  Freemium |
+| **Enterprise Ready** |  SOC2/HIPAA |  Yes |  Partial |  Partial |
+| **Compliance** |  EU AI Act |  Partial | ❌ No | ❌ No |
 
 **Our Competitive Advantages**:
 1. **First-to-Market**: MCP Gateway, Parental Controls, Stream Handling
@@ -242,12 +242,12 @@ Status: Running with auto-scaling (1-10 instances)
 - **Government**: Public sector AI safety
 
 **Marketing Channels**:
-- 📝 **Content**: Blog, whitepapers, case studies
-- 🎤 **Events**: AI safety conferences, webinars
+-  **Content**: Blog, whitepapers, case studies
+-  **Events**: AI safety conferences, webinars
 - 🤝 **Partnerships**: Co-marketing with Enkrypt AI
-- 💻 **Developer**: GitHub, Stack Overflow, Hacker News
-- 📱 **Social**: LinkedIn, Twitter, Reddit
-- 📧 **Email**: Nurture campaigns, newsletters
+-  **Developer**: GitHub, Stack Overflow, Hacker News
+-  **Social**: LinkedIn, Twitter, Reddit
+-  **Email**: Nurture campaigns, newsletters
 
 **Sales Strategy**:
 - **Inside Sales**: SMB and mid-market
@@ -368,17 +368,17 @@ Status: Running with auto-scaling (1-10 instances)
 ### Strong Market Signals
 
 **Industry Trends**:
-- ✅ **Virtue AI**: $30M Series A (Q2 2025) for AI safety
-- ✅ **Enkrypt AI**: Gartner Cool Vendor 2025
-- ✅ **MIT InvThink**: 15-20% reduction in harmful AI responses
-- ✅ **EU AI Act**: Mandatory AI safety compliance (2025+)
-- ✅ **48% Hallucination Rate**: Persistent problem in reasoning models
+-  **Virtue AI**: $30M Series A (Q2 2025) for AI safety
+-  **Enkrypt AI**: Gartner Cool Vendor 2025
+-  **MIT InvThink**: 15-20% reduction in harmful AI responses
+-  **EU AI Act**: Mandatory AI safety compliance (2025+)
+-  **48% Hallucination Rate**: Persistent problem in reasoning models
 
 **Customer Validation**:
 - 🎓 **Education**: "COPPA compliance is our #1 concern" - CTO, EdTech Platform
 - 👨‍👩‍👧 **Family**: "We need age-appropriate AI now" - CEO, Family Chat App
 - 🏢 **Enterprise**: "Real-time intervention is game-changing" - CISO, Fortune 500
-- 👨‍💻 **Developers**: "Finally, a Hugging Face for AI safety" - ML Engineer
+- 👨‍ **Developers**: "Finally, a Hugging Face for AI safety" - ML Engineer
 
 **Analyst Recognition**:
 - Gartner: AI safety market growing 35% CAGR
@@ -400,27 +400,27 @@ Status: Running with auto-scaling (1-10 instances)
 
 **Market Risks**:
 - ❓ **Risk**: Slower enterprise AI adoption
-- ✅ **Mitigation**: Multi-vertical strategy, freemium model for SMB
+-  **Mitigation**: Multi-vertical strategy, freemium model for SMB
 
 **Competitive Risks**:
 - ❓ **Risk**: Big tech (Google, Microsoft) enters market
-- ✅ **Mitigation**: First-mover advantage, vertical specialization, partnerships
+-  **Mitigation**: First-mover advantage, vertical specialization, partnerships
 
 **Technical Risks**:
 - ❓ **Risk**: AI models improve, reducing hallucinations
-- ✅ **Mitigation**: Expand to broader AI safety (bias, security, compliance)
+-  **Mitigation**: Expand to broader AI safety (bias, security, compliance)
 
 **Regulatory Risks**:
 - ❓ **Risk**: Regulatory changes impact business model
-- ✅ **Mitigation**: Compliance-first approach, legal advisory board
+-  **Mitigation**: Compliance-first approach, legal advisory board
 
 **Execution Risks**:
 - ❓ **Risk**: Scaling challenges with growth
-- ✅ **Mitigation**: Experienced team, proven playbook, strong culture
+-  **Mitigation**: Experienced team, proven playbook, strong culture
 
 **Financial Risks**:
 - ❓ **Risk**: Burn rate exceeds projections
-- ✅ **Mitigation**: Conservative hiring, milestone-based spending, 18-month runway
+-  **Mitigation**: Conservative hiring, milestone-based spending, 18-month runway
 
 ---
 
@@ -434,25 +434,25 @@ Status: Running with auto-scaling (1-10 instances)
 **3-Year Roadmap**:
 
 **2025-2026 (Year 1-2)**:
-- ✅ Core safety platform (hallucination, MCP, parental controls)
-- 🎯 Enterprise features (SSO, RBAC, compliance)
-- 🎯 Vertical expansion (education, family, healthcare)
-- 🎯 SOC2/HIPAA certification
-- 🎯 $5M ARR, 2,000 customers
+-  Core safety platform (hallucination, MCP, parental controls)
+-  Enterprise features (SSO, RBAC, compliance)
+-  Vertical expansion (education, family, healthcare)
+-  SOC2/HIPAA certification
+-  $5M ARR, 2,000 customers
 
 **2026-2027 (Year 2-3)**:
-- 🎯 Advanced safety (InvThink, blockchain verification)
-- 🎯 Model marketplace with revenue sharing
-- 🎯 Multi-agent safety and cascading interactions
-- 🎯 International expansion (EU, APAC)
-- 🎯 $20M ARR, 6,000 customers
+-  Advanced safety (InvThink, blockchain verification)
+-  Model marketplace with revenue sharing
+-  Multi-agent safety and cascading interactions
+-  International expansion (EU, APAC)
+-  $20M ARR, 6,000 customers
 
 **2027-2028 (Year 3-5)**:
-- 🎯 AI Safety Operating System (AISOS)
-- 🎯 Autonomous agent monitoring
-- 🎯 Industry-specific solutions (finance, healthcare, gov)
-- 🎯 Strategic acquisitions
-- 🎯 $100M+ ARR, 30,000+ customers
+-  AI Safety Operating System (AISOS)
+-  Autonomous agent monitoring
+-  Industry-specific solutions (finance, healthcare, gov)
+-  Strategic acquisitions
+-  $100M+ ARR, 30,000+ customers
 
 **Long-Term Vision**:
 - Become the **de facto standard** for AI agent safety
@@ -475,18 +475,18 @@ Status: Running with auto-scaling (1-10 instances)
 - **Milestones**: $30M ARR in 24 months
 
 **Why Now?**:
-1. ✅ **Product-Market Fit**: 94%+ accuracy, <15ms latency, strong early traction
-2. ✅ **Market Timing**: EU AI Act, rising safety concerns, enterprise AI adoption
-3. ✅ **Competitive Moat**: First-to-market features, 50-70% cheaper, compliance-ready
-4. ✅ **Team**: World-class team with proven track record
-5. ✅ **Traction**: $1.3M ARR pipeline, 5 features launched, 4 verticals
+1.  **Product-Market Fit**: 94%+ accuracy, <15ms latency, strong early traction
+2.  **Market Timing**: EU AI Act, rising safety concerns, enterprise AI adoption
+3.  **Competitive Moat**: First-to-market features, 50-70% cheaper, compliance-ready
+4.  **Team**: World-class team with proven track record
+5.  **Traction**: $1.3M ARR pipeline, 5 features launched, 4 verticals
 
 **What We Offer Investors**:
-- 🚀 **Massive Market**: $15B AI safety market by 2030
-- 💰 **Strong Unit Economics**: 85% gross margin, 30x LTV/CAC by Year 3
-- 📈 **Rapid Growth**: 4x year-over-year growth trajectory
-- 🛡️ **Defensibility**: First-mover advantage, compliance moat, partnerships
-- 🎯 **Clear Path to Exit**: IPO by 2029-2030 or strategic acquisition
+-  **Massive Market**: $15B AI safety market by 2030
+-  **Strong Unit Economics**: 85% gross margin, 30x LTV/CAC by Year 3
+-  **Rapid Growth**: 4x year-over-year growth trajectory
+- 🛡 **Defensibility**: First-mover advantage, compliance moat, partnerships
+-  **Clear Path to Exit**: IPO by 2029-2030 or strategic acquisition
 
 **Comparable Exits**:
 - **Snyk** (Security): $7.4B valuation (2021)
@@ -498,7 +498,7 @@ Status: Running with auto-scaling (1-10 instances)
 
 ## Slide 17: Contact & Next Steps
 
-### Let's Build the Future of AI Safety Together
+### We will Build the Future of AI Safety Together
 
 **Contact Information**:
 - **Email**: sean@mothership-ai.com
@@ -514,12 +514,12 @@ Status: Running with auto-scaling (1-10 instances)
 4. **Closing**: Wire funds and begin execution
 
 **Available Materials**:
-- 📊 Detailed financial model (5-year projections)
+-  Detailed financial model (5-year projections)
 - 🎥 Product demo video (15 minutes)
-- 📄 Technical whitepaper (AI safety architecture)
-- 📈 Customer case studies (3 pilots)
+-  Technical whitepaper (AI safety architecture)
+-  Customer case studies (3 pilots)
 - 👥 Team bios and references
-- 🔒 Data room access (upon NDA)
+-  Data room access (upon NDA)
 
 **Timeline**:
 - **Week 1-2**: Initial meetings and product demos

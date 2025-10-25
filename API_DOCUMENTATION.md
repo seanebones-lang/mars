@@ -9,7 +9,7 @@
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Authentication
 
@@ -35,7 +35,7 @@ curl -X POST https://watcher-api.onrender.com/test-agent \
 
 ---
 
-## 📋 Table of Contents
+##  Table of Contents
 
 1. [Core Detection APIs](#core-detection-apis)
 2. [Real-time Streaming](#real-time-streaming)
@@ -50,7 +50,7 @@ curl -X POST https://watcher-api.onrender.com/test-agent \
 
 ---
 
-## 🎯 Core Detection APIs
+##  Core Detection APIs
 
 ### POST `/test-agent`
 
@@ -142,7 +142,7 @@ Returns system status and performance metrics.
 
 ---
 
-## ⚡ Real-time Streaming
+##  Real-time Streaming
 
 ### GET `/stream-detect`
 
@@ -369,7 +369,7 @@ Returns list of supported languages and their capabilities.
 
 ---
 
-## 🖼️ Multimodal Detection
+## 🖼 Multimodal Detection
 
 ### POST `/multimodal/detect-image`
 
@@ -496,7 +496,7 @@ Returns supported formats and performance metrics.
 
 ---
 
-## 📊 Analytics & Monitoring
+##  Analytics & Monitoring
 
 ### GET `/analytics/overview`
 
@@ -734,7 +734,7 @@ def make_request_with_retry(url, headers, data, max_retries=3):
 
 ---
 
-## 🛠️ SDKs & Examples
+##  SDKs & Examples
 
 ### Python SDK
 
@@ -829,7 +829,7 @@ curl -X POST https://watcher-api.onrender.com/multimodal/batch-images \
 
 ---
 
-## 🔗 Integration Examples
+##  Integration Examples
 
 ### LangChain Integration
 
@@ -847,7 +847,7 @@ class HallucinationCallback(BaseCallbackHandler):
         result = self.client.detect_hallucination(text=text)
         
         if result.hallucination_score > self.threshold:
-            print(f"⚠️ High hallucination risk: {result.hallucination_score:.3f}")
+            print(f" High hallucination risk: {result.hallucination_score:.3f}")
             print(f"Recommendations: {result.recommendations}")
 
 # Usage

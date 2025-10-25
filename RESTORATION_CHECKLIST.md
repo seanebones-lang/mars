@@ -7,7 +7,7 @@
 
 ---
 
-## 🚨 CRITICAL: Items Temporarily Disabled
+##  CRITICAL: Items Temporarily Disabled
 
 ### 1. **Wikipedia Grounding Service** - HIGH PRIORITY
 **Files Modified:**
@@ -84,7 +84,7 @@ from ..judges.multilingual_judge import get_multilingual_judge, MultilingualResu
 **Required Actions:**
 ```bash
 # Install multimodal dependencies (ALREADY INSTALLED)
-# opencv-python, imageio, av, timm, albumentations - ✅ INSTALLED
+# opencv-python, imageio, av, timm, albumentations -  INSTALLED
 
 # Install missing ONNX dependencies
 pip install onnxruntime onnxruntime-gpu clip-by-openai
@@ -104,9 +104,9 @@ from fastapi import File, UploadFile, Form
 
 ---
 
-## 📦 Dependencies Status
+##  Dependencies Status
 
-### ✅ **INSTALLED (Working)**
+###  **INSTALLED (Working)**
 ```bash
 # Core dependencies
 torch, transformers, fastapi, uvicorn, anthropic
@@ -144,7 +144,7 @@ pip install smtplib  # Built-in, but may need email config
 
 ---
 
-## 🔧 **Restoration Priority Order**
+##  **Restoration Priority Order**
 
 ### **Phase 1: Core Advanced Features (30 minutes)**
 1. **Wikipedia Grounding** - Restore 71% hallucination reduction
@@ -173,7 +173,7 @@ pip install smtplib  # Built-in, but may need email config
 ### **Core System Validation**
 ```bash
 # 1. Test core imports
-python3 -c "from src.api.main_realtime import app; print('✅ Full system imports')"
+python3 -c "from src.api.main_realtime import app; print(' Full system imports')"
 
 # 2. Test health endpoint
 curl http://127.0.0.1:8000/health
@@ -209,7 +209,7 @@ curl -X POST http://127.0.0.1:8000/multimodal/detect-image \
 
 ---
 
-## 📊 **Expected Performance After Full Restoration**
+##  **Expected Performance After Full Restoration**
 
 ### **Technical Metrics (10/10 Targets)**
 - **Response Time**: <50ms (currently ~200ms without optimizations)
@@ -218,7 +218,7 @@ curl -X POST http://127.0.0.1:8000/multimodal/detect-image \
 - **False Positives**: <1% (currently ~3% without UQLM)
 
 ### **Feature Completeness**
-- **Core Detection**: ✅ Working (basic ensemble)
+- **Core Detection**:  Working (basic ensemble)
 - **Wikipedia Grounding**: ❌ DISABLED (71% improvement lost)
 - **4-Agent Pipeline**: ❌ DISABLED (40-50% mitigation lost)
 - **Multilingual**: ❌ DISABLED (14 languages lost)
@@ -228,7 +228,7 @@ curl -X POST http://127.0.0.1:8000/multimodal/detect-image \
 
 ---
 
-## 🚨 **CRITICAL WARNINGS**
+##  **CRITICAL WARNINGS**
 
 ### **Current System Status**
 - **Functionality**: ~30% of full 10/10 system
@@ -250,7 +250,7 @@ curl -X POST http://127.0.0.1:8000/multimodal/detect-image \
 
 ---
 
-## 📝 **Next Steps**
+##  **Next Steps**
 
 ### **Immediate (Next 30 minutes)**
 1. **Verify Core System**: Ensure basic detection works
@@ -269,7 +269,7 @@ curl -X POST http://127.0.0.1:8000/multimodal/detect-image \
 
 ---
 
-**⚠️ REMEMBER: This is a TEMPORARY state for stability. The full 10/10 system requires ALL features restored to achieve the competitive advantages and performance targets outlined in our technical roadmap.**
+** REMEMBER: This is a TEMPORARY state for stability. The full 10/10 system requires ALL features restored to achieve the competitive advantages and performance targets outlined in our technical roadmap.**
 
 **Current Status: 30% of full system capability**  
 **Target Status: 100% of full system capability**  

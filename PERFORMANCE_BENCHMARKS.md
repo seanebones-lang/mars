@@ -83,7 +83,7 @@
 **Expected Results**:
 - Auto-scaling triggers
 - No service disruption
-- Recovery within 30 seconds
+- Recohighly within 30 seconds
 
 #### 5. WebSocket Load Test
 **Purpose**: Validate real-time monitoring scalability  
@@ -352,11 +352,11 @@ diff performance_baselines/v1.0.0.csv performance_baselines/v0.9.0.csv
 
 | Test | Users | Duration | RPS | P95 | Error Rate | Status |
 |------|-------|----------|-----|-----|------------|--------|
-| Baseline | 100 | 2m | TBD | TBD | TBD | ⏳ |
-| Target Load | 1,000 | 5m | TBD | TBD | TBD | ⏳ |
-| Stress | 5,000 | 3m | TBD | TBD | TBD | ⏳ |
-| Spike | 2,000 | 2m | TBD | TBD | TBD | ⏳ |
-| WebSocket | 1,000 | 2m | TBD | TBD | TBD | ⏳ |
+| Baseline | 100 | 2m | TBD | TBD | TBD |  |
+| Target Load | 1,000 | 5m | TBD | TBD | TBD |  |
+| Stress | 5,000 | 3m | TBD | TBD | TBD |  |
+| Spike | 2,000 | 2m | TBD | TBD | TBD |  |
+| WebSocket | 1,000 | 2m | TBD | TBD | TBD |  |
 
 ---
 

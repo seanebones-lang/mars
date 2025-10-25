@@ -4,7 +4,7 @@
 
 ---
 
-## 🚀 Getting Started
+##  Getting Started
 
 ### What is AgentGuard?
 AgentGuard is a production-grade AI safety platform that helps developers detect hallucinations, block prompt injections, and optimize AI costs. Think of it as a security layer for your AI agents.
@@ -27,7 +27,7 @@ Minimal changes! For LangChain/LlamaIndex, just add our callback handler. For ot
 
 ---
 
-## 💰 Pricing & Billing
+##  Pricing & Billing
 
 ### How much does AgentGuard cost?
 - **Free**: 100 queries/month, perfect for testing
@@ -51,7 +51,7 @@ Yes! Upgrade instantly. Downgrades take effect at the next billing cycle. No lon
 
 ---
 
-## 🔒 Security & Privacy
+##  Security & Privacy
 
 ### Is my data secure?
 Absolutely. We use:
@@ -75,7 +75,7 @@ Enterprise plans include on-premise deployment options. Contact sales@agentguard
 
 ---
 
-## 🎯 Features & Capabilities
+##  Features & Capabilities
 
 ### What is hallucination detection?
 Hallucination detection identifies when AI models generate false or fabricated information. AgentGuard uses multi-model consensus to achieve 95%+ accuracy.
@@ -100,7 +100,7 @@ Yes! Get real-time alerts in Slack, Teams, email, or custom endpoints when safet
 
 ---
 
-## 🔧 Technical Questions
+##  Technical Questions
 
 ### What's the API latency?
 AgentGuard adds <100ms latency. With caching enabled, responses are often faster than direct API calls.
@@ -136,7 +136,7 @@ Yes! Use our test mode with mock responses, or run against our staging environme
 
 ---
 
-## 📊 Analytics & Monitoring
+##  Analytics & Monitoring
 
 ### What metrics can I track?
 - **Safety metrics**: Hallucinations detected, attacks blocked
@@ -188,7 +188,7 @@ Absolutely! Submit feature requests via:
 
 ---
 
-## 🚀 Advanced Use Cases
+##  Advanced Use Cases
 
 ### Can I use AgentGuard for evaluation?
 Yes! Many teams use AgentGuard to evaluate AI models before deployment. Batch API is perfect for this.
@@ -297,10 +297,10 @@ Yes! We're open source friendly:
 ## ❓ Still Have Questions?
 
 **Can't find your answer?**
-- 📧 Email: support@agentguard.ai
+-  Email: support@agentguard.ai
 - 💬 Slack: [Join our community](https://agentguard.ai/slack)
 - 📞 Call: +1 (555) 123-4567
-- 📅 Book: [Schedule a call](https://agentguard.ai/demo)
+-  Book: [Schedule a call](https://agentguard.ai/demo)
 
 We typically respond within 24 hours!
 
@@ -309,5 +309,5 @@ We typically respond within 24 hours!
 **Last Updated**: November 6, 2025  
 **Version**: 1.0
 
-*Making AI development safe, one question at a time.* 🛡️
+*Making AI development safe, one question at a time.* 🛡
 

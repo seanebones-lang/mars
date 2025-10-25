@@ -27,13 +27,13 @@ Thank you for your interest in contributing to AgentGuard Statistical Judge! Thi
 ### Code Contributions
 
 1. **Fork the repository**
-2. **Create a feature branch**: `git checkout -b feature/amazing-feature`
+2. **Create a feature branch**: `git checkout -b feature/exceptional-feature`
 3. **Make your changes** following our coding standards
 4. **Add tests** for new functionality
 5. **Update documentation** as needed
 6. **Submit a pull request**
 
-## 🛠️ Development Setup
+##  Development Setup
 
 ### Prerequisites
 
@@ -94,7 +94,7 @@ mypy agentguard_statistical/
 pre-commit run --all-files
 ```
 
-## 📝 Coding Standards
+##  Coding Standards
 
 ### Python Style
 
@@ -154,7 +154,7 @@ def test_evaluate_basic():
     assert len(confidence) == 2
 ```
 
-## 🏗️ Project Structure
+## 🏗 Project Structure
 
 ```
 agentguard-statistical/
@@ -177,30 +177,30 @@ agentguard-statistical/
 └── requirements.txt
 ```
 
-## 🎯 Contribution Areas
+##  Contribution Areas
 
 ### High Priority
 
 - 🐛 **Bug fixes** and stability improvements
-- 📊 **Performance optimizations** for faster inference
+-  **Performance optimizations** for faster inference
 - 🧪 **Test coverage** improvements
-- 📚 **Documentation** enhancements
+-  **Documentation** enhancements
 
 ### Medium Priority
 
 - 🌍 **Multilingual support** for non-English text
-- 📈 **New statistical methods** for detection
+-  **New statistical methods** for detection
 - 🔌 **Framework integrations** (LangChain, etc.)
-- 📊 **Benchmarking** on new datasets
+-  **Benchmarking** on new datasets
 
 ### Future Features
 
-- 🖼️ **Multimodal support** (images, video)
-- ⚡ **Model quantization** for edge deployment
+- 🖼 **Multimodal support** (images, video)
+-  **Model quantization** for edge deployment
 - 🔄 **Streaming evaluation** for real-time use
-- 🎛️ **Configuration management** improvements
+- 🎛 **Configuration management** improvements
 
-## 📋 Pull Request Process
+##  Pull Request Process
 
 ### Before Submitting
 
@@ -241,7 +241,7 @@ Brief description of changes
 4. **Documentation review** if applicable
 5. **Merge** after approval
 
-## 🏷️ Release Process
+## 🏷 Release Process
 
 ### Version Numbering
 
@@ -264,16 +264,16 @@ We follow **Semantic Versioning** (semver):
 ### Getting Help
 
 - 💬 **Discord**: [Join our community](https://discord.gg/agentguard)
-- 📧 **Email**: opensource@mothership-ai.com
+-  **Email**: opensource@mothership-ai.com
 - 🐛 **Issues**: [GitHub Issues](https://github.com/mothership-ai/agentguard-statistical/issues)
-- 📖 **Docs**: [Documentation](https://docs.agentguard.ai)
+-  **Docs**: [Documentation](https://docs.agentguard.ai)
 
 ### Maintainers
 
 - **Sean McDonnell** - [@seanebones-lang](https://github.com/seanebones-lang)
 - **Mothership AI Team** - [@mothership-ai](https://github.com/mothership-ai)
 
-## 📄 License
+##  License
 
 By contributing, you agree that your contributions will be licensed under the MIT License.
 
@@ -284,4 +284,4 @@ Contributors are recognized in:
 - **Release notes** for significant contributions
 - **Hall of Fame** for major contributors
 
-Thank you for helping make AgentGuard better! 🚀
+Thank you for helping make AgentGuard better! 

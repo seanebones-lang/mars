@@ -6,7 +6,7 @@ This repository contains proprietary software owned by **Sean McDonnell**. All r
 
 ## Important Legal Information
 
-⚠️ **WARNING: This is NOT open source software**
+ **WARNING: This is NOT open source software**
 
 - This software is proprietary and confidential
 - Commercial use requires explicit written permission
@@ -17,7 +17,7 @@ This repository contains proprietary software owned by **Sean McDonnell**. All r
 ## Licensing
 
 This software is available for:
-- ✅ **Evaluation purposes** (with proper attribution)
+-  **Evaluation purposes** (with proper attribution)
 - ❌ **Commercial use** (requires separate license)
 - ❌ **Redistribution** (strictly prohibited)
 - ❌ **Modification** (without written permission)

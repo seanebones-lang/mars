@@ -1,4 +1,4 @@
-# 🚀 Complete Deployment Guide: AgentGuard
+#  Complete Deployment Guide: AgentGuard
 
 ## Overview
 **UPDATED: October 2025** - Both frontend and backend now deployed on Render for unified infrastructure management.
@@ -16,12 +16,12 @@ This guide will help you deploy your AgentGuard platform with:
 - Cost-effective scaling
 - Single vendor relationship
 
-## 📋 Prerequisites
+##  Prerequisites
 
 ### Required Accounts
-1. **Render Account**: [render.com](https://render.com) ✅
-2. **GitHub Repository**: Already set up ✅
-3. **Claude API Key**: From Anthropic ✅
+1. **Render Account**: [render.com](https://render.com) 
+2. **GitHub Repository**: Already set up 
+3. **Claude API Key**: From Anthropic 
 4. **Optional**: Custom domain for production deployment
 
 ### Domain Setup (Optional)
@@ -30,7 +30,7 @@ This guide will help you deploy your AgentGuard platform with:
 
 ---
 
-## 🔧 Part 1: Backend Deployment on Render
+##  Part 1: Backend Deployment on Render
 
 ### Step 1: Create Render Services
 
@@ -128,7 +128,7 @@ SESSION_TIMEOUT_HOURS=24
 
 ---
 
-## 🌐 Part 2: Frontend Deployment on Render
+##  Part 2: Frontend Deployment on Render
 
 ### Step 1: Create Frontend Static Site
 
@@ -221,7 +221,7 @@ NEXT_PUBLIC_COMMIT_SHA=latest
 
 ---
 
-## 🔗 Part 3: Integration & Testing
+##  Part 3: Integration & Testing
 
 ### Step 1: Update CORS Settings
 
@@ -263,16 +263,16 @@ CORS_ORIGINS=https://agentguard-ui.onrender.com,https://agentguard.mothership-ai
 
 ---
 
-## 🛡️ Part 4: Security & Monitoring
+## 🛡 Part 4: Security & Monitoring
 
 ### Security Checklist
 
-- ✅ HTTPS enforced on both frontend and backend
-- ✅ CORS properly configured
-- ✅ Security headers implemented
-- ✅ Environment variables secured
-- ✅ Database access restricted
-- ✅ API rate limiting enabled
+-  HTTPS enforced on both frontend and backend
+-  CORS properly configured
+-  Security headers implemented
+-  Environment variables secured
+-  Database access restricted
+-  API rate limiting enabled
 
 ### Monitoring Setup
 
@@ -296,7 +296,7 @@ CORS_ORIGINS=https://agentguard-ui.onrender.com,https://agentguard.mothership-ai
 
 ---
 
-## 🚨 Troubleshooting
+##  Troubleshooting
 
 ### Common Issues
 
@@ -338,7 +338,7 @@ If you encounter any issues during deployment:
 
 ---
 
-## 🎉 Congratulations!
+##  Completion achieved!
 
 Once deployed, your AgentGuard platform will be live at:
 - **Frontend**: https://agentguard-ui.onrender.com (or your custom domain)
@@ -348,7 +348,7 @@ Once deployed, your AgentGuard platform will be live at:
 
 Your enterprise-grade AI agent safety and hallucination detection platform is now ready for production use!
 
-## 🚀 Next Steps
+##  Next Steps
 
 1. **Configure Custom Domains** (if not already done)
 2. **Set up monitoring and alerts** in Render dashboard
@@ -358,14 +358,14 @@ Your enterprise-grade AI agent safety and hallucination detection platform is no
 6. **Load test your deployment** to verify scalability
 7. **Document your deployment** for team reference
 
-## 📊 Render-Specific Advantages
+##  Render-Specific Advantages
 
 - **Unified Infrastructure**: All services on one platform
 - **Auto-scaling**: Automatic resource scaling based on demand
 - **Zero-downtime Deploys**: Rolling deployments with health checks
 - **Managed Services**: PostgreSQL and Redis fully managed
 - **DDoS Protection**: Built-in security features
-- **Global CDN**: Fast content delivery worldwide
+- **Global CDN**: Fast content delihighly worldwide
 - **Cost Efficiency**: Pay only for what you use
 
 ---

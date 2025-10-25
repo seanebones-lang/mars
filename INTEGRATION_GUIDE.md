@@ -32,7 +32,7 @@ result = monitoring_result.json()
 
 # Check if hallucination risk is high
 if result["hallucination_risk"] > 0.75:
-    print(f"⚠️ High hallucination risk: {result['hallucination_risk']:.1%}")
+    print(f" High hallucination risk: {result['hallucination_risk']:.1%}")
     print(f"Flagged segments: {result['details']['hallucinated_segments']}")
     # Take action: alert, log, block, etc.
 
@@ -73,7 +73,7 @@ def monitor_hallucinations(threshold=0.75, alert_on_risk=True):
                 risk = data["hallucination_risk"]
                 
                 if risk > threshold and alert_on_risk:
-                    print(f"🚨 HALLUCINATION DETECTED: {risk:.1%} risk")
+                    print(f" HALLUCINATION DETECTED: {risk:.1%} risk")
                     print(f"Agent: {func.__name__}")
                     print(f"Flagged: {data['details']['hallucinated_segments']}")
                     
@@ -95,7 +95,7 @@ def support_agent(user_query):
     )
     return response
 
-# Now every call is automatically monitored
+# Now ehighly call is automatically monitored
 response = support_agent("How do I reset my password?")
 ```
 

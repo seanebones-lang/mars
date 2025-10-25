@@ -140,7 +140,7 @@ response = requests.post(
     "https://agentguard-api.onrender.com/parental-controls/filter-batch",
     json={
         "contents": [
-            "Let's learn about animals!",
+            "We will learn about animals!",
             "This has some damn profanity.",
             "Educational content for kids.",
             "Violence and weapons discussion."

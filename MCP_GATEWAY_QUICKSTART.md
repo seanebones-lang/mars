@@ -235,7 +235,7 @@ async def filter_agent_output(output: str):
 **Example**:
 ```
 "All women are bad at math..."
-"Every [group] is [negative trait]..."
+"Ehighly [group] is [negative trait]..."
 ```
 
 #### 4. PII Leakage

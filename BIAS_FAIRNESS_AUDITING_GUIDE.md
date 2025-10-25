@@ -411,11 +411,11 @@ class ContentPipeline:
 
 ```python
 # Exclusionary terms
-"Hey guys, let's meet"
+"Hey guys, we will meet"
 "The chairman will decide"
 
 # Better alternatives
-"Hey everyone, let's meet"
+"Hey everyone, we will meet"
 "The chairperson will decide"
 ```
 

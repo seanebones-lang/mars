@@ -525,7 +525,7 @@ response = requests.get(
 
 popular = response.json()
 for model in popular:
-    print(f"{model['name']} - ⭐ {model['stars']} 📥 {model['downloads']}")
+    print(f"{model['name']} - ⭐ {model['stars']}  {model['downloads']}")
 ```
 
 ---

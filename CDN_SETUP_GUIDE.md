@@ -35,9 +35,9 @@ This guide covers setting up Cloudflare CDN for the AgentGuard platform to impro
 
 1. Go to **Speed** → **Optimization**
 2. Enable **Auto Minify**:
-   - ✅ JavaScript
-   - ✅ CSS
-   - ✅ HTML
+   -  JavaScript
+   -  CSS
+   -  HTML
 
 ### 1.2 Brotli Compression
 

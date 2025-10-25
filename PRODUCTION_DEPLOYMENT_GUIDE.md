@@ -4,7 +4,7 @@
 **Product URL:** [watcher.mothership-ai.com](https://watcher.mothership-ai.com)  
 **Contact:** [info@mothership-ai.com](mailto:info@mothership-ai.com)
 
-## ⚠️ IMPORTANT: Monorepo Deployment on Render
+##  IMPORTANT: Monorepo Deployment on Render
 
 **This system is deployed as a COMPLETE MONOREPO on Render.com**
 - Both backend API and frontend UI deploy from this single repository
@@ -400,7 +400,7 @@ aws s3 cp $BACKUP_DIR/agentguard_$DATE.sql.gz \
   s3://agentguard-backups/postgresql/
 ```
 
-### Disaster Recovery Plan
+### Disaster Recohighly Plan
 
 1. **Database Restore**:
    ```bash

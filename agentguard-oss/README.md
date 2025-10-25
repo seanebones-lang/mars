@@ -8,7 +8,7 @@
 
 AgentGuard Statistical Judge is a lightweight, fast, and accurate statistical approach to detecting hallucinations in AI-generated text. This is the open-source core of the AgentGuard platform, designed for researchers, developers, and organizations who need reliable hallucination detection.
 
-## 🚀 Quick Start
+##  Quick Start
 
 ```bash
 pip install agentguard-statistical
@@ -30,29 +30,29 @@ print(f"Hallucination Score: {score:.3f}")  # Higher = more likely hallucination
 print(f"Confidence Interval: {confidence}")
 ```
 
-## ✨ Features
+##  Features
 
-### 🎯 **Core Capabilities**
+###  **Core Capabilities**
 - **Statistical Analysis**: Entropy-based uncertainty detection
 - **Attention Weights**: Advanced attention pattern analysis
 - **Context Comparison**: Ground truth vs generated content analysis
 - **Confidence Intervals**: Bootstrapped uncertainty quantification
 - **Real-time Processing**: <50ms inference time
 
-### 📊 **Advanced Features**
+###  **Advanced Features**
 - **Attention Entropy**: High-entropy token flagging for hallucination detection
 - **Context Ratio Analysis**: Measures alignment with provided context
 - **Uncertainty Quantification**: UQLM-inspired confidence scoring
 - **Span-level Detection**: Identifies specific problematic text segments
 - **Robustness Testing**: Augmentation-based consistency validation
 
-### ⚡ **Performance**
+###  **Performance**
 - **Speed**: <50ms processing time
 - **Accuracy**: 85%+ on standard benchmarks
 - **Memory**: <500MB RAM usage
 - **Scalability**: Handles 1000+ requests/minute
 
-## 📖 Documentation
+##  Documentation
 
 ### Basic Usage
 
@@ -107,7 +107,7 @@ class HallucinationCallback(BaseCallbackHandler):
     def on_llm_end(self, response, **kwargs):
         score, _ = self.judge.evaluate(response.generations[0][0].text)
         if score > 0.7:
-            print("⚠️ High hallucination risk detected!")
+            print(" High hallucination risk detected!")
 ```
 
 #### With Transformers Pipeline
@@ -158,7 +158,7 @@ The AgentGuard Statistical Judge uses multiple statistical indicators to detect 
 | G-Eval | 320ms | 890MB | 81.7% |
 | BERT-Score | 95ms | 650MB | 79.2% |
 
-## 🛠️ Installation & Setup
+##  Installation & Setup
 
 ### Requirements
 
@@ -237,16 +237,16 @@ pre-commit install
 
 ### Contribution Areas
 - 🐛 **Bug fixes** and performance improvements
-- 📊 **New statistical methods** for hallucination detection
+-  **New statistical methods** for hallucination detection
 - 🌍 **Multilingual support** and language-specific optimizations
-- 📚 **Documentation** and examples
+-  **Documentation** and examples
 - 🧪 **Test coverage** and benchmarking
 
-## 📄 License
+##  License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 🔗 Related Projects
+##  Related Projects
 
 - **[AgentGuard Platform](https://watcher.mothership-ai.com)**: Full-featured commercial platform
 - **[AgentGuard CLI](https://github.com/mothership-ai/agentguard-cli)**: Command-line interface
@@ -254,12 +254,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 📞 Support & Community
 
-- 📖 **Documentation**: [docs.agentguard.ai](https://docs.agentguard.ai)
+-  **Documentation**: [docs.agentguard.ai](https://docs.agentguard.ai)
 - 💬 **Discord**: [Join our community](https://discord.gg/agentguard)
 - 🐛 **Issues**: [GitHub Issues](https://github.com/mothership-ai/agentguard-statistical/issues)
-- 📧 **Email**: opensource@mothership-ai.com
+-  **Email**: opensource@mothership-ai.com
 
-## 🏆 Citation
+##  Citation
 
 If you use AgentGuard Statistical Judge in your research, please cite:
 
@@ -272,12 +272,12 @@ If you use AgentGuard Statistical Judge in your research, please cite:
 }
 ```
 
-## 🚀 What's Next?
+##  What's Next?
 
 ### Roadmap
 - 🌍 **Multilingual Support**: Extend to 14+ languages
-- 🖼️ **Multimodal Detection**: Image and video hallucination detection
-- ⚡ **Performance**: Sub-10ms inference with model quantization
+- 🖼 **Multimodal Detection**: Image and video hallucination detection
+-  **Performance**: Sub-10ms inference with model quantization
 - 🔌 **Integrations**: More framework integrations (CrewAI, AutoGen, etc.)
 
 ### Commercial Features
@@ -286,6 +286,6 @@ For enterprise features like real-time streaming, multi-agent pipelines, and adv
 
 ---
 
-**Made with ❤️ by [Mothership AI](https://mothership-ai.com)**
+**Made with ❤ by [Mothership AI](https://mothership-ai.com)**
 
 *Empowering developers to build trustworthy AI systems*

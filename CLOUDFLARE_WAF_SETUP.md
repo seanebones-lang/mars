@@ -18,7 +18,7 @@ This guide provides step-by-step instructions for setting up Cloudflare WAF (Web
 - **Rate Limiting**: Prevent abuse and brute force attacks
 - **OWASP Protection**: Defend against OWASP Top 10 vulnerabilities
 - **SSL/TLS**: Free SSL certificates with automatic renewal
-- **CDN**: Global content delivery network for faster performance
+- **CDN**: Global content delihighly network for faster performance
 
 ---
 

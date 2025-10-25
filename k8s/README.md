@@ -44,12 +44,12 @@ This directory contains production-ready Kubernetes manifests for deploying Agen
 
 ## Features
 
-### 🚀 **Scalability**
+###  **Scalability**
 - **Horizontal Pod Autoscaler (HPA)**: Auto-scales API pods from 3-20 replicas based on CPU, memory, and custom metrics
 - **Vertical Pod Autoscaler (VPA)**: Automatically adjusts resource requests and limits
 - **Load Balancing**: NGINX ingress with intelligent load balancing and session affinity
 
-### 🔒 **Security**
+###  **Security**
 - **RBAC**: Role-based access control with minimal required permissions
 - **Pod Security Policies**: Enforces security constraints on pods
 - **Network Policies**: Restricts network traffic between pods
@@ -57,21 +57,21 @@ This directory contains production-ready Kubernetes manifests for deploying Agen
 - **Non-root Containers**: All containers run as non-root users
 - **Read-only Root Filesystem**: Enhanced container security
 
-### 📊 **Monitoring & Observability**
+###  **Monitoring & Observability**
 - **Prometheus**: Metrics collection and alerting
 - **Grafana**: Visualization dashboards
 - **Custom Metrics**: Application-specific metrics for HPA
 - **Health Checks**: Comprehensive liveness, readiness, and startup probes
 - **Logging**: Structured logging with log aggregation
 
-### 🏗️ **High Availability**
+### 🏗 **High Availability**
 - **Multi-replica Deployments**: Redundancy across availability zones
 - **Pod Anti-affinity**: Spreads pods across different nodes
 - **Persistent Storage**: Reliable data persistence with backup strategies
 - **Rolling Updates**: Zero-downtime deployments
 - **Circuit Breakers**: Fault tolerance and graceful degradation
 
-### ⚡ **Performance**
+###  **Performance**
 - **Resource Optimization**: Tuned resource requests and limits
 - **Caching**: Redis for high-performance caching
 - **Connection Pooling**: Optimized database connections

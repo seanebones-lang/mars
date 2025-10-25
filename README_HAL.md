@@ -2,7 +2,7 @@
 
 **Complete Enterprise AI Agent Testing & Validation System**
 
-## 🚀 Quick Start
+##  Quick Start
 
 ### Backend Setup
 
@@ -42,7 +42,7 @@ npm run dev
 
 Frontend runs on: **http://localhost:3000** (or 3001 if 3000 is taken)
 
-## 📁 Project Structure
+##  Project Structure
 
 ```
 HAL/
@@ -69,7 +69,7 @@ HAL/
 └── SETUP.md              # Detailed setup guide
 ```
 
-## 🎯 Features
+##  Features
 
 ### Backend API (FastAPI + Claude Sonnet 4.5)
 - **Claude Judge**: LLM-as-a-Judge with self-consistency (3 samples, majority voting)
@@ -86,7 +86,7 @@ HAL/
 - **Export**: Download results as JSON/CSV
 - **Responsive Design**: Desktop and tablet optimized
 
-## 🔧 Configuration
+##  Configuration
 
 ### Backend (.env)
 ```
@@ -101,7 +101,7 @@ API_PORT=8000
 NEXT_PUBLIC_API_URL=http://localhost:8000
 ```
 
-## 📊 Performance Targets
+##  Performance Targets
 
 - **Accuracy**: 92%+ hallucination detection
 - **Latency**: <0.5s per test
@@ -131,7 +131,7 @@ docker-compose up -d
 # Frontend: http://localhost:3000
 ```
 
-## 📖 API Usage
+##  API Usage
 
 ### Test an Agent
 
@@ -179,7 +179,7 @@ curl -X POST http://localhost:8000/test-agent \
 - Verify policy compliance
 - Check procedural guidance
 
-## 🔐 Security
+##  Security
 
 - API key management via environment variables
 - Input validation with Pydantic
@@ -187,7 +187,7 @@ curl -X POST http://localhost:8000/test-agent \
 - SOC 2 compliance ready
 - Air-gapped deployment mode available
 
-## 📚 Documentation
+##  Documentation
 
 - **README.md**: Project overview
 - **SETUP.md**: Detailed setup instructions
@@ -195,7 +195,7 @@ curl -X POST http://localhost:8000/test-agent \
 - **agentguard-ui/QUICKSTART.md**: UI quick start
 - API Docs: http://localhost:8000/docs (when running)
 
-## 🛠️ Troubleshooting
+##  Troubleshooting
 
 ### Backend won't start
 ```bash
@@ -219,7 +219,7 @@ cd agentguard-ui && npm install
 curl http://localhost:8000/health
 ```
 
-## 💰 Cost Estimates
+##  Cost Estimates
 
 - **Development**: $10-50/month (testing)
 - **Production**: $0.50-$2 per 100 tests
@@ -233,7 +233,7 @@ For issues:
 3. Verify API key configuration
 4. Check backend health: `curl http://localhost:8000/health`
 
-## 📄 License
+##  License
 
 Proprietary - AgentGuard Platform  
 © 2025 Sean McDonnell. All rights reserved.

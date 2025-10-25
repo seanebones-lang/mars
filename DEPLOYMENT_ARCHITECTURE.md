@@ -5,16 +5,16 @@
 
 ---
 
-## 🎯 Critical Information
+##  Critical Information
 
 ### THIS IS A COMPLETE MONOREPO ON RENDER
 
 **Everything deploys from this single repository:**
-- ✅ Backend API (Python/FastAPI)
-- ✅ Frontend UI (Next.js/React)
-- ✅ Single git repository
-- ✅ Single `render.yaml` configuration
-- ✅ Automatic deployment on `git push origin main`
+-  Backend API (Python/FastAPI)
+-  Frontend UI (Next.js/React)
+-  Single git repository
+-  Single `render.yaml` configuration
+-  Automatic deployment on `git push origin main`
 
 **What we DO NOT use:**
 - ❌ NO Vercel
@@ -24,7 +24,7 @@
 
 ---
 
-## 📁 Repository Structure
+##  Repository Structure
 
 ```
 mars/ (This repository - deployed to Render)
@@ -48,7 +48,7 @@ mars/ (This repository - deployed to Render)
 
 ---
 
-## 🚀 Deployment Flow
+##  Deployment Flow
 
 ### Single Command Deployment
 
@@ -84,7 +84,7 @@ git push origin main
 
 ---
 
-## 🔧 Configuration Files
+##  Configuration Files
 
 ### render.yaml (Master Configuration)
 
@@ -121,7 +121,7 @@ services:
 
 ---
 
-## 🌐 URLs and Endpoints
+##  URLs and Endpoints
 
 ### Production URLs
 
@@ -140,7 +140,7 @@ services:
 
 ---
 
-## 🔐 Environment Variables
+##  Environment Variables
 
 ### Backend (Set in Render Dashboard)
 
@@ -171,7 +171,7 @@ NEXT_PUBLIC_SUPPORT_EMAIL           # info@mothership-ai.com
 
 ---
 
-## 📊 System Architecture
+##  System Architecture
 
 ### Service Communication
 
@@ -225,7 +225,7 @@ NEXT_PUBLIC_SUPPORT_EMAIL           # info@mothership-ai.com
 
 ---
 
-## 🛠️ Deployment Steps
+##  Deployment Steps
 
 ### First-Time Setup
 
@@ -270,7 +270,7 @@ git push origin main
 
 ---
 
-## 🔍 Monitoring and Health Checks
+##  Monitoring and Health Checks
 
 ### Health Check Endpoints
 
@@ -294,7 +294,7 @@ curl https://agentguard-api.onrender.com/metrics
 
 ---
 
-## 🚨 Troubleshooting
+##  Troubleshooting
 
 ### Backend Not Starting
 
@@ -319,7 +319,7 @@ curl https://agentguard-api.onrender.com/metrics
 
 ---
 
-## 📚 Key Documentation
+##  Key Documentation
 
 - [README.md](README.md) - Complete system documentation
 - [MONOREPO_DEPLOYMENT_GUIDE.md](MONOREPO_DEPLOYMENT_GUIDE.md) - Detailed deployment guide
@@ -328,7 +328,7 @@ curl https://agentguard-api.onrender.com/metrics
 
 ---
 
-## 💡 Important Notes
+##  Important Notes
 
 ### Why Monorepo on Render?
 
@@ -348,15 +348,15 @@ curl https://agentguard-api.onrender.com/metrics
 - Complex environment variable management
 
 **Now (Correct):**
-- ✅ Everything on Render
-- ✅ Single deployment
-- ✅ Automatic service connection
-- ✅ Simplified configuration
-- ✅ One source of truth
+-  Everything on Render
+-  Single deployment
+-  Automatic service connection
+-  Simplified configuration
+-  One source of truth
 
 ---
 
-## 🎯 Quick Reference
+##  Quick Reference
 
 ### Deploy Everything
 ```bash

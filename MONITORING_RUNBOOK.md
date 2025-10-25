@@ -34,7 +34,7 @@ This runbook provides procedures for monitoring the AgentGuard platform and resp
 
 ## Common Alerts & Responses
 
-### 🚨 CRITICAL: API Service Down
+###  CRITICAL: API Service Down
 
 **Alert**: "API Service Down: agentguard-api"
 
@@ -131,7 +131,7 @@ psql $DATABASE_URL -c "SELECT schemaname, tablename, pg_size_pretty(pg_total_rel
 
 ---
 
-### ⚠️ WARNING: High Error Rate
+###  WARNING: High Error Rate
 
 **Alert**: "High Error Rate Detected"
 
@@ -172,7 +172,7 @@ curl https://agentguard-api.onrender.com/metrics
 
 ---
 
-### ⚠️ WARNING: Slow API Response
+###  WARNING: Slow API Response
 
 **Alert**: "Slow API Response"
 
@@ -214,7 +214,7 @@ redis-cli INFO stats | grep hit_rate
 
 ---
 
-### 🚨 CRITICAL: Security Incident
+###  CRITICAL: Security Incident
 
 **Alert**: "SECURITY INCIDENT"
 
@@ -313,7 +313,7 @@ aws s3api get-bucket-acl --bucket agentguard-backups
 
 ---
 
-### ✅ INFO: Deployment Successful
+###  INFO: Deployment Successful
 
 **Alert**: "Deployment Successful"
 

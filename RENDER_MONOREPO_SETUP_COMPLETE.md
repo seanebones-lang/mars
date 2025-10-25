@@ -1,4 +1,4 @@
-# ✅ Render Monorepo Setup - COMPLETE
+#  Render Monorepo Setup - COMPLETE
 
 **Date**: October 25, 2025  
 **Status**: Ready for Deployment  
@@ -6,11 +6,11 @@
 
 ---
 
-## 🎯 What Was Done
+##  What Was Done
 
 You were correct - the frontend (`agentguard-ui`) **IS** in this repository! I've now configured everything to deploy BOTH the backend API and frontend UI from this single monorepo on Render.
 
-## 📦 Repository Structure
+##  Repository Structure
 
 ```
 mars/ (Single Git Repository)
@@ -23,16 +23,16 @@ mars/ (Single Git Repository)
 │   ├── app/                      # Pages and routes
 │   ├── components/               # React components
 │   ├── lib/                      # API client & utilities
-│   ├── next.config.js            # ✅ Updated for Render
-│   └── .env.production           # ✅ Created for production
+│   ├── next.config.js            #  Updated for Render
+│   └── .env.production           #  Created for production
 │
-├── requirements-render.txt       # ✅ Backend dependencies (fixed)
-├── render.yaml                   # ✅ Deploys BOTH services
-├── Procfile                      # ✅ Backend start command
-└── runtime.txt                   # ✅ Python 3.11
+├── requirements-render.txt       #  Backend dependencies (fixed)
+├── render.yaml                   #  Deploys BOTH services
+├── Procfile                      #  Backend start command
+└── runtime.txt                   #  Python 3.11
 ```
 
-## 🚀 Two Services, One Repository
+##  Two Services, One Repository
 
 The `render.yaml` now configures **TWO web services**:
 
@@ -52,7 +52,7 @@ The `render.yaml` now configures **TWO web services**:
 - **URL**: `https://agentguard-ui.onrender.com`
 - **Features**: Full web interface, real-time monitoring
 
-## 🔗 Automatic Connection
+##  Automatic Connection
 
 The frontend automatically connects to the backend using Render's service discovery:
 
@@ -66,12 +66,12 @@ NEXT_PUBLIC_API_URL:
 ```
 
 **This means**:
-- ✅ Frontend knows backend URL automatically
-- ✅ No manual configuration needed
-- ✅ Works immediately after deployment
-- ✅ Updates automatically if backend URL changes
+-  Frontend knows backend URL automatically
+-  No manual configuration needed
+-  Works immediately after deployment
+-  Updates automatically if backend URL changes
 
-## 📝 Files Updated/Created
+##  Files Updated/Created
 
 ### Updated Files:
 1. **render.yaml** - Now deploys BOTH services
@@ -87,7 +87,7 @@ NEXT_PUBLIC_API_URL:
 5. **RENDER_DEPLOYMENT_CHECKLIST.md** - Step-by-step checklist
 6. **RENDER_DEPLOYMENT_FIX.md** - Troubleshooting guide
 
-## 🎬 Deployment Steps
+##  Deployment Steps
 
 ### Option A: Automatic (Recommended)
 
@@ -95,7 +95,7 @@ NEXT_PUBLIC_API_URL:
 2. **Click "New" → "Blueprint"**
 3. **Select repository**: `seanebones-lang/mars`
 4. **Click "Apply"**
-5. **Render creates BOTH services automatically** ✨
+5. **Render creates BOTH services automatically** 
 
 ### Option B: Manual
 
@@ -126,34 +126,34 @@ CLAUDE_API_KEY=your_claude_api_key_here
 - All set automatically by render.yaml
 - API URL auto-configured via service discovery
 
-## ✅ What's Fixed
+##  What's Fixed
 
 ### Backend Issues (All Fixed):
-- ✅ Added MLflow to dependencies
-- ✅ Added Pillow for image processing
-- ✅ Added psycopg2-binary for PostgreSQL
-- ✅ Made MLflow optional (graceful degradation)
-- ✅ Removed heavy dependencies (torch, transformers)
-- ✅ Increased health check timeout to 60s
-- ✅ Set workers to 2 for better performance
+-  Added MLflow to dependencies
+-  Added Pillow for image processing
+-  Added psycopg2-binary for PostgreSQL
+-  Made MLflow optional (graceful degradation)
+-  Removed heavy dependencies (torch, transformers)
+-  Increased health check timeout to 60s
+-  Set workers to 2 for better performance
 
 ### Frontend Issues (All Fixed):
-- ✅ Configured for Render deployment (standalone output)
-- ✅ Automatic backend connection via service discovery
-- ✅ Simplified next.config.js (removed complex rewrites)
-- ✅ Added production environment file
-- ✅ Security headers configured
-- ✅ Image optimization enabled
-- ✅ Compression enabled
+-  Configured for Render deployment (standalone output)
+-  Automatic backend connection via service discovery
+-  Simplified next.config.js (removed complex rewrites)
+-  Added production environment file
+-  Security headers configured
+-  Image optimization enabled
+-  Compression enabled
 
 ### Monorepo Issues (All Fixed):
-- ✅ Both services deploy from single repository
-- ✅ Separate root directories for each service
-- ✅ Independent build and start commands
-- ✅ Automatic service-to-service communication
-- ✅ Auto-deploy on push to main
+-  Both services deploy from single repository
+-  Separate root directories for each service
+-  Independent build and start commands
+-  Automatic service-to-service communication
+-  Auto-deploy on push to main
 
-## 🔍 Verification
+##  Verification
 
 After deployment, test:
 
@@ -177,7 +177,7 @@ open https://agentguard-api.onrender.com/docs
 open https://agentguard-ui.onrender.com
 ```
 
-## 📊 Expected Results
+##  Expected Results
 
 ### Backend Deployment:
 - **Build Time**: 3-5 minutes
@@ -193,7 +193,7 @@ open https://agentguard-ui.onrender.com
 - **Pages**: All accessible
 - **API Connection**: Automatic
 
-## 🎨 What You'll See
+##  What You'll See
 
 ### Frontend UI (https://agentguard-ui.onrender.com)
 - Dashboard with real-time monitoring
@@ -211,35 +211,35 @@ open https://agentguard-ui.onrender.com
 - All 97 endpoints accessible
 - WebSocket support for real-time features
 
-## 🔥 Key Features
+##  Key Features
 
 ### Backend (All Live):
-✅ Prompt Injection Detection  
-✅ Multi-Model Consensus  
-✅ Multimodal Detection (image/video/audio)  
-✅ Bias & Fairness Auditing  
-✅ Automated Red Teaming  
-✅ Compliance Reporting  
-✅ PII Protection  
-✅ RAG Security  
-✅ Parental Controls  
-✅ Model Hosting  
-✅ MCP Gateway  
-✅ Stream Handling  
+ Prompt Injection Detection  
+ Multi-Model Consensus  
+ Multimodal Detection (image/video/audio)  
+ Bias & Fairness Auditing  
+ Automated Red Teaming  
+ Compliance Reporting  
+ PII Protection  
+ RAG Security  
+ Parental Controls  
+ Model Hosting  
+ MCP Gateway  
+ Stream Handling  
 
 ### Frontend (All Live):
-✅ Real-time Dashboard  
-✅ Batch Testing  
-✅ Analytics & Insights  
-✅ Agent Console  
-✅ Workstation Management  
-✅ Custom Rules  
-✅ Webhooks  
-✅ Performance Metrics  
-✅ Dark Mode  
-✅ Responsive Design  
+ Real-time Dashboard  
+ Batch Testing  
+ Analytics & Insights  
+ Agent Console  
+ Workstation Management  
+ Custom Rules  
+ Webhooks  
+ Performance Metrics  
+ Dark Mode  
+ Responsive Design  
 
-## 📚 Documentation
+##  Documentation
 
 All guides created:
 1. **MONOREPO_DEPLOYMENT_GUIDE.md** - Complete deployment guide
@@ -248,16 +248,16 @@ All guides created:
 4. **PRODUCTION_READY_SUMMARY.md** - System overview
 5. **SYSTEM_STATUS_REPORT.md** - Technical details
 
-## 🎯 Next Steps
+##  Next Steps
 
 1. **Go to Render Dashboard**: https://dashboard.render.com
 2. **Deploy using Blueprint** (automatic) or manually create services
 3. **Set CLAUDE_API_KEY** in backend environment variables
 4. **Wait for deployment** (5-10 minutes total)
 5. **Test both URLs** to verify everything works
-6. **Start using your platform!** 🎉
+6. **Start using your platform!** 
 
-## 💡 Pro Tips
+##  Pro Tips
 
 ### Custom Domains
 Add custom domains in Render:
@@ -292,26 +292,26 @@ If deployment fails:
 4. Review Render logs in dashboard
 5. Verify environment variables are set
 
-## ✨ Summary
+##  Summary
 
 **Everything is configured and ready!**
 
-- ✅ Both services in one repository
-- ✅ Automatic deployment configured
-- ✅ Backend dependencies fixed
-- ✅ Frontend optimized for Render
-- ✅ Services connect automatically
-- ✅ All features operational
-- ✅ Complete documentation provided
-- ✅ Production-ready setup
+-  Both services in one repository
+-  Automatic deployment configured
+-  Backend dependencies fixed
+-  Frontend optimized for Render
+-  Services connect automatically
+-  All features operational
+-  Complete documentation provided
+-  Production-ready setup
 
-**Just deploy and it will work flawlessly!** 🚀
+**Just deploy and it will work flawlessly!** 
 
 ---
 
 **Repository**: https://github.com/seanebones-lang/mars  
 **Last Commit**: `a78a53b`  
-**Status**: ✅ **READY FOR DEPLOYMENT**  
+**Status**:  **READY FOR DEPLOYMENT**  
 **Services**: 2 (Backend + Frontend)  
 **Features**: 12 major features, all operational  
 **Endpoints**: 97 REST endpoints  

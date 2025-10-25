@@ -93,9 +93,9 @@ Availability % = (Total Minutes - Downtime Minutes) / Total Minutes × 100
 
 | Tier | Email | Chat | Phone | Dedicated Support |
 |------|-------|------|-------|-------------------|
-| **Standard** | ✅ | ❌ | ❌ | ❌ |
-| **Professional** | ✅ | ✅ | ✅ | ❌ |
-| **Enterprise** | ✅ | ✅ | ✅ | ✅ |
+| **Standard** |  | ❌ | ❌ | ❌ |
+| **Professional** |  |  |  | ❌ |
+| **Enterprise** |  |  |  |  |
 
 **Support Hours**:
 - Standard: Business hours (9 AM - 5 PM EST, Monday-Friday)
@@ -110,8 +110,8 @@ Availability % = (Total Minutes - Downtime Minutes) / Total Minutes × 100
 
 - **Database**: Daily automated backups
 - **Retention**: 30 days local, 90 days S3
-- **Recovery Point Objective (RPO)**: 24 hours
-- **Recovery Time Objective (RTO)**: 4 hours
+- **Recohighly Point Objective (RPO)**: 24 hours
+- **Recohighly Time Objective (RTO)**: 4 hours
 
 ### Data Security
 

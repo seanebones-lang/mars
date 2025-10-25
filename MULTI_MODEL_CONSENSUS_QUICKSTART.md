@@ -137,12 +137,12 @@ print(f"Models Voted: {result['models_voted']}")
 
 | Model | Provider | Cost/1K | Weight | Status |
 |-------|----------|---------|--------|--------|
-| **Claude Sonnet 4.5** | Anthropic | $0.003 | 1.2 | ✅ Default |
-| **GPT-4 Turbo** | OpenAI | $0.010 | 1.1 | ⚠️ Optional |
-| **Gemini 2.0 Pro** | Google | $0.00125 | 1.0 | ⚠️ Optional |
-| **Llama 3.1 70B** | Meta | $0.0009 | 0.9 | ⚠️ Optional |
-| **Grok 3** | xAI | $0.005 | 1.0 | ⚠️ Optional |
-| **Mistral Large 2** | Mistral | $0.008 | 0.95 | ⚠️ Optional |
+| **Claude Sonnet 4.5** | Anthropic | $0.003 | 1.2 |  Default |
+| **GPT-4 Turbo** | OpenAI | $0.010 | 1.1 |  Optional |
+| **Gemini 2.0 Pro** | Google | $0.00125 | 1.0 |  Optional |
+| **Llama 3.1 70B** | Meta | $0.0009 | 0.9 |  Optional |
+| **Grok 3** | xAI | $0.005 | 1.0 |  Optional |
+| **Mistral Large 2** | Mistral | $0.008 | 0.95 |  Optional |
 
 ---
 

@@ -1,10 +1,10 @@
-# 🚀 AgentGuard 5-Minute Quickstart
+#  AgentGuard 5-Minute Quickstart
 
 Get your AI agents protected in under 5 minutes. No complex setup, no lengthy configuration—just instant safety.
 
 ---
 
-## ⚡ Step 1: Get Your API Key (30 seconds)
+##  Step 1: Get Your API Key (30 seconds)
 
 1. **Sign up** at [agentguard.ai](https://agentguard.ai)
 2. Navigate to **Workspace → API Keys**
@@ -15,11 +15,11 @@ Get your AI agents protected in under 5 minutes. No complex setup, no lengthy co
 ag_live_abc123def456...
 ```
 
-⚠️ **Important**: Store this key securely. You won't see it again!
+ **Important**: Store this key securely. You won't see it again!
 
 ---
 
-## 📦 Step 2: Install the SDK (30 seconds)
+##  Step 2: Install the SDK (30 seconds)
 
 ### Python
 ```bash
@@ -40,7 +40,7 @@ go get github.com/agentguard/agentguard-go
 
 ---
 
-## 🎯 Step 3: Your First Safety Check (2 minutes)
+##  Step 3: Your First Safety Check (2 minutes)
 
 ### Python Example
 
@@ -62,7 +62,7 @@ print(f"Is Safe: {result.is_safe}")
 print(f"Confidence: {result.confidence:.2%}")
 
 if not result.is_safe:
-    print(f"⚠️ Warning: {result.explanation}")
+    print(f" Warning: {result.explanation}")
 ```
 
 **Output:**
@@ -70,7 +70,7 @@ if not result.is_safe:
 Hallucination Risk: 95.00%
 Is Safe: False
 Confidence: 98.50%
-⚠️ Warning: Geographic location is incorrect. The Eiffel Tower is in Paris, not London.
+ Warning: Geographic location is incorrect. The Eiffel Tower is in Paris, not London.
 ```
 
 ### TypeScript Example
@@ -95,13 +95,13 @@ console.log(`Is Safe: ${result.isSafe}`);
 console.log(`Confidence: ${(result.confidence * 100).toFixed(2)}%`);
 
 if (!result.isSafe) {
-  console.log(`⚠️ Warning: ${result.explanation}`);
+  console.log(` Warning: ${result.explanation}`);
 }
 ```
 
 ---
 
-## 🔥 Step 4: Real-World Integration (2 minutes)
+##  Step 4: Real-World Integration (2 minutes)
 
 ### LangChain Integration (Python)
 
@@ -125,7 +125,7 @@ class AgentGuardCallback(BaseCallbackHandler):
         )
         
         if result.hallucination_risk > self.threshold:
-            print(f"🚨 High hallucination risk: {result.hallucination_risk:.2%}")
+            print(f" High hallucination risk: {result.hallucination_risk:.2%}")
             print(f"   Explanation: {result.explanation}")
             # Optionally: raise exception, log, or retry
 
@@ -150,7 +150,7 @@ class AgentGuardCallback extends BaseCallbackHandler {
   threshold: number;
 
   constructor(apiKey: string, threshold: number = 0.7) {
-    super();
+    highly();
     this.client = new AgentGuardClient({ apiKey });
     this.threshold = threshold;
   }
@@ -163,7 +163,7 @@ class AgentGuardCallback extends BaseCallbackHandler {
     });
     
     if (result.hallucinationRisk > this.threshold) {
-      console.log(`🚨 High hallucination risk: ${(result.hallucinationRisk * 100).toFixed(2)}%`);
+      console.log(` High hallucination risk: ${(result.hallucinationRisk * 100).toFixed(2)}%`);
       console.log(`   Explanation: ${result.explanation}`);
     }
   }
@@ -219,7 +219,7 @@ async def validate_response(request: AgentRequest):
 
 ---
 
-## 🎨 Advanced Features
+##  Advanced Features
 
 ### Streaming Validation
 
@@ -268,7 +268,7 @@ result = client.detect_hallucination(
 
 ---
 
-## 🔧 Configuration Options
+##  Configuration Options
 
 ### Set Detection Threshold
 
@@ -305,14 +305,14 @@ client.configure_webhooks(
 
 ---
 
-## 📊 Monitor in Dashboard
+##  Monitor in Dashboard
 
 Visit your [AgentGuard Dashboard](https://agentguard.ai/workspace) to:
 
-- 📈 View real-time safety metrics
-- 🔍 Analyze flagged responses
-- 📊 Track accuracy trends
-- ⚙️ Configure custom rules
+-  View real-time safety metrics
+-  Analyze flagged responses
+-  Track accuracy trends
+-  Configure custom rules
 - 👥 Manage team access
 
 ---
@@ -365,10 +365,10 @@ async with AgentGuardClient(api_key="your_key") as client:
 ## 🎓 Next Steps
 
 ### Learn More
-- 📚 [Full API Documentation](https://docs.agentguard.ai)
+-  [Full API Documentation](https://docs.agentguard.ai)
 - 🎥 [Video Tutorials](https://agentguard.ai/tutorials)
 - 💬 [Join Discord Community](https://discord.gg/agentguard)
-- 📝 [Blog & Best Practices](https://agentguard.ai/blog)
+-  [Blog & Best Practices](https://agentguard.ai/blog)
 
 ### Advanced Topics
 - [Multi-Model Consensus](https://docs.agentguard.ai/multi-model)
@@ -377,25 +377,25 @@ async with AgentGuardClient(api_key="your_key") as client:
 - [Compliance & Auditing](https://docs.agentguard.ai/compliance)
 
 ### Get Help
-- 📧 Email: support@agentguard.ai
+-  Email: support@agentguard.ai
 - 💬 Discord: [discord.gg/agentguard](https://discord.gg/agentguard)
 - 🐛 GitHub Issues: [github.com/agentguard/issues](https://github.com/agentguard/issues)
 
 ---
 
-## 🎉 You're All Set!
+##  You're All Set!
 
 You've successfully:
-- ✅ Created an API key
-- ✅ Installed the SDK
-- ✅ Run your first safety check
-- ✅ Integrated with your AI stack
+-  Created an API key
+-  Installed the SDK
+-  Run your first safety check
+-  Integrated with your AI stack
 
-**Your AI agents are now protected!** 🛡️
+**Your AI agents are now protected!** 🛡
 
 ---
 
-## 💡 Pro Tips
+##  Pro Tips
 
 1. **Start with high threshold** (0.8) and adjust based on your use case
 2. **Use ground truth** from your knowledge base for better accuracy
@@ -405,7 +405,7 @@ You've successfully:
 
 ---
 
-## 📈 Upgrade for More
+##  Upgrade for More
 
 **Free Tier Limits:**
 - 100 queries/month

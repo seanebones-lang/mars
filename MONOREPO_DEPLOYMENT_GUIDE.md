@@ -3,14 +3,14 @@
 **Mothership AI - watcher.mothership-ai.com**  
 **Contact:** info@mothership-ai.com
 
-## ⚠️ CRITICAL: This is a Complete Monorepo on Render
+##  CRITICAL: This is a Complete Monorepo on Render
 
 **EVERYTHING deploys from this single repository on Render.com**
 
-- ✅ Backend API (Python/FastAPI)
-- ✅ Frontend UI (Next.js/React)
-- ✅ Single `render.yaml` configuration
-- ✅ Automatic deployment on git push
+-  Backend API (Python/FastAPI)
+-  Frontend UI (Next.js/React)
+-  Single `render.yaml` configuration
+-  Automatic deployment on git push
 - ❌ NO VERCEL
 - ❌ NO separate repositories
 - ❌ NO manual deployment steps
@@ -197,29 +197,29 @@ After deployment, you'll have:
 ## Features Available
 
 ### Backend (97 Endpoints)
-✅ Prompt Injection Detection  
-✅ Multi-Model Consensus  
-✅ Multimodal Detection  
-✅ Bias & Fairness Auditing  
-✅ Red Teaming  
-✅ Compliance Reporting  
-✅ PII Protection  
-✅ RAG Security  
-✅ Parental Controls  
-✅ Model Hosting  
-✅ MCP Gateway  
-✅ Stream Handling  
+ Prompt Injection Detection  
+ Multi-Model Consensus  
+ Multimodal Detection  
+ Bias & Fairness Auditing  
+ Red Teaming  
+ Compliance Reporting  
+ PII Protection  
+ RAG Security  
+ Parental Controls  
+ Model Hosting  
+ MCP Gateway  
+ Stream Handling  
 
 ### Frontend (Full UI)
-✅ Dashboard  
-✅ Real-time Monitoring  
-✅ Batch Testing  
-✅ Analytics  
-✅ Agent Console  
-✅ Workstation Management  
-✅ Custom Rules  
-✅ Webhooks  
-✅ Performance Metrics  
+ Dashboard  
+ Real-time Monitoring  
+ Batch Testing  
+ Analytics  
+ Agent Console  
+ Workstation Management  
+ Custom Rules  
+ Webhooks  
+ Performance Metrics  
 
 ## Troubleshooting
 
@@ -428,7 +428,7 @@ After deployment, verify:
 - [ ] Performance is acceptable
 - [ ] SSL certificates are active
 
-## You're Live! 🎉
+## You're Live! 
 
 Once both services are deployed and verified:
 

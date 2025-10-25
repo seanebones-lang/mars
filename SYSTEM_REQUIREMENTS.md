@@ -6,7 +6,7 @@
 
 ---
 
-## 📊 System Resource Requirements
+##  System Resource Requirements
 
 ### Minimum Requirements (Development/Testing)
 
@@ -96,7 +96,7 @@
 
 ---
 
-## 🎯 Total RAM Requirements Summary
+##  Total RAM Requirements Summary
 
 ### By Environment
 
@@ -123,7 +123,7 @@
 
 ---
 
-## 💻 Render.com Deployment Recommendations
+##  Render.com Deployment Recommendations
 
 ### Render Instance Types
 
@@ -163,7 +163,7 @@
 
 ---
 
-## 📦 Storage Requirements
+##  Storage Requirements
 
 ### By Component
 
@@ -191,7 +191,7 @@
 
 ---
 
-## 🌐 Network Requirements
+##  Network Requirements
 
 ### Bandwidth
 
@@ -214,7 +214,7 @@
 
 ---
 
-## 🔧 Software Requirements
+##  Software Requirements
 
 ### Operating System
 
@@ -248,7 +248,7 @@ See `requirements.txt` for full list. Key dependencies:
 
 ---
 
-## 📊 Performance Benchmarks
+##  Performance Benchmarks
 
 ### Response Times (Target)
 
@@ -273,13 +273,13 @@ See `requirements.txt` for full list. Key dependencies:
 
 ---
 
-## 🔒 Security Requirements
+##  Security Requirements
 
 ### SSL/TLS
 
 - **Required**: TLS 1.2+ for all production deployments
 - **Recommended**: TLS 1.3
-- **Certificate**: Let's Encrypt or commercial CA
+- **Certificate**: We will Encrypt or commercial CA
 
 ### Firewall
 
@@ -300,7 +300,7 @@ Required for production:
 
 ---
 
-## 📈 Scaling Recommendations
+##  Scaling Recommendations
 
 ### Horizontal Scaling
 
@@ -322,7 +322,7 @@ Start with vertical scaling (more RAM/CPU per instance) before horizontal scalin
 
 ---
 
-## 🎯 Quick Reference
+##  Quick Reference
 
 ### Minimum Production Setup (Render.com)
 

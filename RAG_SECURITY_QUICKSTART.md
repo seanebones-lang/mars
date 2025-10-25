@@ -944,28 +944,28 @@ class AgentGuardPostprocessor(BaseNodePostprocessor):
 ### Compliance Mapping
 
 **GDPR Compliance**:
-- ✅ PII Detection: Automatic redaction of personal data
-- ✅ Data Minimization: Filter unnecessary sensitive contexts
-- ✅ Audit Trail: Complete logging of data access
-- ✅ Right to be Forgotten: Context removal tracking
+-  PII Detection: Automatic redaction of personal data
+-  Data Minimization: Filter unnecessary sensitive contexts
+-  Audit Trail: Complete logging of data access
+-  Right to be Forgotten: Context removal tracking
 
 **HIPAA Compliance**:
-- ✅ PHI Protection: Medical data detection and masking
-- ✅ Access Controls: User authorization enforcement
-- ✅ Encryption: Data protection in transit and at rest
-- ✅ Audit Logs: Complete access history
+-  PHI Protection: Medical data detection and masking
+-  Access Controls: User authorization enforcement
+-  Encryption: Data protection in transit and at rest
+-  Audit Logs: Complete access history
 
 **SOC 2 Type II**:
-- ✅ Security: Multi-layer threat detection
-- ✅ Availability: 99.9% uptime SLA
-- ✅ Confidentiality: Data encryption and access controls
-- ✅ Processing Integrity: Hallucination detection
+-  Security: Multi-layer threat detection
+-  Availability: 99.9% uptime SLA
+-  Confidentiality: Data encryption and access controls
+-  Processing Integrity: Hallucination detection
 
 **ISO 27001**:
-- ✅ Risk Assessment: Automated threat scoring
-- ✅ Access Control: RBAC implementation
-- ✅ Incident Management: Real-time alerting
-- ✅ Continuous Monitoring: 24/7 security analysis
+-  Risk Assessment: Automated threat scoring
+-  Access Control: RBAC implementation
+-  Incident Management: Real-time alerting
+-  Continuous Monitoring: 24/7 security analysis
 
 ---
 
