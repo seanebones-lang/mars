@@ -84,8 +84,8 @@ instructor>=0.4.0  # Structured outputs from LLMs
 
 # Phase 4 Enhancements - Multilingual Support (October 2025)
 langdetect>=1.0.9  # Language detection for multilingual support
-polyglot>=16.7.4  # Advanced multilingual NLP (optional)
-fasttext>=0.9.2  # Facebook's language identification (alternative)
+# polyglot>=16.7.4  # Advanced multilingual NLP (optional) - Disabled for Python 3.13 compatibility
+# fasttext>=0.9.2  # Facebook's language identification (alternative) - Disabled: build issues with Python 3.13
 
 # Phase 4 Enhancements - Multimodal Support (October 2025)
 onnxruntime>=1.16.0  # ONNX runtime for multimodal processing
