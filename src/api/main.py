@@ -175,6 +175,7 @@ app.include_router(multimodal_router)
 app.include_router(bias_router)
 app.include_router(redteam_router)
 app.include_router(compliance_router)
+app.include_router(monitoring_router)
 
 # Caching middleware (P1-1: Performance)
 from ..middleware.caching_middleware import caching_middleware
