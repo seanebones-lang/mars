@@ -36,6 +36,7 @@ from .bias_auditing import router as bias_router
 from .red_teaming import router as redteam_router
 from .compliance import router as compliance_router
 from .workspace import router as workspace_router
+from .monitoring import router as monitoring_router
 
 # Load environment variables
 load_dotenv()
