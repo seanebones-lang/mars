@@ -1,7 +1,7 @@
 # Core Framework - Updated October 2025 (Final Verified Stable)
 fastapi>=0.120.0
 uvicorn[standard]>=0.38.0
-pydantic[email]>=2.12.3
+pydantic[email]==2.11.0
 python-dotenv>=1.0.1
 
 # CRITICAL SECURITY DEPENDENCIES

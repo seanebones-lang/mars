@@ -2,7 +2,7 @@
 # Core Framework with constrained versions for faster resolution
 fastapi>=0.120.0,<1.0.0
 uvicorn[standard]>=0.38.0,<1.0.0
-pydantic[email]>=2.12.3,<3.0.0
+pydantic[email]==2.11.0
 python-dotenv>=1.0.1,<2.0.0
 
 # CRITICAL SECURITY DEPENDENCIES
