@@ -7,6 +7,10 @@ Uses Claude to perform comprehensive production readiness evaluation
 import os
 import anthropic
 from datetime import datetime
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 def load_input_document():
     """Load the production readiness input document."""
