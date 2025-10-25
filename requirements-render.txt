@@ -1,9 +1,9 @@
-# Optimized requirements for Render deployment
+# Optimized requirements for Render deployment - Updated October 2025 (Final Verified Stable)
 # Core Framework
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-pydantic>=2.9.0
-python-dotenv>=1.0.0
+fastapi>=0.120.0
+uvicorn[standard]>=0.38.0
+pydantic>=2.12.3
+python-dotenv>=1.0.1
 
 # CRITICAL SECURITY DEPENDENCIES
 bleach>=6.1.0
@@ -25,10 +25,12 @@ pandas>=2.0.0
 # Image Processing (for multimodal detection)
 Pillow>=10.0.0
 
-# Database & Storage
-aiosqlite>=0.19.0
-redis>=5.0.0
-psycopg2-binary>=2.9.0
+# Database & Storage - Updated October 2025 (Verified Latest Stable)
+aiosqlite>=0.20.0
+redis>=5.2.0
+psycopg2-binary>=2.9.9
+asyncpg>=0.30.0
+sqlalchemy>=2.0.44
 
 # Web & API
 aiohttp>=3.9.0

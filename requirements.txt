@@ -1,8 +1,8 @@
-# Core Framework
-fastapi>=0.115.0
-uvicorn[standard]>=0.30.0
-pydantic>=2.9.0
-python-dotenv>=1.0.0
+# Core Framework - Updated October 2025 (Final Verified Stable)
+fastapi>=0.120.0
+uvicorn[standard]>=0.38.0
+pydantic>=2.12.3
+python-dotenv>=1.0.1
 
 # CRITICAL SECURITY DEPENDENCIES
 bleach>=6.1.0
@@ -27,10 +27,13 @@ openpyxl>=3.1.0
 mlflow>=2.17.0
 pytest>=8.3.0
 
-# Database & Storage
+# Database & Storage - Updated October 2025 (Verified Latest Stable)
 neo4j>=5.14.0
-aiosqlite>=0.19.0
-redis>=5.0.0
+aiosqlite>=0.20.0
+redis>=5.2.0
+asyncpg>=0.30.0
+psycopg2-binary>=2.9.9
+sqlalchemy>=2.0.44
 
 # Web & API
 aiohttp>=3.9.0

@@ -4,14 +4,15 @@
 # NO VERCEL - Everything runs on Render
 
 services:
-  # Backend API Service
+  # Backend API Service - Updated October 2025 (Final Verified Stable)
   - type: web
     name: agentguard-api
     env: python
+    runtime: python-3.14.0
     region: oregon
     plan: starter
     rootDir: .
-    buildCommand: pip install -r requirements-render.txt
+    buildCommand: pip install --upgrade pip && pip install -r requirements-render.txt
     startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 2
     healthCheckPath: /health
     
