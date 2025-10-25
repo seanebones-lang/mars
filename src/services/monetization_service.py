@@ -53,14 +53,18 @@ class MonetizationService:
                 SubscriptionTier.FREE.value: {
                     "name": "Free",
                     "price_monthly": 0,
-                    "queries_per_month": 3,
+                    "queries_per_month": 100,
                     "agents_limit": 1,
-                    "api_access": False,
+                    "api_access": True,
                     "support_level": "community",
                     "features": [
                         "Basic hallucination detection",
                         "Web interface access",
-                        "Community support"
+                        "API access (rate limited)",
+                        "100 queries per month",
+                        "Community support",
+                        "Prompt injection detection",
+                        "Basic safety checks"
                     ]
                 },
                 SubscriptionTier.PRO.value: {

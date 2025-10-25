@@ -70,16 +70,18 @@ export default function PricingPage() {
             id: 'free',
             name: 'Free',
             price_monthly: 0,
-            queries_per_month: 3,
+            queries_per_month: 100,
             agents_limit: 1,
-            api_access: false,
+            api_access: true,
             support_level: 'community',
             features: [
               'Basic hallucination detection',
               'Web interface access',
-              'Community support',
-              '3 queries per month',
-              '1 agent limit'
+              'API access (rate limited)',
+              '100 queries per month',
+              '1 agent monitored',
+              'Prompt injection detection',
+              'Community support'
             ]
           },
           pro: {

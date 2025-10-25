@@ -9,17 +9,66 @@ import asyncio
 import aiohttp
 import smtplib
 import logging
+import hashlib
+import hmac
 from datetime import datetime, timedelta
 from typing import Dict, List, Any, Optional, Union
-from dataclasses import dataclass, asdict
+from dataclasses import dataclass, asdict, field
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
 from email import encoders
 import ssl
 from jinja2 import Template
+from enum import Enum
+from uuid import uuid4
 
 logger = logging.getLogger(__name__)
+
+
+class WebhookStatus(str, Enum):
+    """Webhook delivery status"""
+    PENDING = "pending"
+    DELIVERED = "delivered"
+    FAILED = "failed"
+    RETRYING = "retrying"
+
+
+@dataclass
+class WebhookDelivery:
+    """Tracks webhook delivery attempts"""
+    delivery_id: str
+    webhook_id: str
+    alert_id: str
+    url: str
+    payload: Dict[str, Any]
+    status: WebhookStatus
+    attempts: int = 0
+    max_attempts: int = 3
+    last_attempt_at: Optional[datetime] = None
+    next_retry_at: Optional[datetime] = None
+    response_status: Optional[int] = None
+    response_body: Optional[str] = None
+    error_message: Optional[str] = None
+    created_at: datetime = field(default_factory=datetime.utcnow)
+    delivered_at: Optional[datetime] = None
+    
+    def should_retry(self) -> bool:
+        """Check if delivery should be retried"""
+        if self.status == WebhookStatus.DELIVERED:
+            return False
+        if self.attempts >= self.max_attempts:
+            return False
+        if self.next_retry_at and datetime.utcnow() < self.next_retry_at:
+            return False
+        return True
+    
+    def calculate_next_retry(self) -> datetime:
+        """Calculate next retry time using exponential backoff"""
+        # Exponential backoff: 1min, 5min, 15min
+        delays = [60, 300, 900]  # seconds
+        delay = delays[min(self.attempts, len(delays) - 1)]
+        return datetime.utcnow() + timedelta(seconds=delay)
 
 
 @dataclass
@@ -58,16 +107,23 @@ class WebhookConfig:
     timeout_seconds: int = 30
     rate_limit_per_minute: int = 60
     escalation_delay_minutes: int = 15
+    secret: Optional[str] = None  # Secret for HMAC signature
+    verify_ssl: bool = True
 
 
 class WebhookService:
-    """Enterprise webhook and notification service."""
+    """Enterprise webhook and notification service with retry logic and delivery tracking."""
     
     def __init__(self):
         self.webhooks: Dict[str, WebhookConfig] = {}
         self.alert_history: List[WebhookAlert] = []
         self.rate_limits: Dict[str, List[datetime]] = {}
         self.session: Optional[aiohttp.ClientSession] = None
+        
+        # Delivery tracking
+        self.deliveries: Dict[str, WebhookDelivery] = {}
+        self.failed_queue: List[WebhookDelivery] = []
+        self.retry_task: Optional[asyncio.Task] = None
         
         # Email configuration
         self.smtp_server = os.getenv("SMTP_SERVER", "smtp.gmail.com")
@@ -82,12 +138,117 @@ class WebhookService:
     async def __aenter__(self):
         """Async context manager entry."""
         self.session = aiohttp.ClientSession()
+        # Start retry background task
+        self.retry_task = asyncio.create_task(self._retry_failed_webhooks())
         return self
     
     async def __aexit__(self, exc_type, exc_val, exc_tb):
         """Async context manager exit."""
+        # Cancel retry task
+        if self.retry_task:
+            self.retry_task.cancel()
+            try:
+                await self.retry_task
+            except asyncio.CancelledError:
+                pass
+        
         if self.session:
             await self.session.close()
+    
+    def _generate_signature(self, payload: Dict[str, Any], secret: str) -> str:
+        """Generate HMAC signature for webhook payload."""
+        payload_bytes = json.dumps(payload, sort_keys=True).encode('utf-8')
+        signature = hmac.new(
+            secret.encode('utf-8'),
+            payload_bytes,
+            hashlib.sha256
+        ).hexdigest()
+        return f"sha256={signature}"
+    
+    async def _retry_failed_webhooks(self):
+        """Background task to retry failed webhook deliveries."""
+        while True:
+            try:
+                await asyncio.sleep(60)  # Check every minute
+                
+                # Find deliveries that need retry
+                to_retry = [
+                    delivery for delivery in self.deliveries.values()
+                    if delivery.should_retry()
+                ]
+                
+                for delivery in to_retry:
+                    logger.info(f"Retrying webhook delivery: {delivery.delivery_id} (attempt {delivery.attempts + 1})")
+                    
+                    # Get webhook config
+                    config = self.webhooks.get(delivery.webhook_id)
+                    if not config or not config.enabled:
+                        delivery.status = WebhookStatus.FAILED
+                        delivery.error_message = "Webhook disabled or removed"
+                        continue
+                    
+                    # Attempt delivery
+                    success = await self._deliver_webhook(delivery, config)
+                    
+                    if success:
+                        delivery.status = WebhookStatus.DELIVERED
+                        delivery.delivered_at = datetime.utcnow()
+                        logger.info(f"Webhook delivery succeeded on retry: {delivery.delivery_id}")
+                    else:
+                        delivery.attempts += 1
+                        delivery.last_attempt_at = datetime.utcnow()
+                        
+                        if delivery.attempts >= delivery.max_attempts:
+                            delivery.status = WebhookStatus.FAILED
+                            self.failed_queue.append(delivery)
+                            logger.error(f"Webhook delivery failed permanently: {delivery.delivery_id}")
+                        else:
+                            delivery.status = WebhookStatus.RETRYING
+                            delivery.next_retry_at = delivery.calculate_next_retry()
+                            logger.warning(f"Webhook delivery failed, will retry: {delivery.delivery_id}")
+                
+            except asyncio.CancelledError:
+                break
+            except Exception as e:
+                logger.error(f"Error in retry task: {e}")
+    
+    async def _deliver_webhook(self, delivery: WebhookDelivery, config: WebhookConfig) -> bool:
+        """Attempt to deliver a webhook."""
+        try:
+            # Add signature header if secret is configured
+            headers = dict(config.headers or {})
+            if config.secret:
+                signature = self._generate_signature(delivery.payload, config.secret)
+                headers['X-Webhook-Signature'] = signature
+            
+            # Add delivery tracking headers
+            headers['X-Delivery-ID'] = delivery.delivery_id
+            headers['X-Delivery-Attempt'] = str(delivery.attempts + 1)
+            
+            # Send request
+            ssl_context = None if config.verify_ssl else False
+            async with self.session.post(
+                delivery.url,
+                json=delivery.payload,
+                headers=headers,
+                timeout=aiohttp.ClientTimeout(total=config.timeout_seconds),
+                ssl=ssl_context
+            ) as response:
+                delivery.response_status = response.status
+                delivery.response_body = await response.text()
+                
+                if response.status == 200:
+                    return True
+                else:
+                    delivery.error_message = f"HTTP {response.status}: {delivery.response_body[:200]}"
+                    return False
+        
+        except asyncio.TimeoutError:
+            delivery.error_message = f"Timeout after {config.timeout_seconds}s"
+            return False
+        except Exception as e:
+            delivery.error_message = str(e)
+            return False
     
     def _load_default_webhooks(self):
         """Load default webhook configurations from environment."""
@@ -362,7 +523,7 @@ class WebhookService:
             }
     
     async def _send_webhook(self, alert: WebhookAlert, config: WebhookConfig) -> bool:
-        """Send webhook notification."""
+        """Send webhook notification with delivery tracking."""
         
         try:
             # Format message based on webhook type
@@ -375,20 +536,35 @@ class WebhookService:
             else:
                 payload = self._format_generic_message(alert, config)
             
-            # Send HTTP request
-            async with self.session.post(
-                config.url,
-                json=payload,
-                headers=config.headers,
-                timeout=aiohttp.ClientTimeout(total=config.timeout_seconds)
-            ) as response:
-                
-                if response.status == 200:
-                    logger.info(f"Webhook sent successfully: {config.name}")
-                    return True
-                else:
-                    logger.error(f"Webhook failed: {config.name} - Status: {response.status}")
-                    return False
+            # Create delivery record
+            delivery = WebhookDelivery(
+                delivery_id=str(uuid4()),
+                webhook_id=config.webhook_id,
+                alert_id=alert.alert_id,
+                url=config.url,
+                payload=payload,
+                status=WebhookStatus.PENDING,
+                max_attempts=config.retry_count
+            )
+            
+            # Store delivery
+            self.deliveries[delivery.delivery_id] = delivery
+            
+            # Attempt delivery
+            success = await self._deliver_webhook(delivery, config)
+            
+            if success:
+                delivery.status = WebhookStatus.DELIVERED
+                delivery.delivered_at = datetime.utcnow()
+                logger.info(f"Webhook sent successfully: {config.name}")
+                return True
+            else:
+                delivery.attempts = 1
+                delivery.last_attempt_at = datetime.utcnow()
+                delivery.status = WebhookStatus.RETRYING
+                delivery.next_retry_at = delivery.calculate_next_retry()
+                logger.warning(f"Webhook failed, will retry: {config.name}")
+                return False
         
         except Exception as e:
             logger.error(f"Webhook error: {config.name} - {str(e)}")
@@ -535,7 +711,7 @@ class WebhookService:
         return [asdict(alert) for alert in reversed(recent_alerts)]
     
     def get_webhook_stats(self) -> Dict[str, Any]:
-        """Get webhook statistics."""
+        """Get webhook statistics including delivery tracking."""
         total_alerts = len(self.alert_history)
         
         # Count by severity
@@ -548,14 +724,58 @@ class WebhookService:
         for alert in self.alert_history:
             type_counts[alert.alert_type] = type_counts.get(alert.alert_type, 0) + 1
         
+        # Delivery statistics
+        delivery_stats = {
+            "total_deliveries": len(self.deliveries),
+            "delivered": len([d for d in self.deliveries.values() if d.status == WebhookStatus.DELIVERED]),
+            "pending": len([d for d in self.deliveries.values() if d.status == WebhookStatus.PENDING]),
+            "retrying": len([d for d in self.deliveries.values() if d.status == WebhookStatus.RETRYING]),
+            "failed": len([d for d in self.deliveries.values() if d.status == WebhookStatus.FAILED]),
+            "failed_queue_size": len(self.failed_queue)
+        }
+        
+        # Calculate success rate
+        if delivery_stats["total_deliveries"] > 0:
+            delivery_stats["success_rate"] = delivery_stats["delivered"] / delivery_stats["total_deliveries"]
+        else:
+            delivery_stats["success_rate"] = 0.0
+        
         return {
             "total_alerts": total_alerts,
             "total_webhooks": len(self.webhooks),
             "enabled_webhooks": len([w for w in self.webhooks.values() if w.enabled]),
             "severity_distribution": severity_counts,
             "alert_type_distribution": type_counts,
-            "rate_limits": {wid: len(timestamps) for wid, timestamps in self.rate_limits.items()}
+            "rate_limits": {wid: len(timestamps) for wid, timestamps in self.rate_limits.items()},
+            "delivery_stats": delivery_stats
         }
+    
+    def get_delivery_status(self, delivery_id: str) -> Optional[Dict[str, Any]]:
+        """Get status of a specific delivery."""
+        delivery = self.deliveries.get(delivery_id)
+        if delivery:
+            return asdict(delivery)
+        return None
+    
+    def get_failed_deliveries(self, limit: int = 100) -> List[Dict[str, Any]]:
+        """Get failed webhook deliveries."""
+        recent_failed = self.failed_queue[-limit:] if limit else self.failed_queue
+        return [asdict(delivery) for delivery in reversed(recent_failed)]
+    
+    def clear_old_deliveries(self, days: int = 7):
+        """Clear delivery records older than specified days."""
+        cutoff = datetime.utcnow() - timedelta(days=days)
+        
+        # Remove old deliveries
+        old_ids = [
+            delivery_id for delivery_id, delivery in self.deliveries.items()
+            if delivery.created_at < cutoff and delivery.status in [WebhookStatus.DELIVERED, WebhookStatus.FAILED]
+        ]
+        
+        for delivery_id in old_ids:
+            del self.deliveries[delivery_id]
+        
+        logger.info(f"Cleared {len(old_ids)} old webhook deliveries")
 
 
 # Global webhook service instance

@@ -1,0 +1,184 @@
+# AgentGuard Alerting Rules
+# Critical alerts for production monitoring
+
+groups:
+  - name: agentguard_critical
+    interval: 30s
+    rules:
+      # API Availability
+      - alert: APIDown
+        expr: up{job="agentguard-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "AgentGuard API is down"
+          description: "API has been down for more than 1 minute"
+
+      # High Error Rate
+      - alert: HighErrorRate
+        expr: rate(http_requests_total{status=~"5.."}[5m]) > 0.05
+        for: 5m
+        labels:
+          severity: critical
+          component: api
+        annotations:
+          summary: "High error rate detected"
+          description: "Error rate is {{ $value | humanizePercentage }} over the last 5 minutes"
+
+      # Response Time
+      - alert: SlowResponseTime
+        expr: histogram_quantile(0.95, rate(http_request_duration_seconds_bucket[5m])) > 1
+        for: 10m
+        labels:
+          severity: warning
+          component: api
+        annotations:
+          summary: "Slow API response time"
+          description: "95th percentile response time is {{ $value }}s"
+
+      # Database Connection
+      - alert: DatabaseDown
+        expr: up{job="postgresql"} == 0
+        for: 1m
+        labels:
+          severity: critical
+          component: database
+        annotations:
+          summary: "PostgreSQL is down"
+          description: "Database has been unreachable for more than 1 minute"
+
+      # Redis Connection
+      - alert: RedisDown
+        expr: up{job="redis"} == 0
+        for: 2m
+        labels:
+          severity: warning
+          component: cache
+        annotations:
+          summary: "Redis is down"
+          description: "Redis cache has been unreachable for more than 2 minutes"
+
+      # High Memory Usage
+      - alert: HighMemoryUsage
+        expr: (node_memory_MemTotal_bytes - node_memory_MemAvailable_bytes) / node_memory_MemTotal_bytes > 0.9
+        for: 5m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High memory usage"
+          description: "Memory usage is at {{ $value | humanizePercentage }}"
+
+      # High CPU Usage
+      - alert: HighCPUUsage
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 10m
+        labels:
+          severity: warning
+          component: infrastructure
+        annotations:
+          summary: "High CPU usage"
+          description: "CPU usage is at {{ $value }}%"
+
+      # Disk Space
+      - alert: LowDiskSpace
+        expr: (node_filesystem_avail_bytes{mountpoint="/"} / node_filesystem_size_bytes{mountpoint="/"}) < 0.1
+        for: 5m
+        labels:
+          severity: critical
+          component: infrastructure
+        annotations:
+          summary: "Low disk space"
+          description: "Only {{ $value | humanizePercentage }} disk space remaining"
+
+      # Webhook Failures
+      - alert: HighWebhookFailureRate
+        expr: rate(webhook_delivery_failures_total[5m]) / rate(webhook_delivery_attempts_total[5m]) > 0.1
+        for: 10m
+        labels:
+          severity: warning
+          component: webhooks
+        annotations:
+          summary: "High webhook failure rate"
+          description: "Webhook failure rate is {{ $value | humanizePercentage }}"
+
+      # Rate Limiting
+      - alert: HighRateLimitHits
+        expr: rate(rate_limit_exceeded_total[5m]) > 10
+        for: 5m
+        labels:
+          severity: info
+          component: api
+        annotations:
+          summary: "High rate limit hits"
+          description: "Rate limit exceeded {{ $value }} times per second"
+
+      # Hallucination Detection
+      - alert: HighHallucinationRate
+        expr: rate(hallucination_detected_total[1h]) / rate(hallucination_checks_total[1h]) > 0.5
+        for: 30m
+        labels:
+          severity: info
+          component: detection
+        annotations:
+          summary: "High hallucination detection rate"
+          description: "{{ $value | humanizePercentage }} of checks detecting hallucinations"
+
+      # Security Alerts
+      - alert: HighFailedAuthAttempts
+        expr: rate(auth_failures_total[5m]) > 5
+        for: 5m
+        labels:
+          severity: warning
+          component: security
+        annotations:
+          summary: "High failed authentication attempts"
+          description: "{{ $value }} failed auth attempts per second"
+
+      # Cache Hit Rate
+      - alert: LowCacheHitRate
+        expr: rate(cache_hits_total[5m]) / (rate(cache_hits_total[5m]) + rate(cache_misses_total[5m])) < 0.5
+        for: 15m
+        labels:
+          severity: info
+          component: cache
+        annotations:
+          summary: "Low cache hit rate"
+          description: "Cache hit rate is {{ $value | humanizePercentage }}"
+
+  - name: agentguard_business
+    interval: 1m
+    rules:
+      # User Signups
+      - alert: NoSignupsIn24Hours
+        expr: increase(user_signups_total[24h]) == 0
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "No user signups in 24 hours"
+          description: "No new users have signed up in the last 24 hours"
+
+      # API Usage
+      - alert: LowAPIUsage
+        expr: rate(api_requests_total[1h]) < 1
+        for: 2h
+        labels:
+          severity: info
+          component: business
+        annotations:
+          summary: "Low API usage"
+          description: "API usage is unusually low"
+
+      # Revenue
+      - alert: NoRevenueIn7Days
+        expr: increase(revenue_usd_total[7d]) == 0
+        labels:
+          severity: warning
+          component: business
+        annotations:
+          summary: "No revenue in 7 days"
+          description: "No revenue generated in the last week"
+

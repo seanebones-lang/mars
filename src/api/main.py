@@ -35,6 +35,7 @@ from .multimodal_detection import router as multimodal_router
 from .bias_auditing import router as bias_router
 from .red_teaming import router as redteam_router
 from .compliance import router as compliance_router
+from .workspace import router as workspace_router
 
 # Load environment variables
 load_dotenv()
@@ -176,6 +177,13 @@ app.include_router(bias_router)
 app.include_router(redteam_router)
 app.include_router(compliance_router)
 app.include_router(monitoring_router)
+
+# Workspace router (User Dashboard - October 2025)
+app.include_router(workspace_router)
+
+# Status page router (System Status - October 2025)
+from .status import router as status_router
+app.include_router(status_router)
 
 # Caching middleware (P1-1: Performance)
 from ..middleware.caching_middleware import caching_middleware
