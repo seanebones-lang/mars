@@ -585,3 +585,13 @@ def get_auth_service() -> AuthService:
     if _auth_service is None:
         _auth_service = AuthService()
     return _auth_service
+
+
+# FastAPI dependency function for getting current user
+async def get_current_user(token: str) -> Optional[User]:
+    """
+    FastAPI dependency to get current authenticated user from token.
+    This is a convenience wrapper for use in endpoint dependencies.
+    """
+    auth_service = get_auth_service()
+    return auth_service.get_current_user(token)

@@ -56,3 +56,13 @@ psutil>=5.9.0,<6.0.0
 # Essential utilities
 requests>=2.31.0,<3.0.0
 scipy>=1.11.0,<2.0.0
+
+# Neo4j driver (required by graph database service)
+neo4j>=5.25.0,<6.0.0
+
+# Sentry SDK for error tracking
+sentry-sdk>=2.17.0,<3.0.0
+
+# Additional dependencies for production
+passlib[argon2]>=1.7.4,<2.0.0
+python-jose[cryptography]>=3.3.0,<4.0.0
