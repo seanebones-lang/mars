@@ -172,17 +172,16 @@ Uses MUI theme (`lib/theme.ts`) with custom colors:
 
 ## Deployment
 
-### Vercel (Recommended)
+### Render (Monorepo Deployment)
+
+**This frontend deploys automatically as part of the monorepo on Render**
 
 ```bash
-# Install Vercel CLI
-npm i -g vercel
-
-# Deploy
-vercel --prod
+# Just push to main - both backend and frontend deploy automatically
+git push origin main
 ```
 
-Set environment variable in Vercel dashboard:
+All environment variables are configured in the root `render.yaml` file.
 - `NEXT_PUBLIC_API_URL` - Your production API URL
 
 ### Docker

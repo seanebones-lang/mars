@@ -1,8 +1,23 @@
 # AgentGuard Monorepo Deployment Guide
 
+**Mothership AI - watcher.mothership-ai.com**  
+**Contact:** info@mothership-ai.com
+
+## ⚠️ CRITICAL: This is a Complete Monorepo on Render
+
+**EVERYTHING deploys from this single repository on Render.com**
+
+- ✅ Backend API (Python/FastAPI)
+- ✅ Frontend UI (Next.js/React)
+- ✅ Single `render.yaml` configuration
+- ✅ Automatic deployment on git push
+- ❌ NO VERCEL
+- ❌ NO separate repositories
+- ❌ NO manual deployment steps
+
 ## Overview
 
-This repository contains both the **backend API** (Python/FastAPI) and **frontend UI** (Next.js) in a single monorepo structure, configured to deploy both services on Render.com.
+This repository contains both the **backend API** (Python/FastAPI) and **frontend UI** (Next.js) in a single monorepo structure, configured to deploy both services on Render.com from a single git push.
 
 ## Repository Structure
 

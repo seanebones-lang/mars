@@ -12,7 +12,7 @@ const SECURITY_CONFIG = {
   CSRF_HEADER_NAME: 'X-CSRF-Token',
   ALLOWED_ORIGINS: [
     'https://watcher.mothership-ai.com',
-    'https://agentguard-ui.vercel.app',
+    'https://agentguard-ui.onrender.com',
     'http://localhost:3000',
     'http://localhost:3001',
   ],

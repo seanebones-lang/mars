@@ -1,5 +1,7 @@
 # AgentGuard Monorepo - Render.com Deployment Configuration
-# Deploys both backend API and frontend UI from single repository
+# Mothership AI - watcher.mothership-ai.com
+# COMPLETE MONOREPO: Both backend API and frontend UI deployed from this single repository on Render
+# NO VERCEL - Everything runs on Render
 
 services:
   # Backend API Service
@@ -121,9 +123,23 @@ services:
       
       # Contact Information
       - key: NEXT_PUBLIC_SUPPORT_EMAIL
-        value: support@agentguard.io
+        value: info@mothership-ai.com
       - key: NEXT_PUBLIC_COMPANY_NAME
-        value: AgentGuard
+        value: Mothership AI
+      - key: NEXT_PUBLIC_COMPANY_URL
+        value: https://mothership-ai.com
+      - key: NEXT_PUBLIC_DOMAIN
+        value: watcher.mothership-ai.com
+      
+      # Investment Information
+      - key: NEXT_PUBLIC_INVESTMENT_SLOTS
+        value: 50
+      - key: NEXT_PUBLIC_FUNDING_GOAL
+        value: 500000
+      - key: NEXT_PUBLIC_INVESTOR_DEADLINE
+        value: 2025-11-30
+      - key: NEXT_PUBLIC_LAUNCH_DATE
+        value: 2026-01-01
     
     # Auto-deploy settings
     autoDeploy: true

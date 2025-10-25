@@ -189,8 +189,8 @@ mars/ (Production Monorepo)
 - WebSocket client
 
 **Infrastructure**:
-- Render.com (backend API)
-- Vercel (frontend UI)
+- **Render.com (MONOREPO)** - Both backend API and frontend UI
+- Single repository deployment
 - Docker & Kubernetes ready
 - Auto-scaling configured
 
@@ -446,48 +446,43 @@ curl -H "Authorization: Bearer your_api_key" \
 
 ## 🚀 Production Deployment
 
-### Backend (Render.com)
+### Monorepo Deployment on Render
+
+**Everything deploys from this single repository on Render - NO VERCEL**
 
 ```bash
 # Automatic deployment via render.yaml
 git push origin main
-
-# Manual deployment
-# 1. Go to dashboard.render.com
-# 2. New → Web Service
-# 3. Connect repository: seanebones-lang/mars
-# 4. Root directory: .
-# 5. Build: pip install -r requirements-render.txt
-# 6. Start: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 2
+# Both backend API and frontend UI deploy automatically
 ```
 
-**Environment Variables** (set in Render dashboard):
-```
-CLAUDE_API_KEY=your_claude_key
-OPENAI_API_KEY=your_openai_key (optional)
-GOOGLE_API_KEY=your_google_key (optional)
-STRIPE_SECRET_KEY=your_stripe_key
-DATABASE_URL=postgresql://... (optional)
-REDIS_URL=redis://... (optional)
-```
+#### Manual Setup (First Time)
 
-### Frontend (Vercel)
+1. Go to [dashboard.render.com](https://dashboard.render.com)
+2. Click **New** → **Blueprint**
+3. Connect repository: **seanebones-lang/mars**
+4. Render will read `render.yaml` and create BOTH services:
+   - **agentguard-api** (Backend)
+   - **agentguard-ui** (Frontend)
 
+#### Environment Variables (Set in Render Dashboard)
+
+**Backend Service (agentguard-api):**
 ```bash
-# Automatic deployment
-git push origin main
-
-# Or deploy manually
-cd agentguard-ui
-vercel --prod
+CLAUDE_API_KEY=your_claude_key          # REQUIRED
+STRIPE_SECRET_KEY=your_stripe_key       # For payments
+OPENAI_API_KEY=your_openai_key         # Optional
+GOOGLE_API_KEY=your_google_key         # Optional
+DATABASE_URL=postgresql://...           # Optional (uses SQLite if not set)
+REDIS_URL=redis://...                   # Optional (in-memory cache if not set)
+ENVIRONMENT=production
 ```
 
-**Environment Variables** (set in Vercel dashboard):
-```
-NEXT_PUBLIC_API_URL=https://watcher-api.onrender.com
-NEXT_PUBLIC_APP_NAME=AgentGuard
-NEXT_PUBLIC_COMPANY_NAME=Mothership AI
-NEXT_PUBLIC_SUPPORT_EMAIL=info@mothership-ai.com
+**Frontend Service (agentguard-ui):**
+```bash
+# API URL is automatically set from backend service via render.yaml
+# All other variables are set in render.yaml
+# No manual configuration needed!
 ```
 
 ### Docker Deployment

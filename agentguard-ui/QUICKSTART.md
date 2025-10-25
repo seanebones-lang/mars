@@ -78,10 +78,11 @@ docker build -t agentguard-ui .
 docker run -p 3000:3000 -e NEXT_PUBLIC_API_URL=http://api:8000 agentguard-ui
 ```
 
-### Vercel
+### Render (Monorepo)
 ```bash
-vercel --prod
+# Automatic deployment - just push to main
+git push origin main
 ```
 
-Set environment variable: `NEXT_PUBLIC_API_URL=your_production_api_url`
+All environment variables are configured in the root `render.yaml` file.
 

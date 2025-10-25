@@ -27,7 +27,7 @@ services:
       - JWT_SECRET_KEY=${JWT_SECRET_KEY}
       - ENCRYPTION_KEY=${ENCRYPTION_KEY}
       - WEBHOOK_SECRET=${WEBHOOK_SECRET}
-      - CORS_ORIGINS=https://watcher.mothership-ai.com,https://watcher-ai.vercel.app
+      - CORS_ORIGINS=https://watcher.mothership-ai.com,https://agentguard-ui.onrender.com
     volumes:
       - watcher_data:/app/data
       - watcher_logs:/app/logs

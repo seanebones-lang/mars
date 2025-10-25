@@ -110,7 +110,7 @@ Watcher AI is an enterprise-grade platform for detecting hallucinations, fabrica
 - **Backend**: FastAPI with Claude 4.5 Sonnet API
 - **Frontend**: React 19 + Next.js 16 + Material-UI v7
 - **Database**: PostgreSQL + Redis + Neo4j (graph DB for RAG)
-- **Deployment**: Vercel (frontend) + Render (backend)
+- **Deployment**: Render monorepo (both frontend and backend)
 - **Monitoring**: Prometheus + custom metrics
 
 ## DETECTION METHODS

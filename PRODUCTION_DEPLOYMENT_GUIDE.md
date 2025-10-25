@@ -4,6 +4,14 @@
 **Product URL:** [watcher.mothership-ai.com](https://watcher.mothership-ai.com)  
 **Contact:** [info@mothership-ai.com](mailto:info@mothership-ai.com)
 
+## ⚠️ IMPORTANT: Monorepo Deployment on Render
+
+**This system is deployed as a COMPLETE MONOREPO on Render.com**
+- Both backend API and frontend UI deploy from this single repository
+- NO VERCEL - Everything runs on Render
+- Single `render.yaml` configuration manages both services
+- Automatic deployment on git push to main
+
 ## Overview
 
 This guide provides comprehensive instructions for deploying AgentGuard to production environments, including configuration, security hardening, monitoring, and maintenance procedures.

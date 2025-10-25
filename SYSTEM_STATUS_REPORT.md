@@ -174,7 +174,7 @@ npm install @agentguard/sdk
 - ✅ AWS ECS/Fargate ready
 - ✅ Google Cloud Run ready
 - ✅ Render.com configured
-- ✅ Vercel for UI deployment
+- ✅ Render monorepo for both API and UI deployment
 
 ## Security Features
 
