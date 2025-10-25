@@ -176,6 +176,10 @@ app.include_router(bias_router)
 app.include_router(redteam_router)
 app.include_router(compliance_router)
 
+# Caching middleware (P1-1: Performance)
+from ..middleware.caching_middleware import caching_middleware
+app.middleware("http")(caching_middleware)
+
 # Rate limiting middleware (P0-Critical)
 from ..middleware.rate_limiter import rate_limit_middleware
 app.middleware("http")(rate_limit_middleware)
