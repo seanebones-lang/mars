@@ -6,6 +6,7 @@ This extends the existing API with WebSocket and real-time agent monitoring.
 import os
 import logging
 from contextlib import asynccontextmanager
+from datetime import datetime
 from fastapi import FastAPI, HTTPException, WebSocket, BackgroundTasks
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -44,6 +45,18 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 )
 logger = logging.getLogger(__name__)
+
+# Import production readiness utilities
+from ..utils.environment_validator import validate_environment
+from ..utils.health_monitor import get_health_status
+
+# Validate environment on startup (P0-Critical)
+try:
+    validate_environment()
+except Exception as e:
+    logger.critical(f"Environment validation failed: {e}")
+    # In production, this should exit, but we'll allow degraded mode for now
+    logger.warning("Continuing in degraded mode - some features may not work")
 
 # Configure MLflow (optional)
 if MLFLOW_AVAILABLE:
@@ -367,32 +380,39 @@ async def send_test_response(agent_id: str, custom_output: str):
 @app.get("/health", tags=["monitoring"])
 async def health_check():
     """
-    Health check endpoint for monitoring.
-    Returns API status and configuration details.
-    """
-    claude_api_key = os.getenv("CLAUDE_API_KEY")
-    claude_api_configured = bool(claude_api_key)
+    Comprehensive health check endpoint for monitoring.
+    Returns detailed status of all system components.
     
+    P0-Critical: Production-grade health monitoring
+    """
     try:
+        # Get comprehensive health status
+        health_status = get_health_status()
+        
+        # Add additional system info
+        claude_api_key = os.getenv("CLAUDE_API_KEY")
         monitor = get_realtime_monitor(claude_api_key) if claude_api_key else None
         
-        return {
-            "status": "healthy" if claude_api_configured else "degraded",
+        health_status["system_info"] = {
             "model": "claude-sonnet-4-5-20250929",
-            "claude_api": "configured" if claude_api_configured else "not configured",
             "statistical_model": "distilbert-base-uncased",
             "ensemble_weights": {"claude": 0.6, "statistical": 0.4},
             "uncertainty_threshold": 0.3,
             "realtime_monitoring": {
                 "available": monitor is not None,
                 "active": monitor.is_active() if monitor else False
-            }
+            },
+            "mlflow_available": MLFLOW_AVAILABLE
         }
+        
+        return health_status
+        
     except Exception as e:
         logger.error(f"Health check failed: {e}")
         return {
             "status": "error",
-            "error": str(e)
+            "error": str(e),
+            "timestamp": datetime.now().isoformat()
         }
 
 
