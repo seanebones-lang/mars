@@ -28,13 +28,13 @@ RUN apt-get update && apt-get install -y \
     curl \
     && rm -rf /var/lib/apt/lists/*
 
-# Copy requirements first for better caching
-COPY requirements.txt .
+# Copy optimized requirements for deployment
+COPY requirements-render.txt .
 
 # Install Python dependencies
 ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements.txt
+    pip install --no-cache-dir -r requirements-render.txt
 
 # Production stage
 FROM python:3.13-slim as production
