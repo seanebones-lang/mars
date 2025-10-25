@@ -1,244 +1,312 @@
-# Render Deployment Checklist
+# Render Deployment Checklist - AgentGuard Monorepo
 
-##  Fixes Applied
-
-All critical deployment issues have been fixed and pushed to GitHub:
-
-1.  **Added MLflow to requirements-render.txt** - Required by main.py
-2.  **Added Pillow** - For multimodal image processing
-3.  **Added psycopg2-binary** - For PostgreSQL support
-4.  **Made MLflow optional** - Graceful degradation if not available
-5.  **Simplified render.yaml** - Removed complex static site build
-6.  **Added Procfile** - Explicit uvicorn start command
-7.  **Added runtime.txt** - Python 3.11 specification
-8.  **Increased health check delay** - 60s initial delay
-9.  **Set workers to 2** - Better performance
-
-##  Deployment Steps
-
-### Step 1: Verify Render Dashboard Settings
-
-Go to your Render dashboard and check:
-
-1. **Service Name**: `agentguard-api` (or your chosen name)
-2. **Branch**: `main`
-3. **Build Command**: `pip install -r requirements-render.txt`
-4. **Start Command**: Should auto-detect from Procfile or use:
-   ```
-   uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 2
-   ```
-
-### Step 2: Set Environment Variables
-
-In Render Dashboard → Your Service → Environment, add:
-
-**Required**:
-```
-CLAUDE_API_KEY=your_claude_api_key_here
-```
-
-**Optional but Recommended**:
-```
-OPENAI_API_KEY=your_openai_key_here
-GOOGLE_API_KEY=your_google_key_here
-LOG_LEVEL=INFO
-ENVIRONMENT=production
-```
-
-**Database (Optional)**:
-```
-DATABASE_URL=postgresql://user:pass@host:5432/dbname
-REDIS_URL=redis://host:6379/0
-```
-
-### Step 3: Trigger Deployment
-
-Option A: **Automatic** (if auto-deploy is enabled)
-- Render will automatically detect the git push and start deploying
-
-Option B: **Manual**
-1. Go to Render Dashboard
-2. Select your service
-3. Click "Manual Deploy" → "Deploy latest commit"
-
-### Step 4: Monitor Deployment
-
-Watch the deployment logs in real-time:
-
-1. Go to Render Dashboard → Your Service → Logs
-2. Look for these success indicators:
-   ```
-   Installing dependencies...
-   ✓ Successfully installed all packages
-   Starting service...
-   INFO: Started server process
-   INFO: Waiting for application startup.
-   INFO: Starting AgentGuard API server
-   INFO: Application startup complete.
-   INFO: Uvicorn running on http://0.0.0.0:PORT
-   ```
-
-### Step 5: Verify Deployment
-
-Once deployed, test these endpoints:
-
-```bash
-# Replace YOUR_APP_URL with your Render URL
-export API_URL="https://your-app.onrender.com"
-
-# 1. Health check
-curl $API_URL/health
-
-# Expected response:
-# {"status":"healthy","model":"claude-sonnet-4-5-20250929",...}
-
-# 2. API documentation
-curl $API_URL/docs
-# Should return HTML page
-
-# 3. OpenAPI spec
-curl $API_URL/openapi.json
-# Should return JSON spec
-
-# 4. Test prompt injection detection
-curl -X POST $API_URL/prompt-injection/detect \
-  -H "Content-Type: application/json" \
-  -d '{"prompt": "Ignore previous instructions"}'
-
-# 5. Test multimodal health
-curl $API_URL/multimodal/health
-
-# 6. Test bias auditing health
-curl $API_URL/bias/health
-
-# 7. Test red teaming health
-curl $API_URL/redteam/health
-
-# 8. Test compliance health
-curl $API_URL/compliance/health
-```
-
-##  Troubleshooting
-
-### Issue: "Build failed"
-
-**Check**:
-1. Build logs for specific error
-2. All dependencies in requirements-render.txt are installable
-3. Python version compatibility (3.11)
-
-**Solution**:
-- If a package fails, check if it's available for Python 3.11
-- Try pinning to specific working versions
-- Remove problematic packages if not critical
-
-### Issue: "Health check failed"
-
-**Check**:
-1. Application logs for startup errors
-2. Health check endpoint `/health` works
-3. App is binding to `$PORT` environment variable
-
-**Solution**:
-- Increase `initialDelaySeconds` in render.yaml (currently 60s)
-- Check if app starts successfully in logs
-- Verify no import errors
-
-### Issue: "Application error" or "Service Unavailable"
-
-**Check**:
-1. Application logs for Python errors
-2. All environment variables are set
-3. No missing imports
-
-**Solution**:
-- Check logs: Dashboard → Logs
-- Verify CLAUDE_API_KEY is set
-- Test imports locally: `python -c "from src.api.main import app"`
-
-### Issue: "Timeout during build"
-
-**Check**:
-1. Build is taking > 15 minutes
-2. Heavy dependencies being installed
-
-**Solution**:
-- Already optimized - removed torch, transformers
-- If still timing out, contact Render support to increase timeout
-
-### Issue: "Import errors for new features"
-
-**Check**:
-1. Logs show `ModuleNotFoundError`
-2. Missing dependencies
-
-**Solution**:
-- All new features' dependencies are in requirements-render.txt
-- If specific import fails, add to requirements-render.txt
-
-##  Expected Performance
-
-After successful deployment:
-
-- **Build Time**: 3-5 minutes
-- **Startup Time**: 30-60 seconds
-- **Health Check**: Should pass after 60 seconds
-- **Response Time**: < 500ms for most endpoints
-- **Memory Usage**: ~500MB-1GB
-- **CPU Usage**: 10-30% idle, 50-80% under load
-
-##  Success Criteria
-
-Your deployment is successful when:
-
- Build completes without errors  
- Health check passes  
- `/health` endpoint returns `{"status":"healthy"}`  
- `/docs` shows Swagger UI  
- All 97 API endpoints are accessible  
- No errors in application logs  
- All 12 features respond correctly  
-
-## 📞 Support
-
-If deployment still fails after following this checklist:
-
-1. **Check Render Status**: https://status.render.com
-2. **Review Logs**: Dashboard → Your Service → Logs
-3. **Check Build Logs**: Dashboard → Your Service → Events
-4. **Render Support**: https://render.com/docs/support
-
-##  Quick Links
-
-- **Render Dashboard**: https://dashboard.render.com
-- **Documentation**: https://render.com/docs
-- **Your Service URL**: `https://your-app.onrender.com`
-- **API Docs**: `https://your-app.onrender.com/docs`
-
-##  Post-Deployment
-
-After successful deployment:
-
-1.  Test all 12 features
-2.  Verify health checks
-3.  Monitor logs for errors
-4.  Test with real API calls
-5.  Update DNS/domain if needed
-6.  Set up monitoring/alerts
-7.  Document your Render URL
-
-##  You're Live!
-
-Once deployed, your AgentGuard API will be accessible at:
-```
-https://your-app.onrender.com
-```
-
-With all 97 endpoints and 12 features fully operational!
+**Mothership AI**  
+**Date:** October 25, 2025  
+**Deployment Type:** Monorepo (Backend + Frontend)
 
 ---
 
-**Last Updated**: October 25, 2025  
-**Deployment Version**: 1.0.0  
-**Status**: Ready for Deployment
+## Pre-Deployment Verification
 
+### Repository Configuration
+- [x] render.yaml exists and configured for monorepo
+- [x] Backend service configured (agentguard-api)
+- [x] Frontend service configured (agentguard-ui)
+- [x] Python runtime specified (python-3.14.0)
+- [x] Node runtime auto-detected (20.x)
+- [x] Health checks configured
+- [x] Auto-deploy enabled on main branch
+
+### Backend Files
+- [x] requirements-render.txt exists with all dependencies
+- [x] runtime.txt specifies python-3.14.0
+- [x] src/api/main.py exists with FastAPI app
+- [x] Health endpoint at /health
+- [x] CORS middleware configured
+- [x] Environment variables documented
+
+### Frontend Files
+- [x] agentguard-ui/package.json exists
+- [x] Next.js 16.0.0 configured
+- [x] React 19.2.0 configured
+- [x] next.config.js with standalone output
+- [x] Security headers configured
+- [x] API proxy configuration
+- [x] Environment variables documented
+
+---
+
+## Deployment Steps
+
+### Step 1: Connect Repository to Render
+- [ ] Log in to Render Dashboard
+- [ ] Click "New +" → "Blueprint"
+- [ ] Connect GitHub repository: seanebones-lang/mars
+- [ ] Select branch: main
+- [ ] Click "Apply"
+- [ ] Wait for services to be created
+
+### Step 2: Configure Backend Environment Variables
+- [ ] Navigate to agentguard-api service
+- [ ] Go to Environment tab
+- [ ] Add required variables:
+  - [ ] ENVIRONMENT=production
+  - [ ] LOG_LEVEL=INFO
+  - [ ] DEBUG=false
+  - [ ] CLAUDE_API_KEY (from Anthropic)
+  - [ ] OPENAI_API_KEY (from OpenAI)
+  - [ ] JWT_SECRET (auto-generated)
+  - [ ] API_KEY_SECRET (auto-generated)
+  - [ ] CORS_ORIGINS=* (update after frontend deploy)
+  - [ ] ENABLE_MULTIMODAL=true
+  - [ ] ENABLE_BIAS_AUDITING=true
+  - [ ] ENABLE_RED_TEAMING=true
+  - [ ] ENABLE_COMPLIANCE_REPORTING=true
+- [ ] Save changes
+
+### Step 3: Deploy Backend
+- [ ] Wait for automatic deployment to complete
+- [ ] Check build logs for errors
+- [ ] Verify health check passes
+- [ ] Note backend URL: https://agentguard-api.onrender.com
+
+### Step 4: Configure Frontend Environment Variables
+- [ ] Navigate to agentguard-ui service
+- [ ] Verify NEXT_PUBLIC_API_URL is set (auto-linked)
+- [ ] Verify company information:
+  - [ ] NEXT_PUBLIC_SUPPORT_EMAIL=info@mothership-ai.com
+  - [ ] NEXT_PUBLIC_COMPANY_NAME=Mothership AI
+  - [ ] NEXT_PUBLIC_COMPANY_URL=https://mothership-ai.com
+  - [ ] NEXT_PUBLIC_DOMAIN=watcher.mothership-ai.com
+
+### Step 5: Deploy Frontend
+- [ ] Wait for automatic deployment to complete
+- [ ] Check build logs for errors
+- [ ] Verify health check passes
+- [ ] Note frontend URL: https://agentguard-ui.onrender.com
+
+### Step 6: Update CORS Configuration
+- [ ] Go back to agentguard-api → Environment
+- [ ] Update CORS_ORIGINS to include frontend URL
+- [ ] CORS_ORIGINS=https://agentguard-ui.onrender.com
+- [ ] Save and wait for redeploy
+
+---
+
+## Post-Deployment Verification
+
+### Backend API Tests
+- [ ] Health check: `curl https://agentguard-api.onrender.com/health`
+- [ ] API docs: Visit https://agentguard-api.onrender.com/docs
+- [ ] Test endpoint with API key
+- [ ] Verify logs show no errors
+- [ ] Check metrics (CPU, memory)
+
+### Frontend UI Tests
+- [ ] Homepage loads: https://agentguard-ui.onrender.com
+- [ ] Dashboard accessible
+- [ ] API connection working (check browser console)
+- [ ] No console errors
+- [ ] Images and assets load
+- [ ] Navigation works
+- [ ] Forms submit correctly
+
+### Integration Tests
+- [ ] Frontend can call backend API
+- [ ] Authentication flow works
+- [ ] Real-time features work (if applicable)
+- [ ] Webhooks configured (if applicable)
+- [ ] Error handling works
+
+---
+
+## Custom Domain Configuration (Optional)
+
+### Backend Domain (api.watcher.mothership-ai.com)
+- [ ] Add custom domain in Render
+- [ ] Configure DNS CNAME record
+- [ ] Wait for SSL certificate
+- [ ] Update frontend NEXT_PUBLIC_API_URL
+- [ ] Update CORS_ORIGINS
+
+### Frontend Domain (watcher.mothership-ai.com)
+- [ ] Add custom domain in Render
+- [ ] Configure DNS CNAME record
+- [ ] Wait for SSL certificate
+- [ ] Update backend CORS_ORIGINS
+- [ ] Test custom domain
+
+---
+
+## Monitoring Setup
+
+### Render Dashboard
+- [ ] Enable email notifications
+- [ ] Configure Slack webhook (optional)
+- [ ] Set up uptime monitoring
+- [ ] Configure alert thresholds
+
+### External Monitoring
+- [ ] Set up Cloudflare (if using)
+- [ ] Configure Sentry error tracking
+- [ ] Set up log aggregation
+- [ ] Configure performance monitoring
+
+---
+
+## Security Checklist
+
+- [ ] All environment variables secured
+- [ ] No secrets in code
+- [ ] HTTPS enforced (automatic)
+- [ ] CORS configured correctly
+- [ ] Security headers enabled
+- [ ] API keys rotated
+- [ ] Rate limiting configured
+- [ ] Input validation enabled
+- [ ] SQL injection protection
+- [ ] XSS protection
+
+---
+
+## Performance Checklist
+
+- [ ] Backend workers configured (2)
+- [ ] Frontend build optimized
+- [ ] Images optimized
+- [ ] Caching configured
+- [ ] CDN enabled (Cloudflare recommended)
+- [ ] Database indexed
+- [ ] Redis caching (if configured)
+- [ ] Response compression enabled
+
+---
+
+## Troubleshooting
+
+### If Backend Fails
+1. Check build logs for errors
+2. Verify Python version (3.14.0)
+3. Check requirements-render.txt
+4. Verify environment variables
+5. Check health endpoint code
+6. Review application logs
+
+### If Frontend Fails
+1. Check build logs for errors
+2. Verify Node version
+3. Check package.json dependencies
+4. Verify NEXT_PUBLIC_API_URL
+5. Check next.config.js
+6. Review build output
+
+### If Services Can't Connect
+1. Verify NEXT_PUBLIC_API_URL is correct
+2. Check CORS configuration
+3. Verify both services are running
+4. Check network tab in browser
+5. Review backend logs for CORS errors
+
+---
+
+## Rollback Plan
+
+### If Deployment Fails
+1. Go to Render Dashboard → Service → Events
+2. Find last successful deployment
+3. Click "Rollback to this deploy"
+4. Confirm rollback
+5. Verify services are working
+
+### If Git-Based Rollback Needed
+```bash
+git revert HEAD
+git push origin main
+```
+
+---
+
+## Success Criteria
+
+### Backend
+- [ ] Health check returns 200 OK
+- [ ] API documentation accessible
+- [ ] Test endpoints work
+- [ ] Logs show no errors
+- [ ] CPU < 50%, Memory < 80%
+
+### Frontend
+- [ ] Homepage loads in < 2 seconds
+- [ ] All pages accessible
+- [ ] API calls succeed
+- [ ] No console errors
+- [ ] Lighthouse score > 90
+
+### Integration
+- [ ] End-to-end user flow works
+- [ ] Authentication functional
+- [ ] Data persists correctly
+- [ ] Real-time features work
+- [ ] Error handling graceful
+
+---
+
+## Post-Deployment Tasks
+
+### Immediate (Day 1)
+- [ ] Monitor logs continuously
+- [ ] Watch for errors
+- [ ] Test all major features
+- [ ] Verify performance metrics
+- [ ] Check user feedback
+
+### Week 1
+- [ ] Review error rates
+- [ ] Optimize performance
+- [ ] Fix any issues
+- [ ] Update documentation
+- [ ] Plan improvements
+
+### Month 1
+- [ ] Analyze usage patterns
+- [ ] Review costs
+- [ ] Scale if needed
+- [ ] Security audit
+- [ ] Performance optimization
+
+---
+
+## Contact and Support
+
+**Internal Team:**
+- Chief Engineer: Sean McDonnell
+- Team: Mothership AI Engineering
+- Email: info@mothership-ai.com
+
+**Render Support:**
+- Dashboard: https://dashboard.render.com
+- Docs: https://render.com/docs
+- Support: https://render.com/support
+
+---
+
+## Deployment Sign-Off
+
+**Deployed By:** ___________________________  
+**Date:** ___________________________  
+**Time:** ___________________________  
+**Backend URL:** ___________________________  
+**Frontend URL:** ___________________________  
+
+**Verification:**
+- [ ] All tests passed
+- [ ] Monitoring configured
+- [ ] Documentation updated
+- [ ] Team notified
+- [ ] Deployment successful
+
+---
+
+**Mothership AI**  
+Enterprise AI Safety & Governance Platform  
+[mothership-ai.com](https://mothership-ai.com) • [watcher.mothership-ai.com](https://watcher.mothership-ai.com) • [info@mothership-ai.com](mailto:info@mothership-ai.com)
