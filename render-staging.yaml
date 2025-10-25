@@ -1,0 +1,173 @@
+# AgentGuard Staging Environment - Render.com Configuration
+# P0-Critical: Staging environment for pre-production validation
+# Mothership AI - watcher.mothership-ai.com
+
+services:
+  # Staging Backend API Service
+  - type: web
+    name: agentguard-api-staging
+    env: python
+    region: oregon
+    plan: starter
+    rootDir: .
+    buildCommand: pip install -r requirements-render.txt
+    startCommand: uvicorn src.api.main:app --host 0.0.0.0 --port $PORT --workers 2
+    healthCheckPath: /health
+    
+    # Environment Variables for Staging Backend
+    envVars:
+      - key: ENVIRONMENT
+        value: staging
+      - key: LOG_LEVEL
+        value: DEBUG
+      - key: DEBUG
+        value: true
+      
+      # API Keys (set these in Render dashboard)
+      - key: CLAUDE_API_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: GOOGLE_API_KEY
+        sync: false
+      
+      # Staging Database
+      - key: DATABASE_URL
+        fromDatabase:
+          name: agentguard-staging-db
+          property: connectionString
+      
+      # Staging Redis
+      - key: REDIS_URL
+        fromDatabase:
+          name: agentguard-staging-redis
+          property: connectionString
+      
+      # Stripe Test Keys for Staging
+      - key: STRIPE_SECRET_KEY
+        sync: false  # Use test key: sk_test_...
+      
+      # Security
+      - key: JWT_SECRET
+        generateValue: true
+      - key: API_KEY_SECRET
+        generateValue: true
+      
+      # CORS - Allow staging frontend
+      - key: CORS_ORIGINS
+        value: "*"
+      
+      # Feature Flags
+      - key: ENABLE_MULTIMODAL
+        value: true
+      - key: ENABLE_BIAS_AUDITING
+        value: true
+      - key: ENABLE_RED_TEAMING
+        value: true
+      - key: ENABLE_COMPLIANCE_REPORTING
+        value: true
+      
+      # Monitoring
+      - key: SENTRY_DSN
+        sync: false
+      - key: SENTRY_ENVIRONMENT
+        value: staging
+    
+    # Auto-deploy settings
+    autoDeploy: true
+    branch: staging
+    
+    # Health check configuration
+    healthCheck:
+      path: /health
+      initialDelaySeconds: 60
+      periodSeconds: 10
+      timeoutSeconds: 10
+      failureThreshold: 3
+
+  # Staging Frontend UI Service
+  - type: web
+    name: agentguard-ui-staging
+    env: node
+    region: oregon
+    plan: starter
+    rootDir: agentguard-ui
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    
+    # Environment Variables for Staging Frontend
+    envVars:
+      # API URL - Point to staging backend service
+      - key: NEXT_PUBLIC_API_URL
+        fromService:
+          type: web
+          name: agentguard-api-staging
+          envVarKey: RENDER_EXTERNAL_URL
+      
+      # Application Configuration
+      - key: NEXT_PUBLIC_APP_NAME
+        value: AgentGuard (Staging)
+      - key: NEXT_PUBLIC_APP_VERSION
+        value: 1.0.0-staging
+      - key: NEXT_PUBLIC_APP_DESCRIPTION
+        value: AI Safety Platform - Staging Environment
+      - key: NEXT_PUBLIC_ENVIRONMENT
+        value: staging
+      
+      # Company Information
+      - key: NEXT_PUBLIC_COMPANY_NAME
+        value: Mothership AI
+      - key: NEXT_PUBLIC_COMPANY_URL
+        value: https://mothership-ai.com
+      - key: NEXT_PUBLIC_DOMAIN
+        value: staging.watcher.mothership-ai.com
+      
+      # Contact Information
+      - key: NEXT_PUBLIC_SUPPORT_EMAIL
+        value: info@mothership-ai.com
+      - key: NEXT_PUBLIC_INVESTMENT_EMAIL
+        value: info@mothership-ai.com
+      
+      # Investment Information
+      - key: NEXT_PUBLIC_INVESTMENT_SLOTS
+        value: 50
+      - key: NEXT_PUBLIC_FUNDING_GOAL
+        value: 500000
+      - key: NEXT_PUBLIC_INVESTOR_DEADLINE
+        value: 2025-11-30
+      - key: NEXT_PUBLIC_LAUNCH_DATE
+        value: 2026-01-01
+      
+      # Feature Flags
+      - key: NEXT_PUBLIC_ENABLE_ANALYTICS
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_MONITORING
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_WEBHOOKS
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_BATCH_PROCESSING
+        value: true
+      
+      # Security
+      - key: NEXT_PUBLIC_ENABLE_HTTPS_ONLY
+        value: true
+      - key: NEXT_PUBLIC_ENABLE_SECURITY_HEADERS
+        value: true
+    
+    # Auto-deploy settings
+    autoDeploy: true
+    branch: staging
+    
+    # Health check
+    healthCheckPath: /
+
+# Staging Databases
+databases:
+  - name: agentguard-staging-db
+    databaseName: agentguard_staging
+    user: agentguard_staging
+    plan: starter
+    
+  - name: agentguard-staging-redis
+    plan: starter
+
