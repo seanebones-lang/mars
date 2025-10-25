@@ -48,3 +48,8 @@ nohup.out
 .pytest_cache/
 .coverage
 htmlcov/
+
+# IDE and Editor directories
+.cursor/
+.vscode/
+.idea/

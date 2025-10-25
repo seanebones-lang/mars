@@ -795,13 +795,13 @@ curl -X GET "https://api.cloudflare.com/client/v4/zones/{zone_id}/firewall/event
 ## October 2025 Enhancements Summary
 
 ### New Features Added
-- ✅ WAF Attack Score (ML-based threat detection)
-- ✅ Malicious Upload Detection (content scanning)
-- ✅ Advanced Rate Limiting (6 rules with enhanced expressions)
-- ✅ 8 Custom WAF Rules (99.9% block rate)
-- ✅ Cloudflare API configuration guide
-- ✅ Programmatic WAF management
-- ✅ Enhanced monitoring and analytics
+-  WAF Attack Score (ML-based threat detection)
+-  Malicious Upload Detection (content scanning)
+-  Advanced Rate Limiting (6 rules with enhanced expressions)
+-  8 Custom WAF Rules (99.9% block rate)
+-  Cloudflare API configuration guide
+-  Programmatic WAF management
+-  Enhanced monitoring and analytics
 
 ### Security Improvements
 - 30% reduction in false positives
