@@ -2,7 +2,7 @@
 # Mothership AI - watcher.mothership-ai.com
 # COMPLETE MONOREPO: Both backend API and frontend UI deployed from this single repository on Render
 # Deployment Date: October 25, 2025
-# Version: 1.0.0 Production Ready
+# Version: 1.0.1 Production Ready - Dependencies Fixed
 
 services:
   # Backend API Service - Production Deployment October 25, 2025
