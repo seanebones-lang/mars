@@ -98,7 +98,7 @@ class ActivityLogDB(Base):
     activity_type = Column(String(50), nullable=False)
     title = Column(String(200), nullable=False)
     description = Column(Text, nullable=True)
-    metadata = Column(JSON, default=dict)
+    activity_metadata = Column(JSON, default=dict)
     created_at = Column(DateTime, default=datetime.utcnow, index=True)
 
 
@@ -557,7 +557,7 @@ class WorkspaceService:
             user_id=user_id,
             activity_type=activity_type,
             title=title,
-            metadata=metadata or {}
+            activity_metadata=metadata or {}
         )
         
         session.add(db_activity)
@@ -626,7 +626,7 @@ class WorkspaceService:
             activity_type=db_activity.activity_type,
             title=db_activity.title,
             description=db_activity.description,
-            metadata=db_activity.metadata or {},
+            metadata=db_activity.activity_metadata or {},
             created_at=db_activity.created_at
         )
 
