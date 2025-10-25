@@ -42,6 +42,14 @@ services:
       - key: REDIS_URL
         sync: false
       
+      # Stripe Configuration (Required for Pro tier $49/mo)
+      - key: STRIPE_SECRET_KEY
+        sync: false
+      - key: STRIPE_PUBLISHABLE_KEY
+        sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      
       # Security
       - key: JWT_SECRET
         generateValue: true

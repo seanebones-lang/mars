@@ -34,7 +34,9 @@ COPY requirements-render.txt .
 # Install Python dependencies
 ENV PIP_ROOT_USER_ACTION=ignore
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -r requirements-render.txt
+    pip install --no-cache-dir -r requirements-render.txt && \
+    pip install --no-cache-dir 'pydantic[email]' && \
+    pip list | grep email-validator
 
 # Production stage
 FROM python:3.13-slim as production
